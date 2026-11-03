@@ -1,9 +1,9 @@
 [
   {
-    "label": "Lazarus: отладка LCL (macOS)",
+    "label": "Lazarus: отладка LCL .app (macOS)",
     "adapter": "CodeLLDB",
     "request": "launch",
-    "program": "$ZED_WORKTREE_ROOT/LclDemo",
+    "program": "$ZED_WORKTREE_ROOT/LclDemo.app/Contents/MacOS/LclDemo",
     "cwd": "$ZED_WORKTREE_ROOT",
     "build": "Lazarus: собрать LCL (macOS)"
   },
