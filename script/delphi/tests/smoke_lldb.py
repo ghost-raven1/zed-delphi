@@ -26,6 +26,7 @@ def verify(adapter, binary, source, breakpoint_line=10, expected_values=None):
         try:
             while (message := read_message(process.stdout)) is not None:
                 messages.put(message)
+            messages.put(EOFError('DAP adapter closed stdout before the next expected message'))
         except Exception as error:
             messages.put(error)
 

@@ -182,12 +182,45 @@ jobs:
           "CODELLDB_SMOKE=$adapter\extension\adapter\codelldb.exe" >> $env:GITHUB_ENV
       - name: Test build and remote transport helpers
         run: python -m unittest discover -s script/delphi/tests -v 2>&1 | tee verification/python-tests.log
-      - name: Verify FPC and real LLDB DAP on macOS
+      - name: Install pinned CodeLLDB on macOS
+        if: runner.os == 'macOS'
+        run: |
+          case "$(uname -m)" in
+            arm64)
+              adapter_arch=arm64
+              adapter_sha256=2f114a990e1b368dd1dbd33c80c0e719767af2d228391ec0df0571c957f9ac91
+              ;;
+            x86_64)
+              adapter_arch=x64
+              adapter_sha256=e25cc716b94c62c07fec268ff2785d2b797245b160502baef8b9c970a0c4d8e8
+              ;;
+            *) echo "Unsupported macOS architecture" >&2; exit 1 ;;
+          esac
+          adapter_archive="$RUNNER_TEMP/codelldb-1.12.3-darwin-$adapter_arch.vsix"
+          adapter_dir="$RUNNER_TEMP/codelldb-1.12.3-darwin-$adapter_arch"
+          curl --fail --location --retry 3 --retry-all-errors --connect-timeout 30 --max-time 300 \
+            "https://github.com/vadimcn/codelldb/releases/download/v1.12.3/codelldb-darwin-$adapter_arch.vsix" \
+            --output "$adapter_archive"
+          printf '%s  %s\n' "$adapter_sha256" "$adapter_archive" | shasum -a 256 --check
+          mkdir -p "$adapter_dir"
+          unzip -q "$adapter_archive" -d "$adapter_dir"
+          adapter_path="$adapter_dir/extension/adapter/codelldb"
+          chmod +x "$adapter_path"
+          test -x "$adapter_path"
+          python - "$adapter_dir/extension/package.json" <<'PYTHON'
+          import json, pathlib, sys
+          version = json.loads(pathlib.Path(sys.argv[1]).read_text())['version']
+          assert version == '1.12.3', version
+          PYTHON
+          printf 'CodeLLDB version: 1.12.3\nArchitecture: %s\nSHA256: %s\nAdapter: %s\n' \
+            "$adapter_arch" "$adapter_sha256" "$adapter_path" | tee verification/codelldb-install.log
+          printf 'CODELLDB_SMOKE=%s\n' "$adapter_path" >> "$GITHUB_ENV"
+      - name: Verify FPC and real CodeLLDB on macOS
         id: macos_debug
         if: runner.os == 'macOS'
         run: |
-          python script/delphi/tests/smoke_lldb.py --fpc "$(command -v fpc)" --lldb-dap "$(xcrun --find lldb-dap)" 2>&1 | tee verification/fpc-dap.log
-          python script/delphi/tests/smoke_lldb.py --multi-unit --fpc "$(command -v fpc)" --lldb-dap "$(xcrun --find lldb-dap)" 2>&1 | tee verification/fpc-multi-unit-dap.log
+          python script/delphi/tests/smoke_lldb.py --fpc "$(command -v fpc)" --lldb-dap "$CODELLDB_SMOKE" 2>&1 | tee verification/fpc-dap.log
+          python script/delphi/tests/smoke_lldb.py --multi-unit --fpc "$(command -v fpc)" --lldb-dap "$CODELLDB_SMOKE" 2>&1 | tee verification/fpc-multi-unit-dap.log
       - name: Verify x86_64 FPC and real CodeLLDB on Windows
         id: windows_debug
         if: runner.os == 'Windows'
@@ -219,6 +252,7 @@ jobs:
           import os, pathlib
           text = '\n'.join(f'{key}: {os.environ[key]}' for key in (
               'EDITOR_RESULT', 'MACOS_DEBUG_RESULT', 'WINDOWS_DEBUG_RESULT', 'RUST_TEST_RESULT'))
+          text += '\nmacOS and Windows debug adapter: CodeLLDB 1.12.3 (see platform test outcomes and logs)\n'
           text += '\nGUI acceptance: not performed\nLicensed Embarcadero toolchain: not tested\n'
           pathlib.Path('verification/acceptance.txt').write_text(text)
           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
