@@ -48,6 +48,8 @@ def verify(adapter, binary, source, breakpoint_line=10, expected_values=None):
                 raise message
             if predicate(message):
                 return message
+            if message.get('type') == 'response' and message.get('success') is False:
+                raise AssertionError(f'DAP request failed before the expected event: {message}')
             pending.append(message)
 
     def response(request):
@@ -100,13 +102,15 @@ def main():
     options = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     with tempfile.TemporaryDirectory(prefix='zed-delphi-debug-') as folder:
+        # macOS aliases /var to /private/var; use the compiler's canonical DWARF path.
+        directory = Path(folder).resolve()
         if options.multi_unit:
-            project = Path(folder) / 'project'
+            project = directory / 'project'
             shutil.copytree(root / 'examples' / 'multi_unit', project)
             source = project / 'MultiUnit.dpr'
         else:
             source = root / 'examples' / 'HelloDelphi.dpr'
-        binary = Path(folder) / ('HelloDelphi.exe' if os.name == 'nt' else 'HelloDelphi')
+        binary = directory / ('HelloDelphi.exe' if os.name == 'nt' else 'HelloDelphi')
         subprocess.run([sys.executable, str(root / 'build.py'), '--tool', 'fpc', '--project',
                         str(source), '--compiler', options.fpc, '--output', str(binary)], check=True)
         if options.multi_unit:

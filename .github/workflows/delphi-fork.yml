@@ -13,6 +13,13 @@ on:
           - windows-x64
           - macos-arm64
           - macos-x64
+      macos_arm_runner:
+        description: Runner image for macOS ARM64
+        type: choice
+        default: macos-26
+        options:
+          - macos-26
+          - macos-15
       link_editor:
         description: Build and upload an unsigned native release executable
         type: boolean
@@ -22,7 +29,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: delphi-fork-${{ github.ref }}-${{ inputs.platform }}
+  group: delphi-fork-${{ github.ref }}-${{ inputs.platform }}-${{ inputs.macos_arm_runner }}
   cancel-in-progress: true
 
 env:
@@ -39,7 +46,7 @@ env:
 jobs:
   native:
     name: ${{ matrix.platform }}
-    runs-on: ${{ matrix.platform == 'windows-x64' && 'windows-2025' || matrix.platform == 'macos-arm64' && 'macos-26' || 'macos-26-intel' }}
+    runs-on: ${{ matrix.platform == 'windows-x64' && 'windows-2025' || matrix.platform == 'macos-arm64' && inputs.macos_arm_runner || 'macos-26-intel' }}
     timeout-minutes: 240
     strategy:
       fail-fast: false
@@ -62,6 +69,17 @@ jobs:
           package-manager-cache: false
       - name: Prepare verification logs
         run: mkdir -p verification
+      - name: Select Xcode 26 SDK on macOS 15 ARM64
+        if: matrix.platform == 'macos-arm64' && inputs.macos_arm_runner == 'macos-15'
+        run: |
+          export DEVELOPER_DIR=/Applications/Xcode_26.3.app/Contents/Developer
+          test -d "$DEVELOPER_DIR"
+          SDKROOT=$(xcrun --sdk macosx --show-sdk-path)
+          test -d "$SDKROOT"
+          SDK_VERSION=$(xcrun --sdk macosx --show-sdk-version)
+          test "${SDK_VERSION%%.*}" -ge 26
+          printf 'DEVELOPER_DIR=%s\nSDKROOT=%s\n' "$DEVELOPER_DIR" "$SDKROOT" >> "$GITHUB_ENV"
+          xcodebuild -version
       - name: Install macOS build dependencies and FPC
         if: runner.os == 'macOS'
         run: |
