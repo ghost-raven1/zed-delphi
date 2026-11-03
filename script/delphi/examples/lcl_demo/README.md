@@ -2,7 +2,8 @@
 
 Откройте эту папку как отдельный проект Zed Delphi. Нужны FPC, Lazarus с LCL,
 `lazbuild` в `PATH` редактора и CodeLLDB. На macOS используется Cocoa, на Linux —
-GTK2. В `.zed/tasks.json` и `.zed/debug.json` есть отдельные задачи двух платформ.
+GTK2. Настройка инструментов описана отдельно для [macOS](../../macos/lazarus.md)
+и [Linux/Astra](../../linux/lcl-acceptance.md). В `.zed/tasks.json` и `.zed/debug.json` есть отдельные задачи двух платформ.
 
 1. Выполните задачу **Lazarus: собрать LCL (macOS)** или **Lazarus: собрать LCL (Linux)**.
 2. Выполните **Lazarus: запустить LCL**. Кнопка **Calculate 20 + 22** меняет надпись

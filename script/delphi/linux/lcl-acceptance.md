@@ -37,3 +37,24 @@ Workflow сохраняет digest образа, `/etc/os-release`, версии
 не собирает Zed и не заменяет приёмку его упакованного интерфейса.
 Успешная проверка стандартного проекта LCL не подтверждает совместимость
 всех сторонних компонентов Lazarus и проектов VCL/FireMonkey.
+
+## Подтверждённый результат
+
+[Прогон 41728004554](https://github.com/ghost-raven1/zed-delphi/actions/runs/41728004554)
+на исходниках `2c7d7e3` полностью прошёл для обеих систем. Ubuntu 24.04 использовала
+Lazarus 3.0; Astra UBI 1.8 — Lazarus 2.2.6. Компилятор в обоих случаях FPC 3.2.2.
+Проверены десять условий сборки/запуска/DAP и три условия видимого GUI.
+
+На обычной установке с разрешёнными репозиториями ОС инструменты сборки
+можно установить так:
+
+```sh
+sudo apt-get install build-essential fp-compiler fp-units-base fp-units-fcl \
+  fp-units-gtk2 fp-units-misc lcl-utils lcl-units lcl-gtk2 lazarus-src libgtk2.0-dev
+```
+
+`lcl-units` и `fp-units-misc` указаны явно: без них чистая установка давала
+ошибки `Can't find unit Interfaces` и `Can't find unit fasthtmlparser`.
+Для отладки дополнительно нужен CodeLLDB; для автоматической проверки окна —
+зависимости Xvfb/OCR из `lcl-acceptance.sh`. Для обычного запуска требуется
+графический сеанс и библиотеки GTK2.
