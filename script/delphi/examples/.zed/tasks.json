@@ -1,0 +1,18 @@
+[
+  {
+    "label": "FPC: build example (Debug)",
+    "command": "fpc -Mdelphi -g -gl -gw3 -O- \"$ZED_WORKTREE_ROOT/HelloDelphi.dpr\"",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "save": "all"
+  },
+  {
+    "label": "FPC: run example (macOS/Linux)",
+    "command": "\"$ZED_WORKTREE_ROOT/HelloDelphi\"",
+    "cwd": "$ZED_WORKTREE_ROOT"
+  },
+  {
+    "label": "FPC: run example (Windows)",
+    "command": "\"$ZED_WORKTREE_ROOT/HelloDelphi.exe\"",
+    "cwd": "$ZED_WORKTREE_ROOT"
+  }
+]

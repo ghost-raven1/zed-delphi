@@ -225,7 +225,7 @@ impl DockerExecConnection {
             _ => version.to_string(),
         };
         let binary_name = format!(
-            "zed-remote-server-{}-{}",
+            "zed-delphi-remote-server-{}-{}",
             release_channel.dev_name(),
             version_str
         );
@@ -277,6 +277,9 @@ impl DockerExecConnection {
 
         let wanted_version = cx.update(|cx| match release_channel {
             ReleaseChannel::Nightly => Ok(None),
+            ReleaseChannel::Dev if std::env::var_os("ZED_DELPHI_REMOTE_SERVER_DIR").is_some() => {
+                Ok(None)
+            }
             ReleaseChannel::Dev => {
                 anyhow::bail!(
                     "ZED_BUILD_REMOTE_SERVER is not set and no remote server exists at ({:?})",
@@ -689,7 +692,7 @@ impl RemoteConnection for DockerExecConnection {
         let mut docker_args = vec!["exec".to_string()];
 
         push_environment(&mut docker_args, &self.connection_options.remote_env);
-        for env_var in ["RUST_LOG", "RUST_BACKTRACE", "ZED_GENERATE_MINIDUMPS"] {
+        for env_var in ["RUST_LOG", "RUST_BACKTRACE"] {
             if let Some(value) = std::env::var(env_var).ok() {
                 docker_args.push("-e".to_string());
                 docker_args.push(format!("{env_var}={value}"));

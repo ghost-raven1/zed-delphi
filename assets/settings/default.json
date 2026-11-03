@@ -1714,12 +1714,12 @@
   //
   // Default: true
   "word_diff_enabled": true,
-  // Control what info is collected by Zed.
+  // Compatibility settings: telemetry is removed in this fork.
   "telemetry": {
-    // Send debug info like crash reports.
-    "diagnostics": true,
-    // Send anonymized usage data like what languages you're using Zed with.
-    "metrics": true,
+    // Crash reporting cannot be enabled in this build.
+    "diagnostics": false,
+    // Usage reporting cannot be enabled in this build.
+    "metrics": false,
     // Allow sending requests to Anthropic models that cannot be offered with
     // Zero Data Retention
     "anthropic_retention": false,

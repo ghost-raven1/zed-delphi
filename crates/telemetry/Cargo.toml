@@ -10,7 +10,7 @@ workspace = true
 
 [lib]
 path = "src/telemetry.rs"
-test = false
+test = true
 
 [dependencies]
 serde_json.workspace = true

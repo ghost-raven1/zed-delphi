@@ -1,0 +1,13 @@
+[
+  {
+    "label": "FPC: build multi-unit (Debug)",
+    "command": "fpc -Mdelphi -g -gl -gw3 -O- \"$ZED_WORKTREE_ROOT/MultiUnit.dpr\"",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "save": "all"
+  },
+  {
+    "label": "FPC: run multi-unit (Linux/macOS)",
+    "command": "\"$ZED_WORKTREE_ROOT/MultiUnit\"",
+    "cwd": "$ZED_WORKTREE_ROOT"
+  }
+]

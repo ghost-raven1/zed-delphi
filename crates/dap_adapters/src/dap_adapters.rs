@@ -1,4 +1,5 @@
 mod codelldb;
+mod delphi;
 mod gdb;
 mod go;
 mod javascript;
@@ -33,6 +34,7 @@ pub fn init(cx: &mut App) {
         registry.add_adapter(Arc::from(JsDebugAdapter::default()));
         registry.add_adapter(Arc::from(GoDebugAdapter::default()));
         registry.add_adapter(Arc::from(GdbDebugAdapter));
+        registry.add_adapter(Arc::from(delphi::DelphiDebugAdapter));
 
         #[cfg(any(test, feature = "test-support"))]
         {

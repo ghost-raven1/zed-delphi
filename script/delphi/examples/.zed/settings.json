@@ -1,0 +1,7 @@
+{
+  "languages": {
+    "Delphi": {
+      "language_servers": ["pasls"]
+    }
+  }
+}

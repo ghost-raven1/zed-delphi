@@ -1,0 +1,13 @@
+package DemoPackage;
+
+{$R *.res}
+
+requires
+  rtl,
+  vcl;
+
+contains
+  Demo.Model in 'Demo.Model.pas',
+  Demo.Forms in 'Demo.Forms.pas';
+
+end.

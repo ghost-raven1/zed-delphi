@@ -25,7 +25,6 @@ use net::async_net::{UnixListener, UnixStream};
 use node_runtime::{NodeBinaryOptions, NodeRuntime};
 use paths::logs_dir;
 use project::{project_settings::ProjectSettings, trusted_worktrees};
-use proto::CrashReport;
 use release_channel::{AppCommitSha, AppVersion, RELEASE_CHANNEL, ReleaseChannel};
 #[cfg(unix)]
 use remote::command::RemoteCommand;
@@ -411,83 +410,14 @@ fn init_logging_server(log_file_path: &Path) -> Result<Receiver<Vec<u8>>> {
     Ok(rx)
 }
 
-/// Initializes the telemetry queue on the remote server, forwarding every
-/// emitted event to the connected client over the proto channel.
-///
-/// The remote server cannot upload telemetry itself (it has no logged-in user,
-/// no checksum seed, and no Telemetry instance), so without this its
-/// `telemetry::event!` calls are silently dropped. The client attributes these
-/// events to the remote host using the platform it already detected during
-/// connection setup, so no OS metadata needs to be sent here.
-fn init_telemetry_forwarding(session: AnyProtoClient, cx: &mut App) {
-    let (tx, mut rx) = mpsc::unbounded::<telemetry::Event>();
-    telemetry::init(tx);
-
-    cx.background_spawn(async move {
-        while let Some(event) = rx.next().await {
-            let Some(event_json) = serde_json::to_string(&event).log_err() else {
-                continue;
-            };
-            session
-                .send(proto::TelemetryEvent {
-                    project_id: REMOTE_SERVER_PROJECT_ID,
-                    event_json,
-                })
-                .log_err();
-        }
-    })
-    .detach();
-}
-
+// Reply to legacy clients without reading or forwarding crash files.
 fn handle_crash_files_requests(project: &Entity<HeadlessProject>, client: &AnyProtoClient) {
     client.add_request_handler(
         project.downgrade(),
         |_, _: TypedEnvelope<proto::GetCrashFiles>, _cx| async move {
-            let mut legacy_panics = Vec::new();
-            let mut crashes = Vec::new();
-            let mut children = smol::fs::read_dir(paths::logs_dir()).await?;
-            while let Some(child) = children.next().await {
-                let child = child?;
-                let child_path = child.path();
-
-                let extension = child_path.extension();
-                if extension == Some(OsStr::new("panic")) {
-                    let filename = if let Some(filename) = child_path.file_name() {
-                        filename.to_string_lossy()
-                    } else {
-                        continue;
-                    };
-
-                    if !filename.starts_with("zed") {
-                        continue;
-                    }
-
-                    let file_contents = smol::fs::read_to_string(&child_path)
-                        .await
-                        .context("error reading panic file")?;
-
-                    legacy_panics.push(file_contents);
-                    smol::fs::remove_file(&child_path)
-                        .await
-                        .context("error removing panic")
-                        .log_err();
-                } else if extension == Some(OsStr::new("dmp")) {
-                    let mut json_path = child_path.clone();
-                    json_path.set_extension("json");
-                    if let Ok(json_content) = smol::fs::read_to_string(&json_path).await {
-                        crashes.push(CrashReport {
-                            metadata: json_content,
-                            minidump_contents: smol::fs::read(&child_path).await?,
-                        });
-                        smol::fs::remove_file(&child_path).await.log_err();
-                        smol::fs::remove_file(&json_path).await.log_err();
-                    } else {
-                        log::error!("Couldn't find json metadata for crash: {child_path:?}");
-                    }
-                }
-            }
-
-            anyhow::Ok(proto::GetCrashFilesResponse { crashes })
+            anyhow::Ok(proto::GetCrashFilesResponse {
+                crashes: Vec::new(),
+            })
         },
     );
 }
@@ -770,7 +700,6 @@ pub fn execute_run(
 
         log::info!("gpui app started, initializing server");
         let session = start_server(listeners, log_rx, cx, is_wsl_interop);
-        init_telemetry_forwarding(session.clone(), cx);
         trusted_worktrees::init(HashMap::default(), cx);
 
         GitHostingProviderRegistry::set_global(git_hosting_provider_registry, cx);

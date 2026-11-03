@@ -1,3 +1,10 @@
+> [!IMPORTANT]
+> Remove this line to confirm you've reviewed this PR before submitting.
+
+## Zed Delphi fork
+
+Built-in Object Pascal support and removal of desktop telemetry. See [fork setup and verification](FORK.md) and [Delphi workflows](docs/src/languages/delphi.md). Cross-platform application builds are still awaiting acceptance.
+
 # Zed
 
 [![Zed](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/zed-industries/zed/main/assets/badge/v0.json)](https://zed.dev)

@@ -1,104 +1,19 @@
-use crate::{EditPredictionStore, StoredEvent, zeta};
+use crate::{EditPredictionStore, StoredEvent};
 
-use anyhow::{Context as _, Result};
+use anyhow::Context as _;
 use buffer_diff::BufferDiffSnapshot;
 use collections::HashMap;
 use gpui::{Context, Entity, Task};
-use language::{Buffer, BufferSnapshot, ToPoint as _};
+use language::BufferSnapshot;
 use project::{Project, ProjectPath, WorktreeId};
 use std::{fmt::Write as _, ops::Range, path::Path, sync::Arc};
-use text::{OffsetRangeExt as _, Point};
+use text::Point;
 use util::rel_path::RelPath;
-
-const MAX_UNCOMMITTED_DIFF_SIZE: usize = 64 * 1024;
 
 pub type UncommittedDiffSnapshot = Vec<(Arc<Path>, BufferSnapshot, BufferDiffSnapshot)>;
 pub type UncommittedDiffResult = std::result::Result<UncommittedDiffSnapshot, Arc<anyhow::Error>>;
 
 pub use zeta_prompt::udiff::CURSOR_POSITION_MARKER;
-
-pub(crate) struct CapturedPredictionContext {
-    pub(crate) repository_url: Option<String>,
-    pub(crate) revision: Option<String>,
-    pub(crate) uncommitted_diff: Option<String>,
-    pub(crate) buffer_diagnostics: Vec<zeta_prompt::ActiveBufferDiagnostic>,
-    pub(crate) editable_context: Vec<zeta_prompt::RelatedFile>,
-}
-
-pub(crate) fn capture_prediction_context(
-    project: Entity<Project>,
-    buffer: Entity<Buffer>,
-    cursor_anchor: language::Anchor,
-    stored_events: Vec<StoredEvent>,
-    repository_url: Option<String>,
-    revision: Option<String>,
-    editable_context_task: Task<Result<Vec<zeta_prompt::RelatedFile>>>,
-    cx: &mut Context<EditPredictionStore>,
-) -> Option<Task<Result<CapturedPredictionContext>>> {
-    let snapshot = buffer.read(cx).snapshot();
-    let worktree_id = snapshot.file()?.worktree_id(cx);
-    let uncommitted_diff_task =
-        uncommitted_diffs_for_events(project, worktree_id, stored_events, cx);
-
-    Some(cx.spawn(async move |_this, cx| {
-        let uncommitted_diff_snapshot = match uncommitted_diff_task.await {
-            Ok(snapshot) => Some(snapshot),
-            Err(error) => {
-                log::debug!("failed to capture uncommitted diff: {error:?}");
-                None
-            }
-        };
-
-        let uncommitted_diff = if let Some(uncommitted_diff_snapshot) = uncommitted_diff_snapshot {
-            let estimated_uncommitted_diff_size = uncommitted_diff_snapshot
-                .iter()
-                .map(|(_, buffer_snapshot, diff_snapshot)| {
-                    diff_snapshot
-                        .hunks(buffer_snapshot)
-                        .map(|hunk| {
-                            hunk.diff_base_byte_range.len()
-                                + hunk.range.to_offset(buffer_snapshot).len()
-                        })
-                        .sum::<usize>()
-                })
-                .sum::<usize>();
-
-            if estimated_uncommitted_diff_size <= MAX_UNCOMMITTED_DIFF_SIZE {
-                let uncommitted_diff = cx
-                    .background_executor()
-                    .spawn(async move { compute_uncommitted_diff(uncommitted_diff_snapshot) })
-                    .await;
-                (uncommitted_diff.len() <= MAX_UNCOMMITTED_DIFF_SIZE).then_some(uncommitted_diff)
-            } else {
-                None
-            }
-        } else {
-            None
-        };
-
-        let buffer_diagnostics = zeta::active_buffer_diagnostics(
-            &snapshot,
-            Point::new(0, 0)..snapshot.max_point(),
-            cursor_anchor.to_point(&snapshot).row,
-            100,
-        );
-        let editable_context = match editable_context_task.await {
-            Ok(editable_context) => editable_context,
-            Err(error) => {
-                log::debug!("failed to capture editable context: {error:?}");
-                Vec::new()
-            }
-        };
-
-        Ok(CapturedPredictionContext {
-            repository_url,
-            revision,
-            uncommitted_diff,
-            buffer_diagnostics,
-            editable_context,
-        })
-    }))
-}
 
 pub fn uncommitted_diffs_for_events(
     project: Entity<Project>,
@@ -234,105 +149,6 @@ pub fn compute_cursor_excerpt(
         cursor_in_context,
         context_buffer_start..context_buffer_end,
     )
-}
-
-pub(crate) fn compute_uncommitted_diff(snapshot: UncommittedDiffSnapshot) -> String {
-    let mut uncommitted_diff = String::new();
-    let mut snapshots_by_path = snapshot;
-    snapshots_by_path.sort_by(|(left_path, _, _), (right_path, _, _)| left_path.cmp(right_path));
-    for (relative_path, buffer_snapshot, diff_snapshot) in snapshots_by_path {
-        let base_snapshot = diff_snapshot.base_text();
-        let is_existing_file = diff_snapshot.base_text_exists();
-
-        let new_path_str = relative_path.to_string_lossy();
-        let old_path_str = if is_existing_file {
-            new_path_str.as_ref()
-        } else {
-            "/dev/null"
-        };
-        writeln!(
-            uncommitted_diff,
-            "--- {}{old_path_str}",
-            if is_existing_file { "a/" } else { "" }
-        )
-        .ok();
-        writeln!(uncommitted_diff, "+++ b/{new_path_str}").ok();
-
-        if !is_existing_file {
-            let new_text = buffer_snapshot.text();
-            writeln!(
-                uncommitted_diff,
-                "@@ -0,0 +1,{} @@",
-                new_text.lines().count()
-            )
-            .ok();
-            for line in new_text.lines() {
-                writeln!(uncommitted_diff, "+{line}").ok();
-            }
-            continue;
-        }
-
-        let mut ranges: Vec<(Range<u32>, Range<u32>)> = Vec::new();
-        for hunk in (&diff_snapshot).hunks(&buffer_snapshot) {
-            let old_start = base_snapshot
-                .offset_to_point(hunk.diff_base_byte_range.start)
-                .row;
-            let old_end =
-                exclusive_end_row(base_snapshot.offset_to_point(hunk.diff_base_byte_range.end));
-            let new_start = hunk.range.start.row;
-            let new_end = exclusive_end_row(hunk.range.end);
-            let old_range = old_start.saturating_sub(3)..old_end + 3;
-            let new_range = new_start.saturating_sub(3)..new_end + 3;
-
-            if let Some((last_old_range, last_new_range)) = ranges.last_mut()
-                && (old_range.start <= last_old_range.end || new_range.start <= last_new_range.end)
-            {
-                last_old_range.end = last_old_range.end.max(old_range.end);
-                last_new_range.end = last_new_range.end.max(new_range.end);
-                continue;
-            }
-            ranges.push((old_range, new_range));
-        }
-
-        for (old_range, new_range) in ranges {
-            uncommitted_diff.push_str(&language::unified_diff_with_offsets(
-                &base_snapshot
-                    .text_for_range(
-                        Point::new(old_range.start, 0)
-                            ..row_start_or_max(base_snapshot, old_range.end),
-                    )
-                    .collect::<String>(),
-                &buffer_snapshot
-                    .text_for_range(
-                        Point::new(new_range.start, 0)
-                            ..row_start_or_max(&buffer_snapshot, new_range.end),
-                    )
-                    .collect::<String>(),
-                old_range.start,
-                new_range.start,
-            ));
-        }
-        if !uncommitted_diff.ends_with('\n') {
-            uncommitted_diff.push('\n');
-        }
-    }
-    uncommitted_diff
-}
-
-fn row_start_or_max(snapshot: &language::BufferSnapshot, row: u32) -> Point {
-    if row >= snapshot.max_point().row {
-        snapshot.max_point()
-    } else {
-        Point::new(row, 0)
-    }
-}
-
-fn exclusive_end_row(point: Point) -> u32 {
-    if point.column == 0 {
-        point.row
-    } else {
-        point.row + 1
-    }
 }
 
 pub fn format_cursor_excerpt(

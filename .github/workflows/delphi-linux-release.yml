@@ -1,0 +1,142 @@
+name: Delphi Linux x86_64 bundle
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: delphi-linux-release-${{ github.ref }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: "0"
+  CARGO_BUILD_JOBS: "2"
+  CARGO_PROFILE_RELEASE_DEBUG: "0"
+  CARGO_PROFILE_RELEASE_LTO: "false"
+  CARGO_PROFILE_RELEASE_CODEGEN_UNITS: "16"
+  CARGO_PROFILE_TEST_DEBUG: "0"
+  CARGO_PROFILE_DEV_DEBUG: "0"
+  CC: clang
+  CXX: clang++
+  RUST_BACKTRACE: "1"
+
+jobs:
+  native-tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+      - name: Install native dependencies
+        run: |
+          mkdir -p verification
+          ./script/linux 2>&1 | tee verification/dependencies.log
+          sudo apt-get install -y --no-install-recommends fp-compiler lldb-18
+          rustup show active-toolchain
+      - name: Test task commands and transport helpers
+        run: python3 -m unittest discover -s script/delphi/tests -v 2>&1 | tee verification/python-tests.log
+      - name: Test real FPC and LLVM DAP
+        run: |
+          python3 script/delphi/tests/smoke_lldb.py --fpc "$(command -v fpc)" --lldb-dap "$(command -v lldb-dap-18)" 2>&1 | tee verification/fpc-llvm-dap.log
+          python3 script/delphi/tests/smoke_lldb.py --fpc "$(command -v fpc)" --lldb-dap "$(command -v lldb-dap-18)" --multi-unit 2>&1 | tee verification/multi-unit-llvm-dap.log
+      - name: Install pinned CodeLLDB
+        run: |
+          curl --fail --location --retry 3 https://github.com/vadimcn/codelldb/releases/download/v1.12.3/codelldb-linux-x64.vsix -o "$RUNNER_TEMP/codelldb.vsix"
+          sha256sum "$RUNNER_TEMP/codelldb.vsix" | tee verification/codelldb-sha256.txt
+          unzip -q "$RUNNER_TEMP/codelldb.vsix" -d "$RUNNER_TEMP/codelldb"
+      - name: Test real FPC and CodeLLDB
+        run: |
+          python3 script/delphi/tests/smoke_lldb.py --fpc "$(command -v fpc)" --lldb-dap "$RUNNER_TEMP/codelldb/extension/adapter/codelldb" 2>&1 | tee verification/fpc-codelldb.log
+          python3 script/delphi/tests/smoke_lldb.py --fpc "$(command -v fpc)" --lldb-dap "$RUNNER_TEMP/codelldb/extension/adapter/codelldb" --multi-unit 2>&1 | tee verification/multi-unit-codelldb.log
+      - name: Test native grammar and inert telemetry
+        run: |
+          cargo test --locked -p telemetry --lib 2>&1 | tee verification/telemetry-tests.log
+          cargo test --locked -p grammars --features load-grammars --test delphi 2>&1 | tee verification/grammar-tests.log
+      - name: Save test evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: delphi-linux-x86_64-tests
+          path: verification/
+          retention-days: 30
+
+  bundle:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+      - name: Reserve space on this disposable runner
+        run: |
+          # These preinstalled SDKs are unrelated to the Linux editor build.
+          sudo python3 - <<'PY'
+          import pathlib, shutil
+          for name in ('/usr/local/lib/android', '/usr/share/dotnet', '/opt/ghc', '/usr/local/.ghcup', '/usr/share/swift', '/opt/hostedtoolcache/CodeQL', '/usr/local/share/powershell'):
+              path = pathlib.Path(name)
+              if path.is_dir() and not path.is_symlink():
+                  shutil.rmtree(path)
+          PY
+          df -h .
+      - name: Install native build and launch dependencies
+        run: |
+          mkdir -p verification
+          ./script/linux 2>&1 | tee verification/dependencies.log
+          sudo apt-get install -y --no-install-recommends xvfb xauth xdotool imagemagick dbus-x11 mesa-vulkan-drivers
+          sudo apt-get clean
+          rustup show active-toolchain
+          ./script/download-wasi-sdk
+      - name: Build and validate the release bundle
+        id: build
+        run: |
+          python3 -u script/delphi/linux/build.py --output-dir "$RUNNER_TEMP/zed-delphi-linux-x86_64" 2>&1 | tee verification/bundle.log
+      - name: Launch the packaged editor under Xvfb
+        env:
+          ZED_ALLOW_EMULATED_GPU: "1"
+        run: |
+          mkdir -p "$RUNNER_TEMP/zed-launch" "$RUNNER_TEMP/zed-runtime"
+          chmod 700 "$RUNNER_TEMP/zed-runtime"
+          export XDG_RUNTIME_DIR="$RUNNER_TEMP/zed-runtime"
+          tar -xzf "$RUNNER_TEMP/zed-delphi-linux-x86_64/zed-linux-x86_64.tar.gz" -C "$RUNNER_TEMP/zed-launch"
+          export ZED_TEST_BINARY
+          ZED_TEST_BINARY=$(find "$RUNNER_TEMP/zed-launch" -path '*/bin/zed' -type f -print -quit)
+          test -n "$ZED_TEST_BINARY"
+          xvfb-run -a -s '-screen 0 1440x1000x24' bash <<'SH'
+          dbus-run-session -- "$ZED_TEST_BINARY" --foreground "$GITHUB_WORKSPACE/script/delphi/examples/multi_unit" > verification/packaged-launch.log 2>&1 &
+          editor_pid=$!
+          trap 'kill "$editor_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 60); do
+            kill -0 "$editor_pid"
+            if xdotool search --onlyvisible --class zed > verification/window-ids.txt; then
+              import -window root verification/packaged-editor.png
+              echo 'Packaged editor created a visible X11 window; this is not a UI debugging acceptance test.' | tee verification/launch-result.txt
+              exit 0
+            fi
+            sleep 1
+          done
+          echo 'No visible editor window appeared' >&2
+          exit 1
+          SH
+      - name: Save bundle and provenance
+        if: always() && steps.build.outcome == 'success'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: zed-delphi-ubuntu24.04-x86_64
+          path: ${{ runner.temp }}/zed-delphi-linux-x86_64/
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 30
+      - name: Save build and launch evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: delphi-linux-x86_64-build-evidence
+          path: |
+            verification/
+            ${{ runner.temp }}/zed-delphi-linux-x86_64/BUILD.log
+            ${{ runner.temp }}/zed-delphi-linux-x86_64/provenance.json
+          retention-days: 30

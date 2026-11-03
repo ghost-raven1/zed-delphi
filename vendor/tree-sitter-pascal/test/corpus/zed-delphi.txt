@@ -1,0 +1,94 @@
+==================
+Delphi project unit paths
+==================
+
+program Demo;
+
+uses
+  System.SysUtils,
+  Demo.Model in 'Demo.Model.pas';
+
+{$R *.res}
+
+begin
+  WriteLn('Delphi project');
+end.
+
+---
+
+(root
+  (program
+    (kProgram)
+    (moduleName
+      (identifier))
+    (declUses
+      (kUses)
+      (moduleName
+        (identifier)
+        (kDot)
+        (identifier))
+      (moduleName
+        (identifier)
+        (kDot)
+        (identifier))
+      (kIn)
+      (literalString))
+    (pp)
+    (block
+      (kBegin)
+      (statement
+        (exprCall
+          (identifier)
+          (exprArgs
+            (literalString))))
+      (kEnd))
+    (kEndDot)))
+
+==================
+Delphi package dependencies and units
+==================
+
+package DemoPackage;
+
+{$R *.res}
+
+requires
+  rtl,
+  vcl;
+
+contains
+  Demo.Model in 'Demo.Model.pas',
+  Demo.Forms in 'Demo.Forms.pas';
+
+end.
+
+---
+
+(root
+  (package
+    (kPackage)
+    (moduleName
+      (identifier))
+    (pp)
+    (declRequires
+      (kRequires)
+      (moduleName
+        (identifier))
+      (moduleName
+        (identifier)))
+    (declContains
+      (kContains)
+      (moduleName
+        (identifier)
+        (kDot)
+        (identifier))
+      (kIn)
+      (literalString)
+      (moduleName
+        (identifier)
+        (kDot)
+        (identifier))
+      (kIn)
+      (literalString))
+    (kEnd)
+    (kEndDot)))

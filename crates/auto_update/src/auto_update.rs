@@ -7,7 +7,6 @@ use gpui::{
     Task, TaskExt, Window, actions,
 };
 use http_client::{HttpClient, HttpClientWithUrl};
-use paths::remote_servers_dir;
 use release_channel::{AppCommitSha, ReleaseChannel};
 use semver::Version;
 use serde::{Deserialize, Serialize};
@@ -23,7 +22,6 @@ use std::{
         self,
         consts::{ARCH, OS},
     },
-    ffi::OsStr,
     ffi::OsString,
     path::{Path, PathBuf},
     sync::Arc,
@@ -31,6 +29,17 @@ use std::{
 };
 use util::command::new_command;
 use workspace::Workspace;
+
+fn ensure_remote_platform_component(value: &str) -> Result<()> {
+    anyhow::ensure!(
+        !value.is_empty()
+            && value
+                .bytes()
+                .all(|byte| byte.is_ascii_alphanumeric() || byte == b'_' || byte == b'-'),
+        "Invalid remote platform component"
+    );
+    Ok(())
+}
 
 const SHOULD_SHOW_UPDATE_NOTIFICATION_KEY: &str = "auto-updater-should-show-updated-notification";
 
@@ -46,7 +55,6 @@ impl std::fmt::Display for MissingDependencyError {
 impl std::error::Error for MissingDependencyError {}
 const POLL_INTERVAL: Duration = Duration::from_secs(60 * 60);
 const NIGHTLY_POLL_INTERVAL: Duration = Duration::from_secs(15 * 60);
-const REMOTE_SERVER_CACHE_LIMIT: usize = 5;
 
 #[cfg(target_os = "linux")]
 fn linux_rsync_install_hint() -> &'static str {
@@ -108,16 +116,6 @@ actions!(
         ViewReleaseNotes,
     ]
 );
-
-#[derive(Serialize, Debug)]
-pub struct AssetQuery<'a> {
-    asset: &'a str,
-    os: &'a str,
-    arch: &'a str,
-    metrics_id: Option<&'a str>,
-    system_id: Option<&'a str>,
-    is_staff: Option<bool>,
-}
 
 #[derive(Clone, Debug)]
 pub enum AutoUpdateStatus {
@@ -252,10 +250,10 @@ struct AutoUpdateSetting(bool);
 
 /// Whether or not to automatically check for updates.
 ///
-/// Default: true
+/// Upstream updates would replace this fork and restore telemetry.
 impl Settings for AutoUpdateSetting {
-    fn from_settings(content: &settings::SettingsContent) -> Self {
-        Self(content.auto_update.unwrap())
+    fn from_settings(_content: &settings::SettingsContent) -> Self {
+        Self(false)
     }
 }
 
@@ -593,148 +591,58 @@ impl AutoUpdater {
         true
     }
 
-    // If you are packaging Zed and need to override the place it downloads SSH remotes from,
-    // you can override this function. You should also update get_remote_server_release_url to return
-    // Ok(None).
+    /// Only use remote-server artifacts built from this fork, never upstream downloads.
     pub async fn download_remote_server_release(
-        release_channel: ReleaseChannel,
-        version: Option<Version>,
+        _release_channel: ReleaseChannel,
+        _version: Option<Version>,
         os: &str,
         arch: &str,
         set_status: impl Fn(&str, &mut AsyncApp) + Send + 'static,
         cx: &mut AsyncApp,
     ) -> Result<PathBuf> {
-        let this = cx.update(|cx| {
-            cx.default_global::<GlobalAutoUpdate>()
-                .0
-                .clone()
-                .context("auto-update not initialized")
-        })?;
-
-        set_status("Fetching remote server release", cx);
-        let release = Self::get_release_asset(
-            &this,
-            release_channel,
-            version,
-            "zed-remote-server",
-            os,
-            arch,
-            cx,
-        )
-        .await?;
-
-        let servers_dir = paths::remote_servers_dir();
-        let channel_dir = servers_dir.join(release_channel.dev_name());
-        let platform_dir = channel_dir.join(format!("{}-{}", os, arch));
-        let version_path = platform_dir.join(format!("{}.gz", release.version));
-        smol::fs::create_dir_all(&platform_dir).await.ok();
-
-        let client = this.read_with(cx, |this, _| this.client.http_client());
-
-        if smol::fs::metadata(&version_path).await.is_err() {
-            log::info!(
-                "downloading zed-remote-server {os} {arch} version {}",
-                release.version
-            );
-            set_status("Downloading remote server", cx);
-            download_remote_server_binary(&version_path, release, client).await?;
-        }
-
-        if let Err(error) =
-            cleanup_remote_server_cache(&platform_dir, &version_path, REMOTE_SERVER_CACHE_LIMIT)
-                .await
-        {
-            log::warn!(
-                "Failed to clean up remote server cache in {:?}: {error:#}",
-                platform_dir
-            );
-        }
-
-        Ok(version_path)
+        ensure_remote_platform_component(os)?;
+        ensure_remote_platform_component(arch)?;
+        let directory = env::var_os("ZED_DELPHI_REMOTE_SERVER_DIR")
+            .context("Build this fork's remote-server and set ZED_DELPHI_REMOTE_SERVER_DIR; upstream remote binaries are disabled")?;
+        let archive = if os == "windows" {
+            "remote-server.zip"
+        } else {
+            "remote-server.gz"
+        };
+        let path = PathBuf::from(directory)
+            .join(format!("{os}-{arch}"))
+            .join(archive);
+        anyhow::ensure!(
+            smol::fs::metadata(&path).await?.is_file(),
+            "Remote server artifact is not a file: {}",
+            path.display()
+        );
+        set_status("Using local Zed Delphi remote server", cx);
+        Ok(path)
     }
 
     pub async fn get_remote_server_release_url(
-        channel: ReleaseChannel,
-        version: Option<Version>,
-        os: &str,
-        arch: &str,
-        cx: &mut AsyncApp,
+        _channel: ReleaseChannel,
+        _version: Option<Version>,
+        _os: &str,
+        _arch: &str,
+        _cx: &mut AsyncApp,
     ) -> Result<Option<String>> {
-        let this = cx.update(|cx| {
-            cx.default_global::<GlobalAutoUpdate>()
-                .0
-                .clone()
-                .context("auto-update not initialized")
-        })?;
-
-        let release =
-            Self::get_release_asset(&this, channel, version, "zed-remote-server", os, arch, cx)
-                .await?;
-
-        Ok(Some(release.url))
+        Ok(None)
     }
 
     async fn get_release_asset(
-        this: &Entity<Self>,
-        release_channel: ReleaseChannel,
-        version: Option<Version>,
-        asset: &str,
-        os: &str,
-        arch: &str,
-        cx: &mut AsyncApp,
+        _this: &Entity<Self>,
+        _release_channel: ReleaseChannel,
+        _version: Option<Version>,
+        _asset: &str,
+        _os: &str,
+        _arch: &str,
+        _cx: &mut AsyncApp,
     ) -> Result<ReleaseAsset> {
-        let client = this.read_with(cx, |this, _| this.client.clone());
-
-        let (system_id, metrics_id, is_staff) = if client.telemetry().metrics_enabled() {
-            (
-                client.telemetry().system_id(),
-                client.telemetry().metrics_id(),
-                client.telemetry().is_staff(),
-            )
-        } else {
-            (None, None, None)
-        };
-
-        let version = if let Some(mut version) = version {
-            version.pre = semver::Prerelease::EMPTY;
-            version.build = semver::BuildMetadata::EMPTY;
-            version.to_string()
-        } else {
-            "latest".to_string()
-        };
-        let http_client = client.http_client();
-
-        let path = format!("/releases/{}/{}/asset", release_channel.dev_name(), version,);
-        let url = http_client.build_zed_cloud_url_with_query(
-            &path,
-            AssetQuery {
-                os,
-                arch,
-                asset,
-                metrics_id: metrics_id.as_deref(),
-                system_id: system_id.as_deref(),
-                is_staff,
-            },
-        )?;
-
-        let mut response = http_client
-            .get(url.as_str(), Default::default(), true)
-            .await?;
-        let mut body = Vec::new();
-        response.body_mut().read_to_end(&mut body).await?;
-
-        anyhow::ensure!(
-            response.status().is_success(),
-            "failed to fetch release: {:?}",
-            String::from_utf8_lossy(&body),
-        );
-
-        serde_json::from_slice(body.as_slice()).with_context(|| {
-            format!(
-                "error deserializing release {:?}",
-                String::from_utf8_lossy(&body),
-            )
-        })
+        anyhow::bail!(
+            "Upstream updates are disabled in Zed Delphi; install a reviewed fork build instead."
+        )
     }
 
     async fn update(this: Entity<Self>, cx: &mut AsyncApp) -> Result<()> {
@@ -996,83 +904,6 @@ impl AutoUpdater {
     }
 }
 
-async fn download_remote_server_binary(
-    target_path: &PathBuf,
-    release: ReleaseAsset,
-    client: Arc<HttpClientWithUrl>,
-) -> Result<()> {
-    let temp = tempfile::Builder::new().tempfile_in(remote_servers_dir())?;
-    let mut temp_file = File::create(&temp).await?;
-
-    let mut response = client.get(&release.url, Default::default(), true).await?;
-    anyhow::ensure!(
-        response.status().is_success(),
-        "failed to download remote server release: {:?}",
-        response.status()
-    );
-    smol::io::copy(response.body_mut(), &mut temp_file).await?;
-    smol::fs::rename(&temp, &target_path).await?;
-
-    Ok(())
-}
-
-async fn cleanup_remote_server_cache(
-    platform_dir: &Path,
-    keep_path: &Path,
-    limit: usize,
-) -> Result<()> {
-    if limit == 0 {
-        return Ok(());
-    }
-
-    let mut entries = smol::fs::read_dir(platform_dir).await?;
-    let now = SystemTime::now();
-    let mut candidates = Vec::new();
-
-    while let Some(entry) = entries.next().await {
-        let entry = entry?;
-        let path = entry.path();
-        if path.extension() != Some(OsStr::new("gz")) {
-            continue;
-        }
-
-        let mtime = if path == keep_path {
-            now
-        } else {
-            smol::fs::metadata(&path)
-                .await
-                .and_then(|metadata| metadata.modified())
-                .unwrap_or(SystemTime::UNIX_EPOCH)
-        };
-
-        candidates.push((path, mtime));
-    }
-
-    if candidates.len() <= limit {
-        return Ok(());
-    }
-
-    candidates.sort_by(|(path_a, time_a), (path_b, time_b)| {
-        time_b.cmp(time_a).then_with(|| path_a.cmp(path_b))
-    });
-
-    for (index, (path, _)) in candidates.into_iter().enumerate() {
-        if index < limit || path == keep_path {
-            continue;
-        }
-
-        if let Err(error) = smol::fs::remove_file(&path).await {
-            log::warn!(
-                "Failed to remove old remote server archive {:?}: {}",
-                path,
-                error
-            );
-        }
-    }
-
-    Ok(())
-}
-
 async fn download_release(
     target_path: &Path,
     release: ReleaseAsset,
@@ -1332,45 +1163,17 @@ async fn install_release_windows(downloaded_installer: &Path) -> Result<Option<P
     Ok(Some(helper_path))
 }
 
-pub async fn finalize_auto_update_on_quit() {
-    let Some(installer_path) = std::env::current_exe()
-        .ok()
-        .and_then(|p| p.parent().map(|p| p.join("updates")))
-    else {
-        return;
-    };
-
-    // The installer will create a flag file after it finishes updating
-    let flag_file = installer_path.join("versions.txt");
-    if flag_file.exists()
-        && let Some(helper) = installer_path
-            .parent()
-            .map(|p| p.join("tools").join("auto_update_helper.exe"))
-    {
-        let mut command = util::command::new_command(helper);
-        command.arg("--launch");
-        command.arg("false");
-        if let Ok(mut cmd) = command.spawn() {
-            _ = cmd.status().await;
-        }
-    }
-}
+/// Do not apply an upstream update left beside an existing installation.
+pub async fn finalize_auto_update_on_quit() {}
 
 #[cfg(test)]
 mod tests {
     use client::Client;
     use clock::FakeSystemClock;
-    use futures::channel::oneshot;
     use gpui::TestAppContext;
     use http_client::{FakeHttpClient, Response};
     use settings::default_settings;
-    use std::{
-        rc::Rc,
-        sync::{
-            Arc,
-            atomic::{self, AtomicBool},
-        },
-    };
+    use std::{rc::Rc, sync::Arc};
     use tempfile::tempdir;
 
     #[ctor::ctor(unsafe)]
@@ -1383,131 +1186,67 @@ mod tests {
     pub(super) struct InstallOverride(pub Rc<dyn Fn(&Path, &AsyncApp) -> Result<Option<PathBuf>>>);
     impl Global for InstallOverride {}
 
+    #[test]
+    fn remote_platform_cannot_escape_artifact_directory() {
+        for valid in ["windows", "linux", "macos", "aarch64", "x86_64"] {
+            assert!(ensure_remote_platform_component(valid).is_ok());
+        }
+        for invalid in ["", "..", "../linux", "C:\\tmp", "/tmp"] {
+            assert!(ensure_remote_platform_component(invalid).is_err());
+        }
+    }
+
     #[gpui::test]
-    fn test_auto_update_defaults_to_true(cx: &mut TestAppContext) {
+    fn test_upstream_updates_cannot_be_enabled(cx: &mut TestAppContext) {
         cx.update(|cx| {
             let mut store = SettingsStore::new(cx, &settings::default_settings());
             store
                 .set_default_settings(&default_settings(), cx)
                 .expect("Unable to set default settings");
             store
-                .set_user_settings("{}", cx)
+                .set_user_settings(r#"{"auto_update": true}"#, cx)
                 .expect("Unable to set user settings");
             cx.set_global(store);
-            assert!(AutoUpdateSetting::get_global(cx).0);
+            assert!(!AutoUpdateSetting::get_global(cx).0);
         });
     }
 
     #[gpui::test]
-    async fn test_auto_update_downloads(cx: &mut TestAppContext) {
+    async fn test_upstream_update_never_requests_network(cx: &mut TestAppContext) {
         cx.background_executor.allow_parking();
-        zlog::init_test();
-        let release_available = Arc::new(AtomicBool::new(false));
-
-        let (dmg_tx, dmg_rx) = oneshot::channel::<String>();
-
-        cx.update(|cx| {
+        let updater = cx.update(|cx| {
             settings::init(cx);
-
-            let current_version = semver::Version::new(0, 100, 0);
-            release_channel::init_test(current_version, ReleaseChannel::Stable, cx);
-
-            let clock = Arc::new(FakeSystemClock::new());
-            let release_available = Arc::clone(&release_available);
-            let dmg_rx = Arc::new(parking_lot::Mutex::new(Some(dmg_rx)));
-            let fake_client_http = FakeHttpClient::create(move |req| {
-                let release_available = release_available.load(atomic::Ordering::Relaxed);
-                let dmg_rx = dmg_rx.clone();
-                async move {
-                if req.uri().path() == "/releases/stable/latest/asset" {
-                    if release_available {
-                        return Ok(Response::builder().status(200).body(
-                            r#"{"version":"0.100.1","url":"https://test.example/new-download"}"#.into()
-                        ).unwrap());
-                    } else {
-                        return Ok(Response::builder().status(200).body(
-                            r#"{"version":"0.100.0","url":"https://test.example/old-download"}"#.into()
-                        ).unwrap());
-                    }
-                } else if req.uri().path() == "/new-download" {
-                    return Ok(Response::builder().status(200).body({
-                        let dmg_rx = dmg_rx.lock().take().unwrap();
-                        dmg_rx.await.unwrap().into()
-                    }).unwrap());
-                }
-                Ok(Response::builder().status(404).body("".into()).unwrap())
-                }
+            release_channel::init_test(Version::new(0, 100, 0), ReleaseChannel::Stable, cx);
+            let http = FakeHttpClient::create(|request| async move {
+                panic!("fork updater must not send requests: {:?}", request.uri());
             });
-            let client = Client::new(clock, fake_client_http, cx);
-            crate::init(client, cx);
+            let client = Client::new(Arc::new(FakeSystemClock::new()), http, cx);
+            init(client, cx);
+            AutoUpdater::get(cx).expect("updater initialized")
         });
-
-        let auto_updater = cx.update(|cx| AutoUpdater::get(cx).expect("auto updater should exist"));
-
-        cx.background_executor.run_until_parked();
-
-        auto_updater.read_with(cx, |updater, _| {
-            assert_eq!(updater.status(), AutoUpdateStatus::Idle);
-            assert_eq!(updater.current_version(), semver::Version::new(0, 100, 0));
-        });
-
-        release_available.store(true, atomic::Ordering::SeqCst);
+        cx.run_until_parked();
         cx.background_executor.advance_clock(POLL_INTERVAL);
-        cx.background_executor.run_until_parked();
-
-        loop {
-            cx.background_executor.timer(Duration::from_millis(0)).await;
-            cx.run_until_parked();
-            let status = auto_updater.read_with(cx, |updater, _| updater.status());
-            if !matches!(status, AutoUpdateStatus::Idle) {
-                break;
-            }
-        }
-        let status = auto_updater.read_with(cx, |updater, _| updater.status());
-        assert_eq!(
-            status,
-            AutoUpdateStatus::Downloading {
-                version: semver::Version::new(0, 100, 1),
-                progress: None,
-            }
-        );
-
-        dmg_tx.send("<fake-zed-update>".to_owned()).unwrap();
-
-        let tmp_dir = Arc::new(tempdir().unwrap());
-
-        cx.update(|cx| {
-            let tmp_dir = tmp_dir.clone();
-            cx.set_global(InstallOverride(Rc::new(move |target_path, _cx| {
-                let tmp_dir = tmp_dir.clone();
-                let dest_path = tmp_dir.path().join("zed");
-                std::fs::copy(&target_path, &dest_path)?;
-                Ok(Some(dest_path))
-            })));
+        cx.run_until_parked();
+        updater.read_with(cx, |updater, _| {
+            assert_eq!(updater.status(), AutoUpdateStatus::Idle)
         });
 
-        loop {
-            cx.background_executor.timer(Duration::from_millis(0)).await;
-            cx.run_until_parked();
-            let status = auto_updater.read_with(cx, |updater, _| updater.status());
-            if !matches!(status, AutoUpdateStatus::Downloading { .. }) {
-                break;
-            }
-        }
-        let status = auto_updater.read_with(cx, |updater, _| updater.status());
-        assert_eq!(
-            status,
-            AutoUpdateStatus::Updated {
-                version: semver::Version::new(0, 100, 1)
-            }
+        let result = AutoUpdater::get_release_asset(
+            &updater,
+            ReleaseChannel::Stable,
+            None,
+            "zed",
+            OS,
+            ARCH,
+            &mut cx.to_async(),
+        )
+        .await;
+        assert!(
+            result
+                .unwrap_err()
+                .to_string()
+                .contains("Upstream updates are disabled")
         );
-        let will_restart = cx.expect_restart();
-        cx.update(|cx| cx.restart());
-        let (path, arguments) = will_restart.await.unwrap();
-        assert!(arguments.is_empty());
-        let path = path.unwrap();
-        assert_eq!(path, tmp_dir.path().join("zed"));
-        assert_eq!(std::fs::read_to_string(path).unwrap(), "<fake-zed-update>");
     }
 
     #[gpui::test]

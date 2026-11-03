@@ -1,19 +1,16 @@
 use crate::{
     CloudRequestTimeoutError, CurrentEditPrediction, DebugEvent, EditPredictionFinishedDebugEvent,
     EditPredictionId, EditPredictionInputs, EditPredictionModelInput,
-    EditPredictionStartedDebugEvent, EditPredictionStore, PromptHistoryBoundary,
-    ZedUpdateRequiredError, buffer_path_with_id_fallback,
+    EditPredictionStartedDebugEvent, EditPredictionStore, ZedUpdateRequiredError,
+    buffer_path_with_id_fallback,
     cursor_excerpt::{self, compute_cursor_excerpt, compute_syntax_ranges},
-    data_collection::CapturedPredictionContext,
     prediction::EditPredictionResult,
     udiff::prediction_edits_for_single_file_diff,
 };
 use anyhow::{Context as _, Result};
-use cloud_llm_client::{
-    AcceptEditPredictionBody, EditPredictionRejectReason, predict_edits_v3::RawCompletionRequest,
-};
+use cloud_llm_client::{EditPredictionRejectReason, predict_edits_v3::RawCompletionRequest};
 use edit_prediction_types::PredictedCursorPosition;
-use gpui::{App, AppContext as _, Entity, Task, TaskExt, WeakEntity, prelude::*};
+use gpui::{App, AppContext as _, Entity, Task, WeakEntity, prelude::*};
 use language::{
     Buffer, BufferSnapshot, DiagnosticSeverity, EditPredictionPromptFormat, OffsetRangeExt as _,
     ToOffset as _, ZetaVersion, language_settings::all_language_settings, text_diff,
@@ -57,8 +54,6 @@ pub(crate) fn request_prediction_with_zeta(
         allow_jump,
         ..
     }: EditPredictionModelInput,
-    context_task: Option<Task<Result<CapturedPredictionContext>>>,
-    prompt_history_boundary: Option<PromptHistoryBoundary>,
     repo_url: Option<String>,
     cx: &mut Context<EditPredictionStore>,
 ) -> Task<Result<Option<EditPredictionResult>>> {
@@ -595,36 +590,6 @@ pub(crate) fn request_prediction_with_zeta(
         )
         .await;
 
-        if let Some(editable_range_in_buffer) = editable_range_in_buffer.clone() {
-            let prediction = &result.prediction;
-            let weak_this = this.clone();
-            let request_id = prediction.id.clone();
-            let edited_buffer = edited_buffer.clone();
-            let edited_buffer_snapshot = edited_buffer_snapshot.clone();
-            let edit_preview = prediction.edit_preview.clone();
-            let model_version = prediction.model_version.clone();
-            cx.spawn(async move |cx| {
-                weak_this
-                    .update(cx, |this, cx| {
-                        this.enqueue_settled_prediction(
-                            request_id.clone(),
-                            &project,
-                            &edited_buffer,
-                            &edited_buffer_snapshot,
-                            editable_range_in_buffer,
-                            &edit_preview,
-                            context_task,
-                            prompt_history_boundary,
-                            model_version,
-                            request_duration,
-                            cx,
-                        );
-                    })
-                    .ok();
-            })
-            .detach();
-        }
-
         Ok(Some(result))
     })
 }
@@ -839,47 +804,10 @@ pub fn zeta2_prompt_input(
 }
 
 pub(crate) fn edit_prediction_accepted(
-    store: &EditPredictionStore,
-    current_prediction: CurrentEditPrediction,
-    cx: &App,
+    _store: &EditPredictionStore,
+    _current_prediction: CurrentEditPrediction,
+    _cx: &App,
 ) {
-    if store.zeta2_raw_config().is_some() {
-        return;
-    }
-
-    let request_id = current_prediction.prediction.id.to_string();
-    let model_version = current_prediction.prediction.model_version;
-    let e2e_latency = current_prediction.e2e_latency;
-    let client = store.client.clone();
-    let llm_token = store.llm_token.clone();
-    let organization_id = store
-        .user_store
-        .read(cx)
-        .current_organization()
-        .map(|organization| organization.id.clone());
-    let app_version = AppVersion::global(cx);
-
-    cx.background_spawn(async move {
-        let body = serde_json::to_string(&AcceptEditPredictionBody {
-            request_id,
-            model_version,
-            e2e_latency_ms: Some(e2e_latency.as_millis()),
-        })?;
-
-        let url = client
-            .http_client()
-            .build_zed_llm_url("/predict_edits/accept", &[])?;
-        EditPredictionStore::send_api_request::<()>(
-            move |builder| Ok(builder.uri(url.as_ref()).body(body.clone().into())?),
-            client,
-            llm_token,
-            organization_id,
-            app_version,
-        )
-        .await?;
-        anyhow::Ok(())
-    })
-    .detach_and_log_err(cx);
 }
 
 pub fn compute_edits(

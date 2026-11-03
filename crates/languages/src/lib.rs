@@ -20,6 +20,8 @@ mod bash;
 mod c;
 mod cpp;
 mod css;
+mod delphi;
+mod delphi_tasks;
 mod eslint;
 mod go;
 mod json;
@@ -109,6 +111,15 @@ pub fn init(languages: Arc<LanguageRegistry>, fs: Arc<dyn Fs>, node: NodeRuntime
         LanguageInfo {
             name: "css",
             adapters: vec![css_lsp_adapter],
+            ..Default::default()
+        },
+        LanguageInfo {
+            name: "delphi",
+            context: Some(Arc::new(delphi_tasks::task_context())),
+            adapters: vec![
+                Arc::new(delphi::DelphiLspAdapter::FreePascal),
+                Arc::new(delphi::DelphiLspAdapter::Embarcadero),
+            ],
             ..Default::default()
         },
         LanguageInfo {
