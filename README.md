@@ -1,9 +1,14 @@
 > [!IMPORTANT]
 > Remove this line to confirm you've reviewed this PR before submitting.
 
-## Zed Delphi fork
+## Форк Zed Delphi
 
-Built-in Object Pascal support and removal of desktop telemetry. See [fork setup and verification](FORK.md) and [Delphi workflows](docs/src/languages/delphi.md). Cross-platform application builds are still awaiting acceptance.
+Встроенная поддержка Object Pascal. Телеметрия настольного приложения удалена.
+См. [настройку и результаты проверок](FORK.md), [работу с Delphi](docs/src/languages/delphi.md)
+и [релиз 1.0.0](https://github.com/ghost-raven1/zed-delphi/releases/tag/v1.0.0).
+Опубликован пакет Linux ARM64 с английским интерфейсом. Сборки Linux x86_64,
+macOS и Windows проходят проверку в CI; полноценная русификация интерфейса
+пока не заявляется.
 
 # Zed
 

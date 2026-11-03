@@ -1,10 +1,26 @@
-# Linux package for Zed Delphi
+# Пакет Zed Delphi для Linux
 
-This entrypoint builds the current fork editor and CLI using the Cargo configuration, linker flags and application layout from `script/bundle-linux`. The default compact package omits remote-server. Add `--with-remote-server` to use the full existing `script/bundle-linux --skip-sentry` instead. Both paths generate licenses and package the native Linux application. It does not publish artifacts or upload debug symbols. Telemetry removal belongs to the fork's source changes, not a runtime environment toggle in this script.
+Этот скрипт собирает редактор и CLI текущего форка, используя настройки Cargo,
+флаги компоновщика и структуру приложения из `script/bundle-linux`. Компактный
+пакет по умолчанию не содержит `remote-server`. Добавьте `--with-remote-server`,
+чтобы использовать полный `script/bundle-linux --skip-sentry`. Оба варианта
+формируют лицензионные уведомления и пакет нативного приложения Linux.
+Артефакты и отладочные символы не загружаются на сервер. Телеметрия удалена
+в исходниках форка, а не отключается переменной окружения этого скрипта.
 
-Use a dedicated Linux x86_64 machine/container for Astra Linux 1.8 x86_64. Native aarch64 Linux builds are also allowed, but do not produce an x86_64 application. Build on Astra itself or an appropriately old compatible system; a successful Debian/Ubuntu build is not Astra acceptance. The target machine still needs compatible glibc, graphics drivers, Vulkan, and the host libraries intentionally excluded by the bundler.
+Для Astra Linux 1.8 x86_64 используйте отдельную машину или контейнер Linux
+x86_64. Нативная сборка aarch64 также поддерживается, но создаёт приложение
+для ARM64. Собирайте на самой Astra или на совместимой системе с достаточно
+старыми библиотеками. Успешная сборка Debian/Ubuntu не подтверждает работу
+на Astra. Целевой машине нужны совместимые glibc, графические драйверы, Vulkan
+и системные библиотеки, которые упаковщик намеренно не включает.
 
-Requires Python 3.9+, the repository's pinned Rust toolchain, Clang, LLD >=12, llvm-objcopy and the libraries/tools listed in `script/linux`. Inspect that script before installing dependencies on Astra: repository and package availability differ. The entrypoint does not install OS packages. The bundler may fetch Rust targets, Cargo dependencies and cargo-about 0.8.2 for license generation. Keep this checkout, Cargo.lock and access to those sources for rebuilding.
+Нужны Python 3.9+, закреплённая в репозитории версия Rust, Clang, LLD >=12,
+llvm-objcopy и зависимости из `script/linux`. Перед установкой на Astra
+проверьте этот скрипт: доступность репозиториев и пакетов отличается.
+Скрипт сборки не устанавливает системные пакеты. Упаковщик может загружать
+целевые компоненты Rust, зависимости Cargo и cargo-about 0.8.2 для формирования
+лицензий. Сохраните исходники, `Cargo.lock` и доступ к зависимостям для пересборки.
 
 ```sh
 # No downloads, Rust commands or build during preflight.
@@ -18,29 +34,65 @@ CARGO_TARGET_DIR=/large-disk/zed-target CARGO_BUILD_JOBS=2 \
   --output-dir /large-disk/results/zed-delphi-run1
 ```
 
-Default preflight requires **30 GiB free disk** at both build and output locations and **8 GiB available RAM**, respecting container limits. These are conservative minimum budgets, not measured guarantees. `--min-free-gib` (alias `--min-disk-gib`) and `--min-memory-gib` permit explicit changes for a measured environment; lowering them cannot make an undersized build reliable. The output directory must not already exist. Target paths must have no whitespace because the upstream bundler has unquoted paths. Jobs, CC, CXX, LLD, and REMOTE_SERVER_TARGET remain explicit environment overrides; RUSTFLAGS overrides are rejected by the bundler contract. When requested, default remote-server uses musl and needs musl-gcc. Cargo profile environment overrides are preserved and recorded; this recipe does not change the repository profile defaults.
+Предварительная проверка по умолчанию требует **30 GiB свободного места**
+для папок сборки и результатов, а также **8 GiB доступной оперативной памяти**
+с учётом ограничений контейнера. Это консервативная оценка, а не гарантия
+пикового расхода. Параметры `--min-free-gib` (синоним `--min-disk-gib`) и
+`--min-memory-gib` позволяют изменить пороги для измеренной среды. Снижение
+порога само по себе не решает нехватку ресурсов. Папка результатов не должна
+существовать. Путь к результатам Cargo не должен содержать пробелы: исходный
+упаковщик использует пути без кавычек. Число заданий и `CC`, `CXX`, `LLD`,
+`REMOTE_SERVER_TARGET` задаются через окружение; переопределение `RUSTFLAGS`
+отклоняется по правилам упаковщика. Если запрошен `remote-server`, его обычная
+сборка использует musl и требует musl-gcc. Переопределения профиля Cargo
+из окружения сохраняются и записываются; рецепт не меняет профиль репозитория.
 
-The output contains the app archive, optional remote-server archive, BUILD.log, provenance, SHA256SUMS, source commit/status/diff and a source snapshot of tracked and untracked non-ignored files. Git metadata, target outputs and ignored files are excluded; any required ignored source inputs must be supplied separately. No bit-identical output is promised. On build failure, logs remain; use a new output directory for the next attempt. Generated `assets/licenses.md` and the Cargo target directory are owned outputs of the existing bundler.
+Результат содержит архив приложения, необязательный архив `remote-server`,
+`BUILD.log`, сведения о происхождении сборки, `SHA256SUMS`, коммит, состояние Git,
+изменения исходников и снимок отслеживаемых и неотслеживаемых файлов,
+не исключённых Git. Метаданные Git, результаты компиляции и игнорируемые файлы
+не входят в снимок; необходимые игнорируемые исходные данные предоставьте
+отдельно. Побитовая воспроизводимость не заявляется. При ошибке журнал
+сохраняется; для следующей попытки выберите новую папку результатов.
+`assets/licenses.md` и папка результатов Cargo создаются упаковщиком.
 
-Before accepting the archive, the script extracts it and runs `ldd` on both bundled CLI and editor, failing for missing libraries. This checks the build machine's loader only, not rendering or project/debug behavior. Repeat loader checks on Astra, then launch the app under a real desktop session and test Delphi editing, completion, FPC project build/run, breakpoint/locals/step and cancellation. Existing `script/delphi/tests/smoke_lldb.py` checks real FPC/DAP behavior separately; successful protocol smoke does not prove Zed UI acceptance. Embarcadero compilation/debug still requires its licensed Windows tools.
+Перед завершением скрипт распаковывает архив и запускает `ldd` для CLI
+и редактора. Отсутствие библиотеки считается ошибкой. Это проверяет загрузчик
+на машине сборки, но не отрисовку, работу с проектами или отладку. Повторите
+проверку библиотек на Astra, затем запустите приложение в графическом сеансе
+и проверьте редактирование Delphi, автодополнение, сборку и запуск FPC,
+точки останова, переменные, шаги и отмену. Скрипт
+`script/delphi/tests/smoke_lldb.py` отдельно проверяет реальную связку FPC/DAP;
+успех протокольного теста не подтверждает работу интерфейса Zed. Для сборки
+и отладки Embarcadero по-прежнему нужны лицензированные инструменты Windows.
 
-## Run the packaged editor
+## Запуск редактора из пакета
 
-Extract the archive for your CPU architecture into a separate folder, then run
-its CLI (the current development channel uses `zed-dev.app`):
+Распакуйте архив для вашей архитектуры процессора в отдельную папку и запустите
+CLI. Текущий канал разработки использует имя `zed-dev.app`:
 
 ```sh
 tar -xzf zed-linux-x86_64.tar.gz
 ./zed-dev.app/bin/zed /absolute/path/to/project
 ```
 
-Install FPC and a compatible CodeLLDB separately. Copy
-`script/delphi/examples/multi_unit` to a writable folder, set the CodeLLDB binary
-path in Zed settings if it is not managed by Zed, then select the example's build,
-run and debug tasks. The project enables `pasls`; install/configure it using
-[the language-server guide](../PASLS.md) or disable that server until installed.
+Установите FPC и совместимый CodeLLDB отдельно. Скопируйте
+`script/delphi/examples/multi_unit` в папку с правом записи. Укажите путь
+к CodeLLDB в настройках Zed, если редактор не управляет его установкой,
+затем выберите задачи сборки, запуска и отладки примера. В проекте включён
+`pasls`: установите и настройте его по
+[руководству языкового сервера](../PASLS.md) либо отключите до установки.
 
-The package is not a system installer. It includes the editor, CLI and selected
-shared libraries, but still uses host glibc/GLib/audio/graphics libraries. Do not
-rename an Ubuntu24.04 archive as an Astra package without testing its loader and
-GUI on the actual target release.
+Это архив приложения, а не системный установщик. Он содержит редактор, CLI
+и часть динамических библиотек, но использует системные glibc, GLib,
+аудиобиблиотеки и графический стек. Не обозначайте архив Ubuntu 24.04 как пакет
+Astra без проверки загрузчика и интерфейса на целевой версии Astra.
+
+## Опубликованные и проверяемые сборки
+
+В [релизе 1.0.0](https://github.com/ghost-raven1/zed-delphi/releases/tag/v1.0.0)
+опубликована проверенная сборка Linux ARM64 с английским интерфейсом.
+На 2026-11-04 сборка редактора Linux x86_64 выполняется в CI. Пакет pasls
+для x86_64 уже прошёл нативную сборку и протокольные проверки; состояние редактора
+и языкового сервера отслеживается отдельно. Сведения о платформах приведены
+в [описании форка](../../../FORK.md).

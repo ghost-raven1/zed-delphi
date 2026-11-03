@@ -1,27 +1,31 @@
 # Zed Delphi
 
-This fork adds built-in Object Pascal editing, compiler tasks and debugger integration,
-and removes application telemetry collectors and senders. The Linux ARM64 application has passed local build/run/debug acceptance.
-It does not include the RAD Studio form designer.
+Форк добавляет встроенную поддержку Object Pascal, задачи компиляции и интеграцию
+отладчиков. Сборщики и отправители телеметрии приложения удалены. Приложение для
+Linux ARM64 прошло локальную проверку сборки, запуска и отладки проектов.
+Визуальный дизайнер форм RAD Studio не входит в состав.
 
-The source baseline is `8a47b3510959f5daba5c8b45bc3d04d68c5bd551` from
-https://github.com/zed-industries/zed. Local work is on
+Исходная версия: `8a47b3510959f5daba5c8b45bc3d04d68c5bd551` из
+https://github.com/zed-industries/zed. Ветка разработки:
 `feature/delphi-no-telemetry`.
 
-## Use and build
+Опубликован [релиз 1.0.0](https://github.com/ghost-raven1/zed-delphi/releases/tag/v1.0.0)
+с пакетом для Linux ARM64. Интерфейс этой сборки остаётся англоязычным.
+Русскоязычная документация сама по себе не означает, что интерфейс уже переведён.
 
-See [Delphi setup](docs/src/languages/delphi.md) for Free Pascal, Lazarus,
-Embarcadero MSBuild, local debugging and Windows SSH transports. External compilers,
-language servers and debuggers are not bundled. An Embarcadero installation and
-its license must be supplied by the user.
+## Настройка и сборка
 
-See the [tested pasls setup](script/delphi/PASLS.md) and the
-[Free Pascal build recipe for Astra validation](script/delphi/astra/README.md)
-for separately built language tools.
+В [руководстве по Delphi](docs/src/languages/delphi.md) описаны Free Pascal,
+Lazarus, Embarcadero MSBuild, локальная отладка и подключение к Windows через SSH.
+Компиляторы, языковые серверы и отладчики устанавливаются отдельно. Для Embarcadero
+нужны ваша установка Delphi и соответствующая лицензия.
 
-Follow the upstream platform build prerequisites in [development](docs/src/development.md).
-The pinned Rust toolchain is in `rust-toolchain.toml`. On macOS, use a full Xcode
-developer directory for the build, without changing the system-wide selection:
+Также доступны [настройка проверенного pasls](script/delphi/PASLS.md) и
+[рецепт сборки Free Pascal для проверки на Astra](script/delphi/astra/README.md).
+
+Установите зависимости вашей платформы по [руководству разработчика](docs/src/development.md).
+Версия Rust закреплена в `rust-toolchain.toml`. На macOS укажите полную установку
+Xcode для конкретной команды, не меняя общесистемный выбор:
 
 ```sh
 . "$HOME/.cargo/env"
@@ -29,27 +33,28 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer cargo build --locked -p
 DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer cargo run --locked -p zed --bin zed
 ```
 
-The Linux packager is documented in [Linux builds](script/delphi/linux/README.md).
-The fork is published at https://github.com/ghost-raven1/zed-delphi.
-Keep separate from an existing Zed installation while evaluating this fork.
+Упаковка приложения описана в [руководстве по сборке Linux](script/delphi/linux/README.md).
+Публичный репозиторий: https://github.com/ghost-raven1/zed-delphi.
+На время проверки держите форк отдельно от установленного Zed.
 
-## Privacy and updates
+## Приватность и обновления
 
-See [privacy behavior](docs/src/telemetry.md). Legacy telemetry settings cannot
-enable the removed collectors. Local troubleshooting logs, explicitly submitted
-feedback and requested network features remain available. External tools and hosted
-services have their own behavior.
+См. [описание приватности](docs/src/telemetry.md). Старые настройки телеметрии
+не могут включить удалённые сборщики. Локальные диагностические журналы, явно
+отправленные отзывы и сетевые функции остаются доступны. У внешних инструментов
+и размещённых в сети сервисов собственные правила обработки данных.
 
-Upstream application updates and symbol uploads in the platform bundling scripts
-are disabled. Updating this fork requires a reviewed rebuild. A pending Windows
-upstream update is not applied on exit.
+Обновления приложения из исходного Zed и загрузка отладочных символов из скриптов
+упаковки отключены. Для обновления форка нужна проверенная новая сборка.
+Ожидающее обновление исходного Zed для Windows не применяется при выходе.
 
-Zed's remote editor backend must also come from this fork. Official remote-server
-downloads are disabled, and SSH, WSL and Docker use a separate
-`zed-delphi-remote-server-*` filename to avoid reusing stock binaries.
+Сервер удалённого редактирования тоже должен быть собран из этого форка.
+Загрузка официальных `remote-server` отключена. SSH, WSL и Docker используют
+отдельные имена `zed-delphi-remote-server-*`, чтобы не запускать исходные бинарные
+файлы Zed повторно.
 
-Set `ZED_DELPHI_REMOTE_SERVER_DIR` in the editor's environment to a directory
-containing your own builds for the destination platform:
+В окружении редактора задайте `ZED_DELPHI_REMOTE_SERVER_DIR`: путь к папке с вашими
+сборками для целевых платформ:
 
 ```text
 remote-artifacts/
@@ -58,16 +63,16 @@ remote-artifacts/
   windows-x86_64/remote-server.zip
 ```
 
-Unix files are gzip-compressed `remote-server` binaries. A Windows ZIP must contain
-`remote_server.exe` at its root. Use matching fork revisions on both ends. The
-directory is a trusted, explicitly supplied build source, not an artifact
-signature verifier. Development builds can also use the upstream
-`ZED_BUILD_REMOTE_SERVER` source-build workflow. The Delphi Python SSH helpers
-are separate from Zed's remote editor backend.
+Для Unix нужны сжатые gzip файлы `remote-server`. В корне ZIP для Windows должен
+находиться `remote_server.exe`. Используйте одну ревизию форка на обеих сторонах.
+Папка считается доверенным источником явно предоставленных сборок; подписи
+артефактов не проверяются. При разработке также можно использовать механизм
+`ZED_BUILD_REMOTE_SERVER` для сборки из исходников. Python-скрипты Delphi для SSH
+работают отдельно от сервера удалённого редактирования Zed.
 
-## Verification
+## Проверки
 
-Run from the checkout root:
+Запускайте команды из корня репозитория:
 
 ```sh
 python3 -m unittest discover -s script/delphi/tests -v
@@ -79,23 +84,29 @@ cargo test --locked -p auto_update
 cargo test --locked -p dap_adapters delphi
 ```
 
-## Acceptance status (2026-11-04)
+## Состояние проверок на 2026-11-04
 
-- Ubuntu 24.04 ARM64: release editor and CLI built; packaged loader checks passed.
-  The extracted package opened a multi-unit Object Pascal project in Xvfb/Mesa.
-  Native highlighting, pasls definition/completion/diagnostics, FPC build/run,
-  CodeLLDB breakpoint, call stack, integer locals, step and exit 0 passed.
-  Project paths containing spaces were also exercised in the editor debugger.
-- Python helpers: 30 tests, 29 passed and one Windows-only test skipped on Linux.
-- macOS ARM64: helper, grammar, telemetry and standalone FPC/DAP checks passed;
-  the complete macOS application has not passed acceptance.
-- Linux x86_64: native Ubuntu CI release build is being prepared; no Astra result
-  is inferred from Ubuntu or ARM64 results.
-- Windows: integration source and CI recipe exist; commercial Delphi, remote
-  Windows sessions and full application acceptance remain unverified.
+- Ubuntu 24.04 ARM64: редактор и CLI собраны в режиме release; проверка загрузки
+  библиотек пакета пройдена. Распакованное приложение открыло многофайловый проект
+  Object Pascal в Xvfb/Mesa. Проверены подсветка, переход к определению через pasls,
+  автодополнение и диагностика по протоколу, сборка и запуск FPC, точка останова,
+  стек, целочисленные переменные, пошаговое выполнение CodeLLDB и выход с кодом 0.
+  В интерфейсе редактора также проверена отладка проекта с пробелами в пути.
+  Пакет опубликован в релизе 1.0.0 с английским интерфейсом.
+- Python-скрипты: 30 тестов, 29 пройдены; один тест только для Windows пропущен
+  на Linux.
+- Linux x86_64: нативная сборка редактора для Ubuntu выполняется в CI.
+  Отдельный пакет pasls уже собран; инициализация, переход к определению,
+  автодополнение, диагностика с восстановлением и завершение прошли проверку
+  после переноса в путь с пробелами. Это не подтверждает совместимость с Astra.
+- macOS ARM64: пройдены проверки вспомогательных скриптов, грамматики, телеметрии
+  и отдельной связки FPC/DAP. Сборки полного приложения для macOS ARM64 и x64
+  выполняются в CI; полная приёмка интерфейса ещё не завершена.
+- Windows: сборка приложения выполняется в CI. Коммерческий Delphi, удалённые
+  сеансы Windows и полная приёмка приложения пока не подтверждены.
 
-FPC is not a drop-in replacement for every Embarcadero Delphi project. Lazarus,
-VCL/FMX applications and complex Pascal debugger expressions require separate
-acceptance. External compilers, language servers and debug adapters must be
-installed; there is no visual DFM/FMX designer. This is a source fork with a
-verified Linux scenario, not a claim of complete RAD Studio compatibility.
+FPC не обеспечивает совместимость с любым проектом Embarcadero Delphi. Lazarus,
+приложения VCL/FMX и сложные выражения Pascal в отладчике требуют отдельных
+проверок. Компиляторы, языковые серверы и адаптеры отладки устанавливаются отдельно.
+Визуального дизайнера DFM/FMX нет. Подтверждён рабочий сценарий Linux;
+полная совместимость с RAD Studio не заявляется.

@@ -1,25 +1,40 @@
 ---
-title: Telemetry
-description: "Telemetry removal in Zed Delphi, local diagnostics, and the limits of external-tool privacy."
+title: Телеметрия
+description: "Удаление телеметрии в Zed Delphi, локальная диагностика и границы контроля внешних инструментов."
 ---
 
-# Telemetry in Zed Delphi
+# Телеметрия в Zed Delphi
 
-## This fork
+## Поведение форка
 
-This build removes the desktop telemetry collectors and senders. Existing settings cannot turn them back on. The Settings Editor shows that telemetry has been removed instead of offering enable switches.
+Из этой сборки удалены сборщики и отправители телеметрии настольного приложения.
+Существующие настройки не могут включить их повторно. В редакторе настроек
+указано, что телеметрия удалена; переключателей для её включения нет.
 
-Removed paths include:
+Удалены следующие механизмы:
 
-- Usage-event queues, telemetry log creation, installation/system tracking identifiers, and project-type reporting.
-- Crash/minidump uploads, automatic build-timing uploads, and hang-event reporting.
-- Remote event forwarding and automatic retrieval of remote crash files.
-- Anthropic usage-event logging.
-- Automatic Git/project snapshots when starting an AI thread (legacy saved threads remain readable).
-- Zed edit-prediction accept, reject, and settled-outcome reporting, training-data collection, and Mercury acceptance/rejection feedback.
+- Очереди событий использования, создание журнала телеметрии, идентификаторы
+  отслеживания установки и системы, отчёты о типах проектов.
+- Отправка отчётов о сбоях и минидампов, автоматическая загрузка замеров времени
+  сборки и сообщений о зависаниях.
+- Пересылка удалённых событий и автоматическое получение файлов удалённых сбоев.
+- Журналирование событий использования Anthropic.
+- Автоматические снимки Git и проекта при создании чата с ИИ. Ранее сохранённые
+  чаты остаются доступны для чтения.
+- Отправка принятия, отклонения и итоговых результатов предсказаний правок Zed,
+  сбор обучающих данных и обратная связь Mercury о принятии и отклонении правок.
 
-Local application, performance, and error logs remain available for troubleshooting. A local session identifier still supports restoring your windows. Existing files from upstream installations are not deleted.
+Локальные журналы приложения, производительности и ошибок остаются доступны
+для диагностики. Локальный идентификатор сеанса используется для восстановления
+окон. Файлы от прежних установок исходного Zed не удаляются.
 
-This does not disable the network. Explicit AI requests, collaboration, extension and tool downloads, and manually submitted feedback can still send data required for those actions. Hosted services may retain their own request logs. Separately installed language servers, debug adapters, extensions, and provider processes have their own behavior; the fork does not control their telemetry. You must configure or audit those tools separately.
+Сетевые функции остаются доступны. Запросы к ИИ, совместная работа, загрузка
+расширений и инструментов, а также вручную отправленные отзывы могут передавать
+данные, необходимые для этих действий. Серверные сервисы могут вести собственные
+журналы запросов. У отдельно установленных языковых серверов, адаптеров отладки,
+расширений и провайдеров свои правила обработки данных. Форк не управляет их
+телеметрией: настройте или проверьте эти инструменты отдельно.
 
-The removal is implemented in source. A complete application build and runtime traffic inspection on each supported platform are still required before claiming a verified release.
+Удаление выполнено в исходном коде. Сборка и проверка интерфейса Linux ARM64
+не подтверждают все сетевые сценарии на каждой платформе. Для такой гарантии
+нужна отдельная проверка трафика работающего приложения в соответствующей среде.

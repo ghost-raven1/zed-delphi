@@ -1,7 +1,20 @@
-# Multi-unit Delphi acceptance project
+# Многофайловый проект для проверки Delphi
 
-Open this directory itself as the Zed worktree. Put `fpc` on the editor's PATH, then run **FPC: build multi-unit (Debug)**. The program prints `42` and exits with status 0. Debug profiles use CodeLLDB and invoke the same build task before launching.
+Откройте эту папку как отдельный проект Zed. Добавьте `fpc` в `PATH` редактора
+и запустите **FPC: build multi-unit (Debug)**. Программа выводит `42` и завершается
+с кодом 0. Профили отладки используют CodeLLDB и перед запуском выполняют ту же
+задачу сборки.
 
-For the desktop acceptance check, open `MultiUnit.dpr`, navigate to `TCalculator.Calculate` in `Arithmetic.pas`, and place a breakpoint on `Result := LeftValue + RightValue` inside `AddValues`. Launch the debugger; verify the stack spans the program and unit, `LeftValue = 20`, `RightValue = 22`, stepping computes `Result = 42`, and continuation exits normally. The integer arguments are suitable for inspecting even where LLDB's Pascal object/property display is limited.
+Для проверки в интерфейсе откройте `MultiUnit.dpr`, перейдите к
+`TCalculator.Calculate` в `Arithmetic.pas` и поставьте точку останова на
+`Result := LeftValue + RightValue` внутри `AddValues`. Запустите отладчик.
+Проверьте, что стек содержит вызовы из программы и модуля, `LeftValue = 20`,
+`RightValue = 22`, шаг вычисляет `Result = 42`, а продолжение завершает программу
+штатно. Целочисленные аргументы можно проверить и там, где LLDB ограниченно
+отображает объекты и свойства Pascal.
 
-The sources deliberately use classic Delphi `uses ... in 'Arithmetic.pas'`, a class/property and a separate function. FPC is selected with `-Mdelphi`; no source mode directive or external framework is needed. Command-line compilation alone does not establish Zed UI/debugger acceptance.
+В исходниках намеренно используются классический синтаксис Delphi
+`uses ... in 'Arithmetic.pas'`, класс со свойством и отдельная функция.
+FPC запускается с `-Mdelphi`; директива режима в исходнике и внешняя библиотека
+не нужны. Одна лишь компиляция из командной строки не подтверждает работу
+интерфейса и отладчика Zed.

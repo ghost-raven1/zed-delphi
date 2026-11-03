@@ -1,31 +1,62 @@
-# Tested Free Pascal language server
+# Проверенный языковой сервер Free Pascal
 
-The real `pasls` process was built and tested on macOS ARM64 with Free Pascal 3.2.2. The smoke test exercises initialization, opening valid source, definition lookup, completion, a syntax error, clearing that error after repair, and orderly shutdown. This verifies the server protocol, not the complete Zed UI.
+Сервер `pasls` собран и проверен с Free Pascal 3.2.2 на macOS ARM64,
+Ubuntu 24.04 ARM64 и Linux x86_64. Тест запускает настоящий процесс сервера:
+инициализация, открытие корректного исходника, переход к определению,
+автодополнение, синтаксическая ошибка, очистка диагностики после исправления
+и штатное завершение. Это проверка протокола сервера. Отдельно в интерфейсе
+Zed на Linux ARM64 проверен переход к определению через pasls.
 
-Sources used without local patches:
+Для Linux x86_64 опубликован
+[успешный запуск CI](https://github.com/ghost-raven1/zed-delphi/actions/runs/41709650819)
+с архивом, исходниками, лицензиями, сведениями о сборке и контрольными суммами.
+Относительные пути запуска проверены после переноса в папку с пробелами.
+Архив не включает компилятор: установите Free Pascal 3.2.2, базовые модули
+и FCL отдельно. Рецепт сборки в репозитории:
+`script/delphi/linux/build_pasls.py`.
 
-| Component | Source revision |
-| --- | --- |
-| [pasls](https://github.com/genericptr/pascal-language-server) | `818f6330b721ed5c89d1fd8f66186f11b7b242b4` |
-| [Lazarus](https://gitlab.com/freepascal.org/lazarus/lazarus) | `9d15c73c91a1545be50bee02b27bd3b43f9d90e8` (`lazarus_4_0`) |
-| [Free Pascal source](https://gitlab.com/freepascal.org/fpc/source) | `0d122c49534b480be9284c21bd60b53d99904346` (`release_3_2_2`) |
+Использованные исходники без локальных изменений:
 
-The installed test toolchain lives in `$HOME/.local/share/zed-delphi/toolchains/pasls/`. Its `installation.json` records source revisions, selected source directories, compiler and build command. The launcher `$HOME/.local/bin/pasls` supplies the matching source paths unless `PP`, `FPCDIR` or `LAZARUSDIR` are explicitly set by the caller. The sources are retained because CodeTools needs them at runtime. Build intermediates were removed; the installation occupies about 92 MB.
+| Компонент                                                             | Ревизия исходников                                           |
+| --------------------------------------------------------------------- | ------------------------------------------------------------ |
+| [pasls](https://github.com/genericptr/pascal-language-server)         | `818f6330b721ed5c89d1fd8f66186f11b7b242b4`                   |
+| [Lazarus](https://gitlab.com/freepascal.org/lazarus/lazarus)          | `9d15c73c91a1545be50bee02b27bd3b43f9d90e8` (`lazarus_4_0`)   |
+| [Исходники Free Pascal](https://gitlab.com/freepascal.org/fpc/source) | `0d122c49534b480be9284c21bd60b53d99904346` (`release_3_2_2`) |
 
-Lazarus was checked out sparsely: `components/codetools`, `components/lazutils`, `components/jcf2`. Free Pascal sources include `rtl`, `packages/fcl-base`, `packages/fcl-json`. Projects that depend on other source packages need those packages added to the source checkout or their own CodeTools search paths. No Lazarus GUI installation was needed.
+Локальная проверочная установка macOS находится в
+`$HOME/.local/share/zed-delphi/toolchains/pasls/`. Файл `installation.json`
+содержит ревизии и выбранные папки исходников, компилятор и команду сборки.
+Скрипт `$HOME/.local/bin/pasls` подставляет пути к соответствующим исходникам,
+если вызывающий процесс явно не задал `PP`, `FPCDIR` или `LAZARUSDIR`.
+Исходники сохранены, поскольку CodeTools использует их при работе.
+Промежуточные файлы сборки удалены; эта установка занимает около 92 МБ.
 
-To rebuild with these checkouts, from the installation's `source` directory:
+Из Lazarus выбраны `components/codetools`, `components/lazutils`, `components/jcf2`.
+Исходники Free Pascal включают `rtl`, `packages/fcl-base`, `packages/fcl-json`.
+Если проект зависит от других пакетов, добавьте их исходники или настройте
+соответствующие пути CodeTools. Установка графической среды Lazarus не требуется.
+
+Для пересборки с этими исходниками выполните команду из папки `source`
+локальной установки macOS:
 
 ```sh
 LAZARUSDIR="$HOME/.local/share/zed-delphi/toolchains/pasls/lazarus" \
 FPC=/opt/homebrew/bin/fpc bash src/build_fpc.sh aarch64-darwin
 ```
 
-The upstream build writes `dist/aarch64-darwin/pasls`. Other targets require the corresponding compiler; change the explicit target instead of assuming this macOS binary works on Windows or Linux.
+Скрипт исходного проекта создаёт `dist/aarch64-darwin/pasls`. Для других платформ
+нужен соответствующий компилятор и явно выбранная цель. Этот бинарный файл macOS
+не предназначен для Windows или Linux.
 
-Choose `pasls` for an FPC project. Replace the example executable path with the absolute path to the installed launcher:
+Для проекта FPC выберите `pasls`. В примере замените путь к исполняемому файлу
+на абсолютный путь к вашему скрипту запуска.
 
-The built-in adapter enables syntax checking, published diagnostics and Delphi mode (`-Mdelphi`) by default. Explicit project initialization options can override these settings; an ObjFPC project can use `fpcOptions: ["-Mobjfpc"]`. The example spells out the defaults for reproducibility with external clients as well. The smoke fixture deliberately has no `{$mode}` directive, so its mode comes from initialization options.
+Встроенный адаптер по умолчанию включает проверку синтаксиса, публикацию
+диагностики и режим Delphi (`-Mdelphi`). Параметры инициализации проекта могут
+их переопределить: например, для ObjFPC задайте `fpcOptions: ["-Mobjfpc"]`.
+Пример явно указывает значения для воспроизводимой настройки внешних клиентов.
+В тестовом исходнике намеренно нет директивы `{$mode}`: режим берётся
+из параметров инициализации.
 
 ```json
 {
@@ -43,7 +74,7 @@ The built-in adapter enables syntax checking, published diagnostics and Delphi m
 }
 ```
 
-Run the real-server smoke test from the fork root:
+Запустите проверку настоящего сервера из корня форка:
 
 ```sh
 python3 script/delphi/tests/smoke_pasls.py \
@@ -53,6 +84,12 @@ python3 script/delphi/tests/smoke_pasls.py \
   --lazarus-source "$HOME/.local/share/zed-delphi/toolchains/pasls/lazarus"
 ```
 
-The test uses a temporary project and bounded waits. A successful result includes `initialize`, `definition`, `completion`, `diagnostics_and_recovery` as `passed`, and `shutdown_exit_code: 0`.
+Тест создаёт временный проект и ограничивает время ожидания ответов. Успешный
+результат содержит `initialize`, `definition`, `completion`,
+`diagnostics_and_recovery` со значением `passed` и `shutdown_exit_code: 0`.
 
-This pasls revision expects `clientInfo` during initialization and rejects an explicit JSON `null` for shutdown parameters. Zed supplies client information in normal app startup and omits unit-valued parameters, so no adapter workaround was needed. These observations are protocol checks, not evidence of Embarcadero DelphiLSP compatibility or Windows execution.
+Эта ревизия pasls ожидает `clientInfo` при инициализации и отклоняет явный
+JSON `null` в параметрах завершения. При обычном запуске Zed передаёт сведения
+о клиенте и опускает параметры без значения, поэтому обходная правка адаптера
+не понадобилась. Эти результаты не подтверждают совместимость с Embarcadero
+DelphiLSP или работу сервера на Windows.

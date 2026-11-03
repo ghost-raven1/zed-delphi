@@ -1,46 +1,53 @@
 ---
 title: Delphi / Object Pascal
-description: Built-in Object Pascal editing, compiler tasks and Delphi debugging.
+description: Встроенное редактирование Object Pascal, задачи компиляции и отладка Delphi.
 ---
 
 # Delphi / Object Pascal
 
-This fork includes a native Tree-sitter grammar for `.pas`, `.dpr`, `.dpk` and
-`.lpr` files, with highlighting, an outline, brackets and indentation. Compiler,
-language-server and debugger executables are installed separately.
+Форк содержит встроенную грамматику Tree-sitter для файлов `.pas`, `.dpr`,
+`.dpk` и `.lpr`: подсветку, структуру кода, парные скобки и отступы.
+Компилятор, языковой сервер и отладчик устанавливаются отдельно.
 
-The vendored grammar includes project `uses ... in 'file.pas'` declarations and
-package `requires`/`contains` declarations. `.dfm` and `.fmx` form designers are not
-implemented. VCL and FMX projects can be built by their installed Embarcadero
-toolchain; this does not provide a visual form designer.
+Включённая грамматика понимает объявления проектов `uses ... in 'file.pas'`
+и разделы пакетов `requires`/`contains`. Дизайнеры форм `.dfm` и `.fmx`
+не реализованы. Проекты VCL и FMX можно собирать установленными инструментами
+Embarcadero; визуальное редактирование форм этим не предоставляется.
 
-## Platform coverage {#platform-coverage}
+## Поддержка платформ {#platform-coverage}
 
-The editor remains a native Rust/GPUI application. Editor host, compiler host and
-application target are separate choices:
+Редактор остаётся нативным приложением Rust/GPUI. Платформу редактора,
+машину компилятора и целевую платформу программы выбирают отдельно:
 
-| Editor host | Local compilation              | Embarcadero integration               | Debugging                                                     |
-| ----------- | ------------------------------ | ------------------------------------- | ------------------------------------------------------------- |
-| Windows x64 | FPC, Lazarus, installed Delphi | Local DelphiLSP and MSBuild           | FPC through LLDB/GDB; Delphi through MCA DAP                  |
-| macOS ARM64 | FPC, Lazarus                   | Windows SSH build and language server | Local FPC through LLDB; Delphi through Windows DAP bridge     |
-| macOS x64   | FPC, Lazarus                   | Windows SSH build and language server | Same configured adapters as ARM64                             |
-| Linux x64   | FPC, Lazarus                   | Windows SSH build and language server | Local FPC through LLDB/GDB; Delphi through Windows DAP bridge |
+| Платформа редактора | Локальная компиляция               | Интеграция Embarcadero                     | Отладка                                                       |
+| ------------------- | ---------------------------------- | ------------------------------------------ | ------------------------------------------------------------- |
+| Windows x64         | FPC, Lazarus, установленный Delphi | Локальные DelphiLSP и MSBuild              | FPC через LLDB/GDB; Delphi через MCA DAP                      |
+| macOS ARM64         | FPC, Lazarus                       | Сборка и языковой сервер Windows через SSH | Локальный FPC через LLDB; Delphi через мост DAP к Windows     |
+| macOS x64           | FPC, Lazarus                       | Сборка и языковой сервер Windows через SSH | Те же настраиваемые адаптеры, что для ARM64                   |
+| Linux x64           | FPC, Lazarus                       | Сборка и языковой сервер Windows через SSH | Локальный FPC через LLDB/GDB; Delphi через мост DAP к Windows |
 
-This table describes implemented integration paths, not completed acceptance on
-every platform. On Ubuntu 24.04 ARM64, the packaged native editor passed FPC
-multi-unit build/run and CodeLLDB breakpoint, stack, integer locals, stepping and
-exit checks, including a project path with spaces. Native pasls navigation and
-protocol diagnostics/completion checks passed. Standalone FPC/DAP also passed on
-macOS ARM64. See [fork verification](../../../FORK.md) for current platform results.
+Таблица описывает реализованные способы интеграции, а не завершённую приёмку
+каждой платформы. На Ubuntu 24.04 ARM64 пакет редактора прошёл сборку и запуск
+многофайлового проекта FPC, проверку точки останова, стека, целочисленных
+переменных, пошагового выполнения CodeLLDB и завершения. Проверен и путь
+проекта с пробелами. Пройдены переход к определению через pasls в редакторе
+и протокольные проверки диагностики и автодополнения. Отдельная связка FPC/DAP
+также проверена на macOS ARM64. Текущее состояние платформ см. в
+[результатах проверок форка](../../../FORK.md).
 
-The manually dispatched fork workflows build native applications and retain test
-logs and artifacts. Linux x86_64 uses the separate `Delphi Linux x86_64 bundle`
-workflow. These results do not imply Astra ABI compatibility, signed installers,
-or licensed Embarcadero and remote Windows acceptance. Windows ARM64 is not
-covered by the fork's CI matrix.
+На 2026-11-04 опубликован релиз 1.0.0 для Linux ARM64 с английским интерфейсом.
+Сборки редактора Linux x86_64, macOS и Windows выполняются в CI. Нативный
+языковой сервер pasls для Linux x86_64 уже собран и прошёл протокольные проверки.
+Русская документация не означает завершённую русификацию интерфейса.
 
-Include files are ambiguous across languages. To treat your project's `.inc`
-files as Delphi, add this to your project settings:
+Вручную запускаемые процессы CI форка собирают приложения и сохраняют журналы
+и артефакты. Для Linux x86_64 используется отдельный процесс
+`Delphi Linux x86_64 bundle`. Эти результаты не подтверждают совместимость ABI
+с Astra, подписанные установщики, работу лицензированного Embarcadero
+или удалённых сеансов Windows. Windows ARM64 не входит в матрицу CI форка.
+
+Расширение `.inc` используется разными языками. Чтобы распознавать такие файлы
+вашего проекта как Delphi, добавьте в настройки проекта:
 
 ```json [settings]
 {
@@ -48,12 +55,12 @@ files as Delphi, add this to your project settings:
 }
 ```
 
-## Language servers {#language-servers}
+## Языковые серверы {#language-servers}
 
-Select one server in the Settings Editor, or configure it explicitly. Neither
-server is automatically downloaded or enabled.
+Выберите один сервер в редакторе настроек или задайте его явно.
+Автоматическая загрузка и включение этих серверов не выполняются.
 
-For Free Pascal, install `pasls` and configure its CodeTools search paths:
+Для Free Pascal установите `pasls` и настройте пути поиска CodeTools:
 
 ```json [settings]
 {
@@ -64,7 +71,7 @@ For Free Pascal, install `pasls` and configure its CodeTools search paths:
 }
 ```
 
-For Embarcadero, use the DelphiLSP from your licensed installation on Windows:
+Для Embarcadero используйте DelphiLSP из вашей лицензированной установки Windows:
 
 ```json [settings]
 {
@@ -78,12 +85,13 @@ For Embarcadero, use the DelphiLSP from your licensed installation on Windows:
 }
 ```
 
-Follow the [Embarcadero external-editor setup](https://docwiki.embarcadero.com/RADStudio/Alexandria/en/Using_DelphiLSP_Code_Insight_with_Other_Editors)
-for the project configuration. `pasls` uses Free Pascal semantics; it does not
-replace DelphiLSP for Embarcadero-specific APIs.
+Настройте проект по
+[руководству Embarcadero для внешних редакторов](https://docwiki.embarcadero.com/RADStudio/Alexandria/en/Using_DelphiLSP_Code_Insight_with_Other_Editors).
+`pasls` использует семантику Free Pascal и не заменяет DelphiLSP для API,
+специфичных для Embarcadero.
 
-For a Mac/Linux editor with a Windows language server, configure the included
-stdio bridge instead of the Windows executable:
+Чтобы редактор macOS/Linux работал с языковым сервером Windows, укажите
+входящий в форк мост stdio вместо исполняемого файла Windows:
 
 ```json [settings]
 {
@@ -110,47 +118,53 @@ stdio bridge instead of the Windows executable:
 }
 ```
 
-Use a noninteractive OpenSSH host alias. Synchronize source files yourself and
-generate `.delphilsp.json` for the Windows compiler paths. The bridge maps rooted
-file URIs, paths and workspace-edit keys in both directions. Framing and mapping
-have automated tests; completion/navigation against an actual Windows DelphiLSP
-has not been validated. Mac/Linux LSP transport does not install or license
-Delphi on the build host.
+Используйте псевдоним узла OpenSSH с неинтерактивной аутентификацией.
+Самостоятельно синхронизируйте исходники и создайте `.delphilsp.json`
+с путями компилятора Windows. Мост преобразует файловые URI с корневым путём,
+обычные пути и ключи изменений рабочей области в обоих направлениях.
+Формат сообщений и преобразования покрыты автоматическими тестами;
+автодополнение и навигация с настоящим Windows DelphiLSP пока не проверены.
+Транспорт из macOS/Linux не устанавливает Delphi на сервер и не предоставляет
+лицензию.
 
-## Build and run {#build-and-run}
+## Сборка и запуск {#build-and-run}
 
-The task picker includes Free Pascal Debug and Release compilation for the current
-file. Open the program entry point before using it. A unit can compile without
-producing an executable. Debug uses Delphi mode, DWARF symbols and no optimization.
-See the [Free Pascal compiler options](https://www.freepascal.org/docs-html/3.0.2/user/userap1.html).
+Список задач содержит компиляцию текущего файла Free Pascal в режимах Debug
+и Release. Перед запуском откройте главный файл программы: отдельный модуль
+может компилироваться без создания исполняемого файла. Режим Debug использует
+синтаксис Delphi, символы DWARF и отключённую оптимизацию. См.
+[параметры компилятора Free Pascal](https://www.freepascal.org/docs-html/3.0.2/user/userap1.html).
 
-For a complete project, use `script/delphi/build.py` from this fork. It requires
-Python 3.9 or newer and invokes installed tools; it does not install compilers.
-Paths supplied to this helper are process arguments, not shell commands. It
-returns compiler failures unchanged and runs a program only after a successful
-build. Relative output and program paths are resolved beside the project file.
+Для целого проекта используйте `script/delphi/build.py` из форка. Скрипт требует
+Python 3.9 или новее и вызывает установленные инструменты; компиляторы он
+не устанавливает. Пути передаются как аргументы процесса, а не команды оболочки.
+Коды ошибок компилятора возвращаются без изменений. Программа запускается только
+после успешной сборки. Относительные пути результата и программы вычисляются
+от папки файла проекта.
 
 ```sh
 python3 script/delphi/build.py --tool fpc --project /projects/App/App.dpr --run
 python3 script/delphi/build.py --tool lazarus --project /projects/App/App.lpi --config Debug --run --program bin/App
 ```
 
-Lazarus build modes must already exist in the `.lpi`. The helper uses `lazbuild`;
-it does not replace the Lazarus form designer.
+Режимы сборки Lazarus должны быть заранее определены в `.lpi`. Скрипт использует
+`lazbuild` и не заменяет дизайнер форм Lazarus.
 
-On Windows, select your Delphi installation explicitly:
+На Windows явно выберите установку Delphi:
 
 ```powershell
 python script/delphi/build.py --tool delphi --project "C:\Projects\App\App.dproj" --rsvars "C:\Program Files (x86)\Embarcadero\Studio\23.0\bin\rsvars.bat" --config Debug --platform Win64 --run --program "Win64\Debug\App.exe"
 ```
 
-You can omit `--rsvars` when launching from a configured RAD Studio command prompt.
-The helper uses [MSBuild project configuration and platform properties](https://docwiki.embarcadero.com/RADStudio/Sydney/en/Building_a_Project_Using_an_MSBuild_Command).
-Use the platform name available in your installed compiler and project. Legacy
-`.dpr`/`.dpk` builds without `.dproj` need explicit compiler tasks. Mobile deployment,
-code signing and platform SDK setup remain responsibilities of the toolchain.
+Параметр `--rsvars` можно опустить при запуске из настроенной командной строки
+RAD Studio. Скрипт использует
+[свойства конфигурации и платформы проекта MSBuild](https://docwiki.embarcadero.com/RADStudio/Sydney/en/Building_a_Project_Using_an_MSBuild_Command).
+Укажите платформу, доступную в вашем компиляторе и проекте. Для старых проектов
+`.dpr`/`.dpk` без `.dproj` нужны явно заданные задачи компиляции. Развёртывание
+на мобильных устройствах, подпись кода и настройка SDK выполняются средствами
+выбранной платформы.
 
-To expose a helper invocation in Zed, create `.zed/tasks.json`:
+Для запуска скрипта из Zed создайте `.zed/tasks.json`:
 
 ```json [tasks]
 [
@@ -169,75 +183,77 @@ To expose a helper invocation in Zed, create `.zed/tasks.json`:
 ]
 ```
 
-Use `python` on Windows if that is the installed command. Set `--compiler` to
-select a specific compiler executable. Repeat `--arg=value` to pass arguments to
-the program when using `--run`.
+На Windows используйте `python`, если именно так называется установленная команда.
+Для выбора конкретного исполняемого файла компилятора задайте `--compiler`.
+Повторяйте `--arg=value`, чтобы передавать аргументы программе с `--run`.
 
-### Cross-compile an application {#cross-compilation}
+### Сборка приложения для другой платформы {#cross-compilation}
 
-For Free Pascal, pass its target identifiers explicitly:
+Для Free Pascal явно передайте идентификаторы целевой платформы:
 
 ```sh
 python3 script/delphi/build.py --tool fpc --project /projects/App/App.dpr --target-os linux --target-cpu x86_64 --output /projects/App/build/linux-x64/App
 ```
 
-The helper forwards these as `-Tlinux` and `-Px86_64`. Install the matching cross
-compiler, RTL units, linker and target libraries first; flags alone do not install
-a cross toolchain or port platform-specific code. Create the output folder before
-building. `--target-os` and `--target-cpu` apply only to FPC. `--run` rejects an
-explicit target OS or CPU different from the build host, including combinations
-that would need an emulator. Cross-target compilation has command-construction
-tests but has not been run against an installed cross toolchain here.
+Скрипт преобразует их в `-Tlinux` и `-Px86_64`. Сначала установите соответствующий
+кросс-компилятор, модули RTL, компоновщик и целевые библиотеки. Одни флаги
+не устанавливают инструменты и не адаптируют платформозависимый код.
+До сборки создайте папку результата. `--target-os` и `--target-cpu` применяются
+только к FPC. Параметр `--run` отклоняет явно заданную ОС или архитектуру,
+отличную от машины сборки, в том числе варианты, требующие эмулятора.
+Для кросс-компиляции проверено построение команд, но запуск установленного
+кросс-компилятора в этой проверке не выполнялся.
 
-For Embarcadero, `--platform` selects the target defined in your `.dproj`. Available
-targets, SDK setup, deployment and framework compatibility depend on the selected
-licensed installation. `--run` is accepted only for `Win32` or `Win64` on a
-Windows host. Build Linux, macOS, Android and iOS targets without `--run`, then
-deploy and execute them on their target platform with the appropriate tools.
-The helper does not perform mobile deployment. Lazarus cross targets are
-configured in the selected project build mode.
+Для Embarcadero `--platform` выбирает цель из `.dproj`. Доступные цели,
+настройка SDK, развёртывание и совместимость библиотек зависят от выбранной
+лицензированной установки. `--run` допускается только для `Win32` или `Win64`
+на машине Windows. Цели Linux, macOS, Android и iOS собирайте без `--run`,
+затем переносите и запускайте их соответствующими инструментами на целевой
+платформе. Скрипт не выполняет мобильное развёртывание. Кросс-компиляция Lazarus
+настраивается в выбранном режиме сборки проекта.
 
-### Build on Windows from macOS or Linux {#remote-build}
+### Сборка на Windows из macOS или Linux {#remote-build}
 
-Configure a Windows OpenSSH host alias and key authentication. Install Python and
-Delphi on that host and copy `build.py` there. Keep an existing checkout on each
-machine at the same source revision. This helper does not synchronize or delete
-files.
+Настройте псевдоним Windows-узла OpenSSH и аутентификацию по ключу. Установите
+на узле Python и Delphi, скопируйте туда `build.py`. На обеих машинах поддерживайте
+одинаковую ревизию исходников. Скрипт не синхронизирует и не удаляет файлы.
 
 ```sh
 python3 script/delphi/build.py --tool delphi --project 'C:\Projects\App\App.dproj' --rsvars 'C:\Delphi\bin\rsvars.bat' --ssh-host delphi-builder --remote-helper 'C:\Tools\build.py' --config Debug --platform Win64
 ```
 
-All build paths in this mode refer to the Windows host. `--remote-python` selects
-its Python executable. SSH runs without a terminal and without interactive
-password prompts. The remote compiler's output and exit status return to Zed.
-Stopping SSH does not guarantee that Windows has stopped every compiler child;
-check the host before restarting an interrupted build. Remote GUI programs run
-in the SSH session, not necessarily on the interactive desktop.
+В этом режиме все пути сборки относятся к Windows-узлу. Параметр
+`--remote-python` выбирает его исполняемый файл Python. SSH работает без терминала
+и интерактивного запроса пароля. Вывод и код завершения удалённого компилятора
+возвращаются в Zed. Остановка SSH не гарантирует завершение всех дочерних
+процессов компилятора Windows: проверьте узел перед повторным запуском
+прерванной сборки. Удалённые графические программы запускаются в SSH-сеансе,
+который может не совпадать с интерактивным рабочим столом.
 
-## Debugging {#debugging}
+## Отладка {#debugging}
 
-### Free Pascal and Lazarus
+### Free Pascal и Lazarus
 
-Compile with debug symbols and disabled optimization. Use the built-in `CodeLLDB`
-adapter (or GDB with DAP support on an appropriate host). Open
-`script/delphi/examples` as a project for a runnable sample with build and debug
-profiles. See [debugger settings](../debugger.md#customizing-debug-adapters) to
-select an existing `lldb-dap` binary, with `args: []`, instead of downloading
-CodeLLDB.
+Собирайте с отладочными символами и отключённой оптимизацией. Используйте
+встроенный адаптер `CodeLLDB` или GDB с поддержкой DAP на подходящей платформе.
+Откройте `script/delphi/examples` как проект: он содержит готовый пример
+с профилями сборки и отладки. В
+[настройках отладчика](../debugger.md#customizing-debug-adapters) можно выбрать
+установленный `lldb-dap` с `args: []` вместо загрузки CodeLLDB.
 
-Pascal expression evaluation and complex type inspection depend on the debugger.
-Apple LLDB reports that it lacks a Pascal language plugin; basic source
-breakpoints, stepping, stack frames and integer locals were tested on the sample.
-This does not establish complete Pascal debugger compatibility.
+Вычисление выражений Pascal и просмотр сложных типов зависят от отладчика.
+Apple LLDB сообщает об отсутствии языкового модуля Pascal. На примере проверены
+точки останова в исходнике, шаги, стек и целочисленные локальные переменные.
+Полная совместимость отладчика с Pascal этим не подтверждается.
 
-### Embarcadero Delphi on Windows
+### Embarcadero Delphi на Windows
 
-The built-in `Delphi` adapter launches the separately installed
-[MCA Delphi DAP debugger](https://github.com/csm101/delphi-visual-studio-code-debugger/tree/599d4bf04b14daee91b7606c18b0b1df2098f5b8).
-That project is MIT licensed; its executable is not bundled or downloaded. The
-integration uses its stdio DAP contract and supports explicit launch/attach
-profiles. Configure the executable in your user settings:
+Встроенный адаптер `Delphi` запускает отдельно установленный
+[отладчик MCA Delphi DAP](https://github.com/csm101/delphi-visual-studio-code-debugger/tree/599d4bf04b14daee91b7606c18b0b1df2098f5b8).
+Проект распространяется по лицензии MIT; его исполняемый файл не включён в пакет
+и автоматически не загружается. Интеграция использует DAP через stdio
+и поддерживает явно заданные профили запуска и подключения к процессу.
+Укажите исполняемый файл в пользовательских настройках:
 
 ```json [settings]
 {
@@ -250,7 +266,7 @@ profiles. Configure the executable in your user settings:
 }
 ```
 
-Create `.zed/debug.json` in the project:
+Создайте `.zed/debug.json` в проекте:
 
 ```json [debug]
 [
@@ -266,18 +282,20 @@ Create `.zed/debug.json` in the project:
 ]
 ```
 
-Use a Windows MSBuild task for the referenced build label. For attach, set
-`request: "attach"` and an integer `processId` or `processName`. Preserve `.map`
-and `.rsm` beside your executable and enable debug information, local symbols and
-remote symbols while disabling optimization. Packages need their own symbols.
-The adapter's Win32/Win64 behavior depends on the installed version. It has not
-been executed on Windows as part of this fork's local validation.
+Для указанного имени задачи сборки используйте задачу Windows MSBuild.
+Для подключения к процессу задайте `request: "attach"` и целочисленный
+`processId` либо имя `processName`. Сохраните `.map` и `.rsm` рядом с исполняемым
+файлом, включите отладочную информацию, локальные и удалённые символы,
+отключите оптимизацию. Для пакетов нужны собственные символы. Работа адаптера
+с Win32/Win64 зависит от установленной версии. В рамках локальной проверки
+форка этот адаптер на Windows не запускался.
 
-### Delphi debugging through a Windows SSH host
+### Отладка Delphi через Windows-узел SSH
 
-`script/delphi/dap_remote.py` forwards stdio DAP and maps one local source root to a
-Windows source root. Install Python locally and the MCA adapter on Windows. Set
-`dap.Delphi.binary` to your local Python and its `args` to:
+`script/delphi/dap_remote.py` передаёт DAP через stdio и сопоставляет один
+локальный корень исходников с корнем на Windows. Установите Python локально,
+а адаптер MCA на Windows. В `dap.Delphi.binary` укажите локальный Python,
+а в `args` передайте:
 
 ```json
 [
@@ -293,10 +311,12 @@ Windows source root. Install Python locally and the MCA adapter on Windows. Set
 ]
 ```
 
-Keep both source trees synchronized. The debug profile can use local paths under
-`--local-root`; the proxy translates source and launch paths in both directions.
-It does not translate expressions or arbitrary string values. Sources outside
-that root and case mismatches on a case-sensitive local filesystem require
-matching local files. SSH authentication must be noninteractive. The proxy's
-framing, Unicode, quoting and mapping have automated tests; Windows OpenSSH,
-remote process cleanup and a complete remote breakpoint session remain untested.
+Синхронизируйте оба дерева исходников. Профиль отладки может использовать
+локальные пути внутри `--local-root`; прокси преобразует пути исходников
+и запуска в обоих направлениях. Выражения и произвольные строковые значения
+не преобразуются. Для исходников вне этого корня и несовпадений регистра
+на локальной файловой системе с учётом регистра нужны соответствующие
+локальные файлы. Аутентификация SSH должна быть неинтерактивной.
+Формат сообщений, Unicode, кавычки и преобразование путей проверены
+автоматическими тестами. Windows OpenSSH, завершение удалённых процессов
+и полный удалённый сеанс с точкой останова пока не проверены.
