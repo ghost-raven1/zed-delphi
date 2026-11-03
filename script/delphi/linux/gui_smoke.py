@@ -104,7 +104,7 @@ def main():
                 return
         raise RuntimeError(f'Cannot locate visible label {label!r} in {stage}')
 
-    def wait_cursor_line(stage, line, timeout=30, retry_definition=False):
+    def wait_cursor_line(stage, line, timeout=60):
         deadline = time.monotonic() + timeout
         while time.monotonic() < deadline:
             capture(stage)
@@ -115,13 +115,14 @@ def main():
                 '+repage', '-resize', '400%', str(status))
             text = run('tesseract', str(status), 'stdout', '--psm', '7').stdout
             (output / f'{stage}-cursor.txt').write_text(text)
+            with (output / f'{stage}-cursor-history.txt').open('a') as history:
+                history.write(text)
             if re.search(rf'(?<!\d){line}\s*:\s*\d+', text):
                 result['checks'].append(stage)
                 print(f'PASS: {stage} (cursor line {line})', flush=True)
                 return
-            # Retry only while still on the original call; never navigate onward from another result.
-            if retry_definition and re.search(r'(?<!\d)25\s*:\s*\d+', text):
-                key('F12')
+            # Do not repeat F12: a pending request may complete between the screenshot
+            # and the next key, turning the retry into navigation from the definition.
             time.sleep(1)
         raise RuntimeError(f'Cursor did not reach line {line}: {stage}; see screenshots and OCR')
 
@@ -143,11 +144,11 @@ def main():
             if russian:
                 key('ctrl+shift+p')
                 type_text('перейти к определению')
-                wait_text('russian-command-search', ['перейти к определению'])
+                wait_text('russian-command-search', [r'Редактор:\s*перейти к определению'])
                 key('Escape')
                 key('ctrl+shift+p')
                 type_text('go to definition')
-                wait_text('english-command-alias', ['перейти к определению'])
+                wait_text('english-command-alias', [r'Редактор:\s*перейти к определению'])
                 key('Escape')
             if options.pasls:
                 key('ctrl+g')
@@ -155,7 +156,7 @@ def main():
                 key('Return')
                 wait_cursor_line('lsp-call-site', 25)
                 key('F12')
-                wait_cursor_line('lsp-definition', 18, retry_definition=True)
+                wait_cursor_line('lsp-definition', 18)
             key('ctrl+g')
             type_text('20')
             key('Return')
@@ -163,7 +164,7 @@ def main():
             key('F4')
             wait_text('debug-picker', [r'debug multi.unit', 'Запустить' if russian else 'Spawn'])
             key('Return')
-            wait_text('breakpoint', ['Стек вызовов', 'Точки останова', 'AddValues', 'Calculate', 'Переменные'] if russian
+            wait_text('breakpoint', [r'Стек\s*вызовов', r'Точки\s*останова', 'AddValues', 'Calculate', 'Переменные'] if russian
                       else ['Frames', 'Breakpoints', 'AddValues', 'Calculate', 'Variables'])
             click_label('Переменные' if russian else 'Variables', 'breakpoint')
             wait_text('variables', [r'LeftValue\s*=\s*20', r'RightValue\s*=\s*22'])
@@ -180,11 +181,13 @@ def main():
                 raise RuntimeError(f'Unexpected output from UI-built program: {executed.stdout!r}')
             (output / 'program-output.txt').write_text(executed.stdout)
             if russian:
+                previous_windows = set(run('xdotool', 'search', '--onlyvisible', '--class', 'zed').stdout.splitlines())
                 key('ctrl+comma')
-                wait_text('russian-settings', ['Поиск настроек'])
-                settings_windows = run('xdotool', 'search', '--onlyvisible', '--name',
-                                       'Zed.*Настройки').stdout.splitlines()
-                run('xdotool', 'windowfocus', settings_windows[-1])
+                wait_text('russian-settings', ['Раскладка клавиш', 'Режим доступности'])
+                settings_windows = set(run('xdotool', 'search', '--onlyvisible', '--class', 'zed').stdout.splitlines()) - previous_windows
+                if len(settings_windows) != 1:
+                    raise RuntimeError(f'Expected one new settings window, got {settings_windows}')
+                run('xdotool', 'windowfocus', settings_windows.pop())
                 key('ctrl+f')
                 type_text('шрифта')
                 wait_text('russian-settings-search', ['Размер шрифта'])

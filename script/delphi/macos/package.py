@@ -115,9 +115,12 @@ def package(source, output):
         resources = contents / "Resources"
         macos.mkdir(parents=True)
         resources.mkdir()
-        executable = macos / "zed"
+        executable = macos / "zed-editor"
         shutil.copy2(binary, executable)
         executable.chmod(0o755)
+        run("/usr/bin/xcrun", "clang", "-arch", "arm64",
+            f"-mmacosx-version-min={minimum_os}", "-Os", "-Wall", "-Wextra", "-Werror",
+            str(Path(__file__).with_name("launcher.c")), "-o", str(macos / "zed"))
         for name in REQUIRED[1:]:
             shutil.copy2(source / name, resources / name)
         shutil.copy2(source / "SHA256SUMS", resources / "SOURCE-SHA256SUMS")
@@ -141,6 +144,9 @@ def package(source, output):
         report = {
             "source_commit": provenance.get("commit"),
             "source_sha256": sha256(binary),
+            "packager_sha256": sha256(Path(__file__)),
+            "launcher_source_sha256": sha256(Path(__file__).with_name("launcher.c")),
+            "bundle_version": "1.0.1",
             "architectures": architectures,
             "file": file_info,
             "minimum_macos": minimum_os,
@@ -151,7 +157,8 @@ def package(source, output):
             "compiler_lsp_debugger": "external; not bundled",
         }
         (resources / "packaging.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
-        run("/usr/bin/codesign", "--force", "--sign", "-", "--entitlements", str(entitlement_path), str(output))
+        run("/usr/bin/codesign", "--force", "--sign", "-", "--entitlements", str(entitlement_path), str(executable))
+        run("/usr/bin/codesign", "--force", "--sign", "-", str(output))
         run("/usr/bin/codesign", "--verify", "--deep", "--strict", str(output))
         print(json.dumps({"bundle": str(output), **report}, ensure_ascii=False, indent=2))
     except BaseException:

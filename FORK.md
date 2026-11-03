@@ -43,6 +43,8 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer cargo run --locked -p z
 ```
 
 Упаковка приложения описана в [руководстве по сборке Linux](script/delphi/linux/README.md).
+Для macOS ARM64 есть [рецепт отдельного приложения](script/delphi/macos/README.md)
+с собственным каталогом настроек Zed Delphi.
 Публичный репозиторий: https://github.com/ghost-raven1/zed-delphi.
 На время проверки держите форк отдельно от установленного Zed.
 

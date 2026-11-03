@@ -1,7 +1,7 @@
 # Локальный пакет Zed Delphi для macOS ARM64
 
 `package.py` упаковывает **уже собранный** нативный исполняемый файл из артефакта
-`delphi-macos-arm64-native` workflow `delphi-fork.yml`. Скрипт не запускает Cargo,
+`delphi-macos-arm64-native` workflow `delphi-fork.yml`. Скрипт компилирует небольшой launcher через `xcrun clang`, не запускает Cargo,
 не устанавливает приложение и не запускает редактор.
 
 После распаковки `zed-delphi-macos-arm64-native.tar.gz`:
@@ -27,7 +27,8 @@ python3 script/delphi/macos/package.py \
 
 В пакете находятся:
 
-- `Contents/MacOS/zed` — нативный файл редактора;
+- `Contents/MacOS/zed` — нативный launcher ARM64, собранный из `launcher.c`;
+- `Contents/MacOS/zed-editor` — нативный файл редактора из CI;
 - `Contents/Info.plist` — имя **Zed Delphi**, версия **1.0.1**, идентификатор
   **dev.zed.Zed-Delphi**;
 - значки приложения и документов из ресурсов upstream;
@@ -44,9 +45,17 @@ python3 script/delphi/macos/package.py \
 подписание изменяет исполняемый файл внутри `.app`.
 
 Скрипт требует macOS и доступных `file`, `lipo`, `otool`, `sips`, `iconutil`,
-`codesign`. Результат упаковки ещё не подтверждает запуск интерфейса или работу
+`codesign` и Command Line Tools с `xcrun clang`. Результат упаковки ещё не подтверждает запуск интерфейса или работу
 сборки и отладки проектов. FPC, pasls и отладчик устанавливаются отдельно.
-Для проверки редактора используйте отдельный каталог данных:
+При запуске из Finder или терминала launcher по умолчанию добавляет
+`--user-data-dir "$HOME/Library/Application Support/Zed Delphi"`. Это изолирует
+данные и IPC от обычного Zed. Аргументы передаются через `execv` без оболочки;
+пробелы и кириллица сохраняются. Явный `--user-data-dir` или
+`--user-data-dir=...` до разделителя `--` заменяет каталог по умолчанию.
+Отсутствующий, пустой или не абсолютный `HOME` приводит к понятной ошибке,
+если каталог данных не задан явно.
+
+Для проверки с другим отдельным каталогом данных:
 
 ```sh
 '/path/to/output/Zed Delphi.app/Contents/MacOS/zed' \
