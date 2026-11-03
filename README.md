@@ -5,10 +5,12 @@
 
 Встроенная поддержка Object Pascal. Телеметрия настольного приложения удалена.
 См. [настройку и результаты проверок](FORK.md), [работу с Delphi](docs/src/languages/delphi.md)
-и [релиз 1.0.0](https://github.com/ghost-raven1/zed-delphi/releases/tag/v1.0.0).
-Опубликован пакет Linux ARM64 с английским интерфейсом. Сборки Linux x86_64,
-macOS и Windows проходят проверку в CI; полноценная русификация интерфейса
-пока не заявляется.
+и [релиз 1.0.1](https://github.com/ghost-raven1/zed-delphi/releases/tag/v1.0.1).
+Опубликованы пакеты с русским интерфейсом для macOS ARM64 и Ubuntu 24.04
+x86_64/ARM64. Доступны [единый установщик и диагностика окружения](script/delphi/INSTALL-RU.md).
+Готовый Windows-пакет и полная совместимость редактора с Astra пока не подтверждены.
+Визуального дизайнера VCL/FMX нет; [полная поддержка Delphi 10.3](script/delphi/DELPHI-10.3-RU.md)
+остаётся отдельной незавершённой задачей.
 
 # Zed
 
@@ -21,7 +23,9 @@ macOS и Windows проходят проверку в CI; полноценная
 
 ### Установка
 
-В macOS, Linux и Windows можно [скачать Zed напрямую](https://zed.dev/download) или установить через системный менеджер пакетов ([macOS](https://zed.dev/docs/installation#macos)/[Linux](https://zed.dev/docs/linux#installing-via-a-package-manager)/[Windows](https://zed.dev/docs/windows#package-managers)).
+Пакеты этого форка доступны в [GitHub Releases](https://github.com/ghost-raven1/zed-delphi/releases).
+Используйте [руководство установки Zed Delphi](script/delphi/INSTALL-RU.md).
+Обычный пакет Zed с сайта upstream не содержит изменений этого форка.
 
 Другие платформы пока не поддерживаются:
 
