@@ -22,6 +22,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--zed', type=Path, required=True)
     parser.add_argument('--codelldb', type=Path, required=True)
+    parser.add_argument('--pasls', type=Path, help='Also verify definition lookup through this real LSP')
     parser.add_argument('--fixture', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     options = parser.parse_args()
@@ -29,23 +30,28 @@ def main():
     output.mkdir(parents=True, exist_ok=False)
     project = output / 'Delphi Space Project'
     shutil.copytree(options.fixture, project)
-    # This acceptance covers native language/build/debug; the LSP has a separate smoke test.
-    (project / '.zed/settings.json').write_text(json.dumps({'languages': {'Delphi': {'language_servers': []}}}))
+    (project / '.zed/settings.json').write_text(json.dumps({
+        'languages': {'Delphi': {'language_servers': ['pasls'] if options.pasls else []}},
+    }))
     home = output / 'home'
     config = home / '.config/zed'
     config.mkdir(parents=True)
-    (config / 'settings.json').write_text(json.dumps({
+    settings = {
         'theme': 'One Dark', 'buffer_font_size': 16, 'ui_font_size': 14,
         'telemetry': {'metrics': True, 'diagnostics': True}, 'auto_update': True,
         'dap': {'CodeLLDB': {'binary': str(options.codelldb.resolve())}},
-    }))
+    }
+    if options.pasls:
+        settings['lsp'] = {'pasls': {'binary': {'path': str(options.pasls.resolve())}}}
+    (config / 'settings.json').write_text(json.dumps(settings))
     runtime = output / 'runtime'
     runtime.mkdir(mode=0o700)
     environment = dict(os.environ, HOME=str(home), XDG_CONFIG_HOME=str(home / '.config'),
                        XDG_DATA_HOME=str(home / '.local/share'), XDG_CACHE_HOME=str(home / '.cache'),
                        XDG_RUNTIME_DIR=str(runtime), ZED_ALLOW_EMULATED_GPU='1')
     result = {'status': 'running', 'platform': os.uname().machine,
-              'binary': str(options.zed.resolve()), 'checks': []}
+              'binary': str(options.zed.resolve()),
+              'pasls': str(options.pasls.resolve()) if options.pasls else None, 'checks': []}
 
     def key(value):
         run('xdotool', 'key', '--clearmodifiers', value)
@@ -76,7 +82,7 @@ def main():
 
     def click_label(label, stage):
         data = run('tesseract', str(output / f'{stage}.png'), 'stdout', '--psm', '11', 'tsv').stdout
-        words = csv.DictReader(io.StringIO(data), delimiter='\t')
+        words = csv.DictReader(io.StringIO(data), delimiter='\t', quoting=csv.QUOTE_NONE)
         for word in words:
             if word['text'].casefold() == label.casefold():
                 x = int(word['left']) + int(word['width']) // 2
@@ -88,6 +94,27 @@ def main():
                 run('xdotool', 'mousemove', '1040', '500')
                 return
         raise RuntimeError(f'Cannot locate visible label {label!r} in {stage}')
+
+    def wait_cursor_line(stage, line, timeout=30, retry_definition=False):
+        deadline = time.monotonic() + timeout
+        while time.monotonic() < deadline:
+            capture(stage)
+            picture = output / f'{stage}.png'
+            width, height = map(int, run('identify', '-format', '%w %h', str(picture)).stdout.split())
+            status = output / f'{stage}-cursor.png'
+            run('convert', str(picture), '-crop', f'500x26+{width - 500}+{height - 26}',
+                '+repage', '-resize', '400%', str(status))
+            text = run('tesseract', str(status), 'stdout', '--psm', '7').stdout
+            (output / f'{stage}-cursor.txt').write_text(text)
+            if re.search(rf'(?<!\d){line}\s*:\s*\d+', text):
+                result['checks'].append(stage)
+                print(f'PASS: {stage} (cursor line {line})', flush=True)
+                return
+            # Retry only while still on the original call; never navigate onward from another result.
+            if retry_definition and re.search(r'(?<!\d)25\s*:\s*\d+', text):
+                key('F12')
+            time.sleep(1)
+        raise RuntimeError(f'Cursor did not reach line {line}: {stage}; see screenshots and OCR')
 
     with (output / 'packaged-launch.log').open('w') as log:
         process = subprocess.Popen(['dbus-run-session', '--', str(options.zed.resolve()),
@@ -103,6 +130,13 @@ def main():
             type_text('Arithmetic.pas')
             key('Return')
             wait_text('native-delphi', ['Arithmetic.pas', 'Delphi', 'AddValues'])
+            if options.pasls:
+                key('ctrl+g')
+                type_text('25:18')
+                key('Return')
+                wait_cursor_line('lsp-call-site', 25)
+                key('F12')
+                wait_cursor_line('lsp-definition', 18, retry_definition=True)
             key('ctrl+g')
             type_text('20')
             key('Return')

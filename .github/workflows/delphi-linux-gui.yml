@@ -7,6 +7,10 @@ on:
         description: Run ID of Delphi Linux x86_64 bundle containing the archive to test
         required: true
         type: string
+      pasls_run_id:
+        description: Optional successful Delphi pasls Linux package run ID for real F12 acceptance
+        required: false
+        type: string
 
 permissions:
   actions: read
@@ -36,20 +40,41 @@ jobs:
           printf '%s\n' "$GITHUB_SHA" > verification/gui-test-source-commit.txt
           sha256sum "$RUNNER_TEMP/package/zed-linux-x86_64.tar.gz" > verification/tested-bundle-sha256.txt
           tar -xzf "$RUNNER_TEMP/package/zed-linux-x86_64.tar.gz" -C "$RUNNER_TEMP/application"
+      - name: Download optional tested pasls package
+        if: inputs.pasls_run_id != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PASLS_RUN_ID: ${{ inputs.pasls_run_id }}
+        run: |
+          [[ "$PASLS_RUN_ID" =~ ^[0-9]+$ ]]
+          mkdir -p "$RUNNER_TEMP/pasls-package" "$RUNNER_TEMP/language-server"
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$PASLS_RUN_ID" > verification/pasls-run.json
+          gh run download "$PASLS_RUN_ID" --repo "$GITHUB_REPOSITORY" --name pasls-linux-x86_64 --dir "$RUNNER_TEMP/pasls-package"
+          (cd "$RUNNER_TEMP/pasls-package" && sha256sum -c SHA256SUMS) | tee verification/pasls-checksums.log
+          jq -e '.target == "x86_64-linux"' "$RUNNER_TEMP/pasls-package/provenance.json"
+          cp "$RUNNER_TEMP/pasls-package/provenance.json" verification/pasls-provenance.json
+          tar -xzf "$RUNNER_TEMP/pasls-package/pasls-linux-x86_64.tar.gz" -C "$RUNNER_TEMP/language-server"
       - name: Install runtime, FPC and UI test tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends fp-compiler libasound2t64 libglib2.0-0t64 libvulkan1 libfontconfig1 xvfb xauth xdotool imagemagick dbus-x11 mesa-vulkan-drivers tesseract-ocr
+          sudo apt-get install -y --no-install-recommends fp-compiler fp-units-base fp-units-fcl libasound2t64 libglib2.0-0t64 libvulkan1 libfontconfig1 xvfb xauth xdotool imagemagick dbus-x11 mesa-vulkan-drivers tesseract-ocr
           curl --fail --location --retry 3 https://github.com/vadimcn/codelldb/releases/download/v1.12.3/codelldb-linux-x64.vsix -o "$RUNNER_TEMP/codelldb.vsix"
           sha256sum "$RUNNER_TEMP/codelldb.vsix" > verification/codelldb-sha256.txt
           unzip -q "$RUNNER_TEMP/codelldb.vsix" -d "$RUNNER_TEMP/codelldb"
       - name: Build and debug through the packaged IDE
+        env:
+          PASLS_RUN_ID: ${{ inputs.pasls_run_id }}
         run: |
           binary=$(find "$RUNNER_TEMP/application" -path '*/bin/zed' -type f -print -quit)
           test -n "$binary"
+          pasls_args=()
+          if [[ -n "$PASLS_RUN_ID" ]]; then
+            pasls_args=(--pasls "$RUNNER_TEMP/language-server/pasls/bin/pasls")
+          fi
           xvfb-run -a -s '-screen 0 1440x1000x24' python3 -u script/delphi/linux/gui_smoke.py \
             --zed "$binary" \
             --codelldb "$RUNNER_TEMP/codelldb/extension/adapter/codelldb" \
+            "${pasls_args[@]}" \
             --fixture script/delphi/examples/multi_unit \
             --output "$GITHUB_WORKSPACE/verification/gui" 2>&1 | tee verification/gui-test.log
       - name: Save screenshots, assertions and provenance
