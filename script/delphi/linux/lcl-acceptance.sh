@@ -10,7 +10,7 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get update
 apt-get install -y --no-install-recommends \
   ca-certificates curl unzip python3 build-essential file \
-  fp-compiler fp-units-base fp-units-fcl fp-units-gtk2 \
+  fp-compiler fp-units-base fp-units-fcl fp-units-gtk2 fp-units-misc \
   lcl-utils lcl-units lcl-gtk2 lazarus-src libgtk2.0-dev \
   xvfb xauth xdotool imagemagick tesseract-ocr
 dpkg-query -W > /verification/installed-packages.txt
@@ -35,6 +35,8 @@ xvfb-run -a -s '-screen 0 1280x900x24' bash -euo pipefail -c '
     --lazbuild /usr/bin/lazbuild \
     --codelldb /opt/codelldb/extension/adapter/codelldb \
     --widgetset gtk2 --output /verification/debug
+  file "/verification/debug/Проект Lazarus с пробелами/LclDemo" > /verification/binary-format.txt
+  sha256sum "/verification/debug/Проект Lazarus с пробелами/LclDemo" > /verification/binary-sha256.txt
   python3 -u /repo/script/delphi/linux/lcl-gui.py \
     --binary "/verification/debug/Проект Lazarus с пробелами/LclDemo" \
     --output /verification/gui
