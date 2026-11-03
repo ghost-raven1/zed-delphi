@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       link_editor:
-        description: Link the native Zed executable after checks and targeted tests
+        description: Build and upload an unsigned native release executable
         type: boolean
         default: true
 
@@ -22,19 +22,20 @@ env:
   CARGO_BUILD_JOBS: "2"
   CARGO_PROFILE_DEV_DEBUG: "0"
   CARGO_PROFILE_TEST_DEBUG: "0"
+  CARGO_PROFILE_RELEASE_DEBUG: "0"
+  CARGO_PROFILE_RELEASE_LTO: "false"
+  CARGO_PROFILE_RELEASE_CODEGEN_UNITS: "16"
   RUST_BACKTRACE: "1"
 
 jobs:
   native:
     name: ${{ matrix.platform }}
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 180
+    timeout-minutes: 240
     strategy:
       fail-fast: false
       matrix:
         include:
-          - platform: linux-x64
-            runner: ubuntu-24.04
           - platform: windows-x64
             runner: windows-2025
           - platform: macos-arm64
@@ -58,13 +59,6 @@ jobs:
           package-manager-cache: false
       - name: Prepare verification logs
         run: mkdir -p verification
-      - name: Install upstream Linux dependencies and FPC
-        if: runner.os == 'Linux'
-        run: |
-          ./script/linux
-          sudo apt-get install -y fp-compiler lldb-18
-          echo "CC=clang" >> "$GITHUB_ENV"
-          echo "CXX=clang++" >> "$GITHUB_ENV"
       - name: Install macOS build dependencies and FPC
         if: runner.os == 'macOS'
         run: |
@@ -89,28 +83,103 @@ jobs:
           cargo --version
       - name: Install upstream WASI SDK
         run: ./script/download-wasi-sdk
-      - name: Test build and remote transport helpers
-        run: python -m unittest discover -s script/delphi/tests -v 2>&1 | tee verification/python-tests.log
-      - name: Verify FPC and real LLDB DAP on Linux
-        if: runner.os == 'Linux'
-        run: python script/delphi/tests/smoke_lldb.py --fpc "$(command -v fpc)" --lldb-dap "$(command -v lldb-dap-18)" 2>&1 | tee verification/fpc-dap.log
-      - name: Verify FPC and real LLDB DAP on macOS
-        if: runner.os == 'macOS'
-        run: python script/delphi/tests/smoke_lldb.py --fpc "$(command -v fpc)" --lldb-dap "$(xcrun --find lldb-dap)" 2>&1 | tee verification/fpc-dap.log
-      - name: Check native editor and remote server
-        run: |
-          cargo check --locked -p zed --bin zed 2>&1 | tee verification/zed-check.log
-          cargo check --locked -p remote_server 2>&1 | tee verification/remote-server-check.log
-      - name: Test Delphi grammar and inert telemetry
-        run: |
-          cargo test --locked -p grammars --features load-grammars --test delphi 2>&1 | tee verification/grammar-tests.log
-          cargo test --locked -p telemetry --lib 2>&1 | tee verification/telemetry-tests.log
-          cargo test --locked -p client --lib telemetry::tests 2>&1 | tee verification/client-privacy-tests.log
-          cargo test --locked -p languages --features test-support --lib delphi::tests 2>&1 | tee verification/lsp-adapter-tests.log
-          cargo test --locked -p dap_adapters --lib delphi::tests 2>&1 | tee verification/dap-tests.log
+      - name: Generate bundled license notices
+        if: inputs.link_editor
+        run: ./script/generate-licenses 2>&1 | tee verification/licenses.log
       - name: Link native editor
         if: inputs.link_editor
-        run: cargo build --locked -p zed --bin zed 2>&1 | tee verification/zed-build.log
+        run: cargo build --locked --release -p zed --bin zed 2>&1 | tee verification/zed-build.log
+      - name: Package native executable with provenance
+        if: inputs.link_editor
+        env:
+          ARTIFACT_PLATFORM: ${{ matrix.platform }}
+        run: |
+          python - <<'PYTHON'
+          import hashlib, json, os, pathlib, platform, shutil, subprocess, tarfile
+          root = pathlib.Path('native-artifact')
+          root.mkdir()
+          executable = 'zed.exe' if os.name == 'nt' else 'zed'
+          shutil.copy2(pathlib.Path('target/release') / executable, root / executable)
+          for source in ('LICENSE-GPL', 'LICENSE-APACHE', 'assets/licenses.md'):
+              shutil.copy2(source, root / pathlib.Path(source).name)
+          metadata = {
+              'commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
+              'platform': os.environ['ARTIFACT_PLATFORM'], 'os': platform.platform(),
+              'rustc': subprocess.check_output(['rustc', '--version', '--verbose'], text=True),
+              'profile': 'release', 'signed': False, 'gui_acceptance': 'not performed',
+              'format': 'standalone executable; not an installer or application bundle',
+          }
+          (root / 'provenance.json').write_text(json.dumps(metadata, indent=2) + '\n')
+          (root / 'README.txt').write_text(
+              'Unsigned native build checkpoint. Extract before running.\n'
+              'Not a signed installer or macOS app bundle; platform integration is not packaged.\n'
+              'External compilers, language servers and debug adapters are not bundled.\n'
+              'Consult verification logs for test results; binary compilation does not prove GUI acceptance.\n')
+          (root / 'SHA256SUMS').write_text(''.join(
+              f'{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.name}\n'
+              for path in sorted(root.iterdir()) if path.is_file()))
+          with tarfile.open(f'zed-delphi-{os.environ["ARTIFACT_PLATFORM"]}-native.tar.gz', 'w:gz') as archive:
+              archive.add(root, arcname='zed-delphi')
+          PYTHON
+      - name: Save native executable
+        if: inputs.link_editor
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: delphi-${{ matrix.platform }}-native
+          path: zed-delphi-${{ matrix.platform }}-native.tar.gz
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+      - name: Install Windows Free Pascal and CodeLLDB
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          # Official combined Win32/Win64 installer; hash measured from the HTTPS distribution.
+          $installer = Join-Path $env:RUNNER_TEMP 'fpc-3.2.2.exe'
+          Invoke-WebRequest 'https://downloads.freepascal.org/fpc/dist/3.2.2/i386-win32/fpc-3.2.2.win32.and.win64.exe' -OutFile $installer
+          if ((Get-FileHash $installer -Algorithm SHA256).Hash.ToLowerInvariant() -ne '8c255390544b051388b577eb61c6191a04883264afe0e3369b3600a56daf7bde') { throw 'FPC installer checksum mismatch' }
+          $prefix = Join-Path $env:RUNNER_TEMP 'fpc'
+          $process = Start-Process $installer -ArgumentList @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/SP-', "/DIR=`"$prefix`"") -Wait -PassThru
+          if ($process.ExitCode -notin @(0, 3010)) { throw "FPC install failed: $($process.ExitCode)" }
+          $fpc = Get-ChildItem $prefix -Recurse -Filter fpc.exe | Sort-Object FullName | Select-Object -First 1
+          if (-not $fpc) { throw 'Installed fpc.exe not found' }
+          $fpc.DirectoryName >> $env:GITHUB_PATH
+          $compiler = Get-ChildItem $prefix -Recurse -File | Where-Object Name -Match '^pp(cross)?x64\.exe$' | Select-Object -First 1
+          if (-not $compiler) { throw 'Installed x86_64 FPC compiler not found' }
+          "FPC_SMOKE=$($compiler.FullName)" >> $env:GITHUB_ENV
+          & $compiler.FullName -iTP | Tee-Object verification/fpc-target.txt
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $archive = Join-Path $env:RUNNER_TEMP 'codelldb.zip'
+          Invoke-WebRequest 'https://github.com/vadimcn/codelldb/releases/download/v1.12.3/codelldb-win32-x64.vsix' -OutFile $archive
+          if ((Get-FileHash $archive -Algorithm SHA256).Hash.ToLowerInvariant() -ne 'a916e509308dac817732f63ca604a8b93ed29cd16f38a2fa9f0b64ed58e8f51a') { throw 'CodeLLDB checksum mismatch' }
+          $adapter = Join-Path $env:RUNNER_TEMP 'codelldb'
+          Expand-Archive $archive -DestinationPath $adapter
+          "CODELLDB_SMOKE=$adapter\extension\adapter\codelldb.exe" >> $env:GITHUB_ENV
+      - name: Test build and remote transport helpers
+        run: python -m unittest discover -s script/delphi/tests -v 2>&1 | tee verification/python-tests.log
+      - name: Verify FPC and real LLDB DAP on macOS
+        if: runner.os == 'macOS'
+        run: |
+          python script/delphi/tests/smoke_lldb.py --fpc "$(command -v fpc)" --lldb-dap "$(xcrun --find lldb-dap)" 2>&1 | tee verification/fpc-dap.log
+          python script/delphi/tests/smoke_lldb.py --multi-unit --fpc "$(command -v fpc)" --lldb-dap "$(xcrun --find lldb-dap)" 2>&1 | tee verification/fpc-multi-unit-dap.log
+      - name: Verify x86_64 FPC and real CodeLLDB on Windows
+        if: runner.os == 'Windows'
+        run: |
+          python script/delphi/tests/smoke_lldb.py --fpc "$FPC_SMOKE" --lldb-dap "$CODELLDB_SMOKE" 2>&1 | tee verification/fpc-dap.log
+          python script/delphi/tests/smoke_lldb.py --multi-unit --fpc "$FPC_SMOKE" --lldb-dap "$CODELLDB_SMOKE" 2>&1 | tee verification/fpc-multi-unit-dap.log
+      - name: Check native editor without linking
+        if: ${{ !inputs.link_editor }}
+        run: cargo check --locked --release -p zed --bin zed 2>&1 | tee verification/zed-check.log
+      - name: Check remote server
+        run: cargo check --locked --release -p remote_server 2>&1 | tee verification/remote-server-check.log
+      - name: Test Delphi grammar and inert telemetry
+        run: |
+          cargo test --locked --release -p grammars --features load-grammars --test delphi 2>&1 | tee verification/grammar-tests.log
+          cargo test --locked --release -p telemetry --lib 2>&1 | tee verification/telemetry-tests.log
+          cargo test --locked --release -p client --lib telemetry::tests 2>&1 | tee verification/client-privacy-tests.log
+          cargo test --locked --release -p languages --features test-support --lib delphi::tests 2>&1 | tee verification/lsp-adapter-tests.log
+          cargo test --locked --release -p dap_adapters --lib delphi::tests 2>&1 | tee verification/dap-tests.log
       - name: Save validation logs
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a

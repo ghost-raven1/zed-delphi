@@ -23,3 +23,24 @@ Default preflight requires **30 GiB free disk** at both build and output locatio
 The output contains the app archive, optional remote-server archive, BUILD.log, provenance, SHA256SUMS, source commit/status/diff and a source snapshot of tracked and untracked non-ignored files. Git metadata, target outputs and ignored files are excluded; any required ignored source inputs must be supplied separately. No bit-identical output is promised. On build failure, logs remain; use a new output directory for the next attempt. Generated `assets/licenses.md` and the Cargo target directory are owned outputs of the existing bundler.
 
 Before accepting the archive, the script extracts it and runs `ldd` on both bundled CLI and editor, failing for missing libraries. This checks the build machine's loader only, not rendering or project/debug behavior. Repeat loader checks on Astra, then launch the app under a real desktop session and test Delphi editing, completion, FPC project build/run, breakpoint/locals/step and cancellation. Existing `script/delphi/tests/smoke_lldb.py` checks real FPC/DAP behavior separately; successful protocol smoke does not prove Zed UI acceptance. Embarcadero compilation/debug still requires its licensed Windows tools.
+
+## Run the packaged editor
+
+Extract the archive for your CPU architecture into a separate folder, then run
+its CLI (the current development channel uses `zed-dev.app`):
+
+```sh
+tar -xzf zed-linux-x86_64.tar.gz
+./zed-dev.app/bin/zed /absolute/path/to/project
+```
+
+Install FPC and a compatible CodeLLDB separately. Copy
+`script/delphi/examples/multi_unit` to a writable folder, set the CodeLLDB binary
+path in Zed settings if it is not managed by Zed, then select the example's build,
+run and debug tasks. The project enables `pasls`; install/configure it using
+[the language-server guide](../PASLS.md) or disable that server until installed.
+
+The package is not a system installer. It includes the editor, CLI and selected
+shared libraries, but still uses host glibc/GLib/audio/graphics libraries. Do not
+rename an Ubuntu24.04 archive as an Astra package without testing its loader and
+GUI on the actual target release.

@@ -15,6 +15,7 @@ Removed paths include:
 - Crash/minidump uploads, automatic build-timing uploads, and hang-event reporting.
 - Remote event forwarding and automatic retrieval of remote crash files.
 - Anthropic usage-event logging.
+- Automatic Git/project snapshots when starting an AI thread (legacy saved threads remain readable).
 - Zed edit-prediction accept, reject, and settled-outcome reporting, training-data collection, and Mercury acceptance/rejection feedback.
 
 Local application, performance, and error logs remain available for troubleshooting. A local session identifier still supports restoring your windows. Existing files from upstream installations are not deleted.

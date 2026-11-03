@@ -27,22 +27,17 @@ application target are separate choices:
 | Linux x64   | FPC, Lazarus                   | Windows SSH build and language server | Local FPC through LLDB/GDB; Delphi through Windows DAP bridge |
 
 This table describes implemented integration paths, not completed acceptance on
-every platform. The local FPC build and real LLDB DAP breakpoint, stack, integer
-locals and stepping were verified on macOS ARM64 and in an isolated Ubuntu 24.04
-ARM64 container. The Linux container also passed the Python helper suite; it did
-not build or launch the native editor. Windows, Linux x64, Intel macOS and remote
-Windows end-to-end sessions still need execution. Native editor builds on Linux
-ARM64 and Windows ARM64 are not covered by the fork's CI matrix.
+every platform. On Ubuntu 24.04 ARM64, the packaged native editor passed FPC
+multi-unit build/run and CodeLLDB breakpoint, stack, integer locals, stepping and
+exit checks, including a project path with spaces. Native pasls navigation and
+protocol diagnostics/completion checks passed. Standalone FPC/DAP also passed on
+macOS ARM64. See [fork verification](../../../FORK.md) for current platform results.
 
-The manually dispatched `Delphi fork platform verification` workflow in
-`.github/workflows/delphi-fork.yml` uses native `ubuntu-24.04`, `windows-2025`,
-`macos-26` (ARM64) and `macos-26-intel` runners. It runs helper tests, native editor
-and remote-server checks, grammar/telemetry/adapter tests and, by default, links
-the native editor. Linux and both macOS jobs also compile and debug the FPC sample.
-The workflow has been prepared but has not yet run for this fork. Its artifacts
-are validation logs; it does not publish signed applications or installers.
-Licensed Delphi toolchains and interactive GUI acceptance are external to that
-workflow.
+The manually dispatched fork workflows build native applications and retain test
+logs and artifacts. Linux x86_64 uses the separate `Delphi Linux x86_64 bundle`
+workflow. These results do not imply Astra ABI compatibility, signed installers,
+or licensed Embarcadero and remote Windows acceptance. Windows ARM64 is not
+covered by the fork's CI matrix.
 
 Include files are ambiguous across languages. To treat your project's `.inc`
 files as Delphi, add this to your project settings:
