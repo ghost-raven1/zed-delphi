@@ -47,16 +47,25 @@ def main():
             def capture(stage):
                 picture = output / f'{stage}.png'
                 run('import', '-window', 'root', str(picture))
-                text = run('tesseract', str(picture), 'stdout', '--psm', '11')
+                # Small GTK button text and its dotted focus outline confuse OCR
+                # on a full virtual screen. Preserve that screenshot, but read
+                # an enlarged capture of the actual client window.
+                window_picture = output / f'{stage}-window.png'
+                ocr_picture = output / f'{stage}-ocr.png'
+                run('import', '-window', window, str(window_picture))
+                run('convert', str(window_picture), '-resize', '300%', str(ocr_picture))
+                text = run('tesseract', str(ocr_picture), 'stdout', '--psm', '11')
                 (output / f'{stage}.txt').write_text(text)
                 return text
 
             def click_word(stage, word):
-                data = run('tesseract', str(output / f'{stage}.png'), 'stdout', '--psm', '11', 'tsv')
+                data = run('tesseract', str(output / f'{stage}-ocr.png'), 'stdout', '--psm', '11', 'tsv')
+                geometry = dict(line.split('=', 1) for line in
+                                run('xdotool', 'getwindowgeometry', '--shell', window).splitlines())
                 for item in csv.DictReader(io.StringIO(data), delimiter='\t', quoting=csv.QUOTE_NONE):
                     if item['text'].casefold() == word.casefold():
-                        x = int(item['left']) + int(item['width']) // 2
-                        y = int(item['top']) + int(item['height']) // 2
+                        x = int(geometry['X']) + (int(item['left']) + int(item['width']) // 2) // 3
+                        y = int(geometry['Y']) + (int(item['top']) + int(item['height']) // 2) // 3
                         run('xdotool', 'mousemove', '--sync', str(x), str(y))
                         run('xdotool', 'click', '1')
                         return
