@@ -11,7 +11,7 @@ apt-get update
 apt-get install -y --no-install-recommends \
   ca-certificates curl unzip python3 build-essential file \
   fp-compiler fp-units-base fp-units-fcl fp-units-gtk2 \
-  lcl-utils lcl-gtk2 lazarus-src libgtk2.0-dev \
+  lcl-utils lcl-units lcl-gtk2 lazarus-src libgtk2.0-dev \
   xvfb xauth xdotool imagemagick tesseract-ocr
 dpkg-query -W > /verification/installed-packages.txt
 fpc -iV > /verification/fpc-version.txt
