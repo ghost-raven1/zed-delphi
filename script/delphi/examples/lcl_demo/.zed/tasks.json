@@ -1,0 +1,19 @@
+[
+  {
+    "label": "Lazarus: собрать LCL (macOS)",
+    "command": "lazbuild --widgetset=cocoa --build-mode=Debug \"$ZED_WORKTREE_ROOT/LclDemo.lpi\"",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "save": "all"
+  },
+  {
+    "label": "Lazarus: собрать LCL (Linux)",
+    "command": "lazbuild --widgetset=gtk2 --build-mode=Debug \"$ZED_WORKTREE_ROOT/LclDemo.lpi\"",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "save": "all"
+  },
+  {
+    "label": "Lazarus: запустить LCL",
+    "command": "\"$ZED_WORKTREE_ROOT/LclDemo\"",
+    "cwd": "$ZED_WORKTREE_ROOT"
+  }
+]

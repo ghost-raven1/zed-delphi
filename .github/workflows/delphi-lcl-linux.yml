@@ -1,0 +1,53 @@
+name: Lazarus LCL Linux x86_64 acceptance
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  lcl:
+    name: LCL ${{ matrix.system }} x86_64
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - system: ubuntu-24.04
+            image: ubuntu:24.04
+          - system: astra-ubi18
+            image: registry.astralinux.ru/library/astra/ubi18:latest
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+      - name: Record the exact test and distribution
+        env:
+          TEST_IMAGE: ${{ matrix.image }}
+        run: |
+          mkdir -p verification
+          printf '%s\n' "$GITHUB_SHA" > verification/test-source-commit.txt
+          uname -a > verification/host-kernel.txt
+          docker pull --platform linux/amd64 "$TEST_IMAGE" 2>&1 | tee verification/image-pull.log
+          docker image inspect "$TEST_IMAGE" > verification/container-image.json
+      - name: Build, open and debug the LCL application
+        env:
+          TEST_IMAGE: ${{ matrix.image }}
+        run: |
+          docker run --rm --platform linux/amd64 \
+            --cap-add SYS_PTRACE --security-opt seccomp=unconfined \
+            --mount "type=bind,source=$GITHUB_WORKSPACE,target=/repo,readonly" \
+            --mount "type=bind,source=$GITHUB_WORKSPACE/verification,target=/verification" \
+            "$TEST_IMAGE" bash /repo/script/delphi/linux/lcl-acceptance.sh \
+            2>&1 | tee verification/acceptance.log
+      - name: Save GUI screenshots, debugger checks and provenance
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: lazarus-lcl-${{ matrix.system }}-x86_64
+          path: verification/
+          retention-days: 30

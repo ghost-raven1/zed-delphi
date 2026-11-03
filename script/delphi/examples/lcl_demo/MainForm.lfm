@@ -1,0 +1,44 @@
+object DemoForm: TDemoForm
+  Left = 300
+  Height = 220
+  Top = 200
+  Width = 420
+  Caption = 'Zed Delphi - Lazarus LCL'
+  ClientHeight = 220
+  ClientWidth = 420
+  OnShow = FormShow
+  Position = poScreenCenter
+  object CalculateButton: TButton
+    Left = 30
+    Height = 40
+    Top = 30
+    Width = 220
+    Caption = 'Calculate 20 + 22'
+    OnClick = CalculateButtonClick
+    TabOrder = 0
+  end
+  object ResultLabel: TLabel
+    Left = 30
+    Height = 30
+    Top = 95
+    Width = 180
+    AutoSize = False
+    Caption = 'Ready'
+  end
+  object CloseButton: TButton
+    Left = 280
+    Height = 40
+    Top = 150
+    Width = 110
+    Caption = 'Close'
+    OnClick = CloseButtonClick
+    TabOrder = 1
+  end
+  object SmokeTimer: TTimer
+    Enabled = False
+    Interval = 1000
+    OnTimer = SmokeTimerTimer
+    Left = 350
+    Top = 30
+  end
+end

@@ -45,6 +45,31 @@ class BuildTests(unittest.TestCase):
             build.command_for(dict(tool='lazarus', config='Debug', target_cpu='aarch64'),
                               Path('/source/App.lpi'), False)
 
+    def test_widgetset_rejects_other_compilers_and_option_injection(self):
+        with self.assertRaises(ValueError):
+            build.command_for(self.request(widgetset='cocoa'), Path('/source/App.dpr'), False)
+        for widgetset in ('gtk2 --build-all', '-gtk2', '', 'Cocoa'):
+            with self.subTest(widgetset=widgetset), self.assertRaises(ValueError):
+                build.command_for(dict(tool='lazarus', config='Debug', widgetset=widgetset),
+                                  Path('/source/App.lpi'), False)
+
+    @unittest.skipIf(os.name == 'nt', 'POSIX executable fixture')
+    def test_lazarus_cli_passes_widgetset_and_literal_project_to_child(self):
+        with tempfile.TemporaryDirectory(prefix='Lazarus пробелы ') as folder:
+            project = Path(folder) / 'Demo.lpi'
+            project.touch()
+            marker = Path(folder) / 'argv.json'
+            compiler = Path(folder) / 'lazbuild'
+            compiler.write_text('#!' + sys.executable + '\nimport json,sys\n'
+                                + 'open(' + repr(str(marker)) + ',"w").write(json.dumps(sys.argv[1:]))\n')
+            compiler.chmod(0o755)
+            result = subprocess.run([sys.executable, str(Path(build.__file__)), '--tool', 'lazarus',
+                                     '--project', str(project), '--compiler', str(compiler),
+                                     '--widgetset', 'cocoa'], capture_output=True, timeout=10)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(json.loads(marker.read_text()),
+                             ['--widgetset=cocoa', '--build-mode=Debug', str(project.resolve())])
+
     def test_cross_target_run_is_rejected_before_compilation(self):
         request = self.request(run=True, target_os='win64', target_cpu='x86_64')
         with self.assertRaises(ValueError):

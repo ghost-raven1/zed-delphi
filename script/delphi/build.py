@@ -20,6 +20,7 @@ def parser():
     result.add_argument('--platform', default='Win64')
     result.add_argument('--rsvars', help='Path to the selected Delphi installation rsvars.bat')
     result.add_argument('--compiler', help='Explicit fpc, lazbuild or MSBuild executable')
+    result.add_argument('--widgetset', help='Lazarus widgetset, e.g. cocoa, gtk2 or qt5')
     result.add_argument('--output', help='FPC executable output path')
     result.add_argument('--target-os', help='FPC target operating system (-T), e.g. linux, darwin, win64')
     result.add_argument('--target-cpu', help='FPC target processor (-P), e.g. x86_64, aarch64, i386')
@@ -47,6 +48,10 @@ def command_for(request, project, windows):
     if not re.fullmatch(r'[\w .-]+', config):
         raise ValueError('config contains unsupported property separators')
     compiler = request.get('compiler')
+    widgetset = request.get('widgetset')
+    if widgetset is not None:
+        if tool != 'lazarus' or not isinstance(widgetset, str) or not re.fullmatch(r'[a-z][a-z0-9]*', widgetset):
+            raise ValueError('--widgetset requires a lowercase Lazarus widgetset identifier')
     targets = []
     for key, flag in (('target_os', '-T'), ('target_cpu', '-P')):
         value = request.get(key)
@@ -72,6 +77,8 @@ def command_for(request, project, windows):
         if project.suffix.lower() != '.lpi':
             raise ValueError('Lazarus requires a .lpi project')
         command = [compiler or 'lazbuild', '--build-mode=' + config, str(project)]
+        if widgetset:
+            command.insert(1, '--widgetset=' + widgetset)
     elif tool == 'delphi':
         if not windows:
             raise ValueError('Embarcadero builds require Windows; use --ssh-host for a Windows host')
