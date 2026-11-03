@@ -164,7 +164,7 @@ def main():
             key('F4')
             wait_text('debug-picker', [r'debug multi.unit', 'Запустить' if russian else 'Spawn'])
             key('Return')
-            wait_text('breakpoint', [r'Стек\s*вызовов', r'Точки\s*останова', 'AddValues', 'Calculate', 'Переменные'] if russian
+            wait_text('breakpoint', [r'Стек\s*вызовов', 'AddValues', 'Calculate', 'Переменные'] if russian
                       else ['Frames', 'Breakpoints', 'AddValues', 'Calculate', 'Variables'])
             click_label('Переменные' if russian else 'Variables', 'breakpoint')
             wait_text('variables', [r'LeftValue\s*=\s*20', r'RightValue\s*=\s*22'])
