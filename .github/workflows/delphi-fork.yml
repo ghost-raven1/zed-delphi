@@ -4,6 +4,15 @@ name: Delphi fork platform verification
 on:
   workflow_dispatch:
     inputs:
+      platform:
+        description: Platform to build and verify
+        type: choice
+        default: all
+        options:
+          - all
+          - windows-x64
+          - macos-arm64
+          - macos-x64
       link_editor:
         description: Build and upload an unsigned native release executable
         type: boolean
@@ -13,7 +22,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: delphi-fork-${{ github.ref }}
+  group: delphi-fork-${{ github.ref }}-${{ inputs.platform }}
   cancel-in-progress: true
 
 env:
@@ -30,18 +39,12 @@ env:
 jobs:
   native:
     name: ${{ matrix.platform }}
-    runs-on: ${{ matrix.runner }}
+    runs-on: ${{ matrix.platform == 'windows-x64' && 'windows-2025' || matrix.platform == 'macos-arm64' && 'macos-26' || 'macos-26-intel' }}
     timeout-minutes: 240
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - platform: windows-x64
-            runner: windows-2025
-          - platform: macos-arm64
-            runner: macos-26
-          - platform: macos-x64
-            runner: macos-26-intel
+        platform: ${{ fromJSON(inputs.platform == 'all' && '["windows-x64", "macos-arm64", "macos-x64"]' || format('["{0}"]', inputs.platform)) }}
     defaults:
       run:
         shell: bash
