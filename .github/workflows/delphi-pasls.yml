@@ -1,0 +1,36 @@
+name: Delphi pasls Linux package
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linux-x64:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out selected revision
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+      - name: Install native compiler and units
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends fp-compiler fp-units-base fp-units-fcl build-essential git python3 ca-certificates
+      - name: Build pinned pasls and verify real protocol after relocation
+        run: |
+          python3 script/delphi/linux/build_pasls.py \
+            --work-dir "$RUNNER_TEMP/pasls-build" \
+            --output-dir "$RUNNER_TEMP/pasls-artifacts"
+      - name: Upload compiler-independent pasls package and logs
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: pasls-linux-x86_64
+          path: ${{ runner.temp }}/pasls-artifacts/
+          if-no-files-found: warn
+          compression-level: 0
+          retention-days: 30
