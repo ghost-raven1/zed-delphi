@@ -99,6 +99,53 @@ class BuildTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             build.command_for(request, Path('App.dproj'), True)
 
+    def test_delphi_msbuild_targets_and_default(self):
+        request = dict(tool='delphi', config='Debug', platform='Win64')
+        for suffix in ('.dproj', '.groupproj'):
+            for target in (None, 'Build', 'Clean', 'Rebuild', 'Deploy'):
+                with self.subTest(suffix=suffix, target=target):
+                    request['msbuild_target'] = target
+                    argv, _ = build.command_for(request, Path('App' + suffix), True)
+                    self.assertEqual([arg for arg in argv if arg.startswith('/t:')],
+                                     ['/t:' + (target or 'Build')])
+
+    def test_msbuild_target_rejects_invalid_json_values_and_other_tools(self):
+        for target in ('', 'build', 'Build;Deploy', '/t:Clean', [], 1):
+            with self.subTest(target=target), self.assertRaises(ValueError):
+                build.command_for(dict(tool='delphi', config='Debug', platform='Win64',
+                                       msbuild_target=target), Path('App.dproj'), True)
+        for tool, suffix in (('fpc', '.dpr'), ('lazarus', '.lpi')):
+            for target in ('Build', 'Clean', 'Rebuild', 'Deploy'):
+                with self.subTest(tool=tool, target=target), self.assertRaises(ValueError):
+                    build.command_for(dict(tool=tool, config='Debug', msbuild_target=target),
+                                      Path('App' + suffix), True)
+
+    def test_run_requires_a_compiling_msbuild_target(self):
+        for target in ('Clean', 'Deploy'):
+            with self.subTest(target=target), self.assertRaisesRegex(ValueError, 'Build or Rebuild'):
+                build.command_for(dict(tool='delphi', config='Debug', platform='Win64',
+                                       msbuild_target=target, run=True), Path('App.dproj'), True)
+        for target in ('Build', 'Rebuild'):
+            build.command_for(dict(tool='delphi', config='Debug', platform='Win64',
+                                   msbuild_target=target, run=True), Path('App.dproj'), True)
+
+    def test_cli_and_json_reject_msbuild_target_before_starting_non_delphi_compiler(self):
+        with tempfile.TemporaryDirectory() as folder:
+            project = Path(folder) / 'App.dpr'
+            project.touch()
+            for use_json in (False, True):
+                with self.subTest(use_json=use_json):
+                    request = self.request(project=str(project), compiler='/no/such/compiler',
+                                           msbuild_target='Clean')
+                    args = ['--request-stdin'] if use_json else [
+                        '--tool', 'fpc', '--project', str(project), '--compiler', '/no/such/compiler',
+                        '--msbuild-target', 'Clean']
+                    result = subprocess.run([sys.executable, str(Path(build.__file__)), *args],
+                                            input=json.dumps(request).encode() if use_json else None,
+                                            capture_output=True, timeout=10)
+                    self.assertEqual(result.returncode, 1)
+                    self.assertIn(b'applies only to Delphi MSBuild', result.stderr)
+
     def test_delphi_run_requires_windows_host_and_windows_target(self):
         for target in ('Linux64', 'OSX64', 'OSXARM64', 'Android64', 'iOSDevice64'):
             with self.subTest(target=target), self.assertRaises(ValueError):

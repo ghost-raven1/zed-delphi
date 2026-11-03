@@ -173,7 +173,10 @@ mod tests {
         for adapter in [DelphiLspAdapter::FreePascal, DelphiLspAdapter::Embarcadero] {
             assert!(adapter.is_opt_in_for(&"Delphi".into()));
             assert_eq!(
-                adapter.language_ids().get(&"Delphi".into()).unwrap(),
+                adapter
+                    .language_ids()
+                    .get(&LanguageName::from("Delphi"))
+                    .unwrap(),
                 "pascal"
             );
         }

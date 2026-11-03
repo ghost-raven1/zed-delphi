@@ -1,0 +1,47 @@
+diff --git a/src/serverprotocol/PasLS.Parser.pas b/src/serverprotocol/PasLS.Parser.pas
+index 9a51365..9d0beb7 100644
+--- a/src/serverprotocol/PasLS.Parser.pas
++++ b/src/serverprotocol/PasLS.Parser.pas
+@@ -68,6 +68,7 @@ Type
+     FCPUTarget: String;
+     FOptions: TParseSourceOptions;
+     FOSTarget: String;
++    procedure CheckLazarusFormResource(Sender: TObject; const aFileName: String; aOptions: TStrings);
+ {$IFDEF MULTIERROR}
+     procedure DoError(Sender: TObject; const aContext: TRecoveryContext;
+       var aAllowRecovery: Boolean);
+@@ -109,6 +110,26 @@ end;
+ 
+ { TSourceParser }
+ 
++procedure TSourceParser.CheckLazarusFormResource(Sender: TObject;
++  const aFileName: String; aOptions: TStrings);
++var
++  Source: TFileStream;
++  Binary: TMemoryStream;
++begin
++  // Validate the form stream without instantiating components or linking resources.
++  Source := TFileStream.Create(aFileName, fmOpenRead or fmShareDenyWrite);
++  try
++    Binary := TMemoryStream.Create;
++    try
++      ObjectTextToBinary(Source, Binary);
++    finally
++      Binary.Free;
++    end;
++  finally
++    Source.Free;
++  end;
++end;
++
+ {$IFDEF MULTIERROR}
+ procedure TSourceParser.DoError(Sender: TObject;
+   const aContext: TRecoveryContext; var aAllowRecovery: Boolean);
+@@ -205,6 +226,7 @@ begin
+       TFileResolver(FileResolver).UseStreams:=poUseStreams in Options;
+     {$endif}
+     Scanner := TPascalScanner.Create(FileResolver);
++    Scanner.RegisterResourceHandler('lfm', @CheckLazarusFormResource);
+     Scanner.LogEvents:=Engine.ScannerLogEvents;
+     Scanner.OnLog:=Engine.Onlog;
+     if not (poSkipDefaultDefs in Options) then

@@ -18,6 +18,8 @@ def parser():
     result.add_argument('--project')
     result.add_argument('--config', default='Debug')
     result.add_argument('--platform', default='Win64')
+    result.add_argument('--msbuild-target', choices=['Build', 'Clean', 'Rebuild', 'Deploy'],
+                        help='Delphi MSBuild target (default: Build); Clean/Deploy cannot use --run')
     result.add_argument('--rsvars', help='Path to the selected Delphi installation rsvars.bat')
     result.add_argument('--compiler', help='Explicit fpc, lazbuild or MSBuild executable')
     result.add_argument('--widgetset', help='Lazarus widgetset, e.g. cocoa, gtk2 or qt5')
@@ -43,6 +45,15 @@ def checked_text(value, name):
 def command_for(request, project, windows):
     """Create argv without shell interpretation; preserve paths and program arguments."""
     tool = request['tool']
+    target = request.get('msbuild_target')
+    if target is not None:
+        if tool != 'delphi':
+            raise ValueError('--msbuild-target applies only to Delphi MSBuild')
+        if target not in ('Build', 'Clean', 'Rebuild', 'Deploy'):
+            raise ValueError('msbuild_target must be Build, Clean, Rebuild or Deploy')
+    target = target or 'Build'
+    if tool == 'delphi' and request.get('run') and target in ('Clean', 'Deploy'):
+        raise ValueError('--run requires the Delphi Build or Rebuild target')
     config = checked_text(request['config'], 'config')
     # MSBuild separates multiple property values with ; and , even in argv.
     if not re.fullmatch(r'[\w .-]+', config):
@@ -87,7 +98,7 @@ def command_for(request, project, windows):
         platform = checked_text(request['platform'], 'platform')
         if not re.fullmatch(r'[A-Za-z0-9_]+', platform):
             raise ValueError('platform contains unsupported property separators')
-        command = [compiler or 'MSBuild.exe', str(project), '/nologo', '/t:Build',
+        command = [compiler or 'MSBuild.exe', str(project), '/nologo', '/t:' + target,
                    '/p:Config=' + config, '/p:Platform=' + platform, '/nodeReuse:false']
     else:
         raise ValueError('Unknown compiler tool')

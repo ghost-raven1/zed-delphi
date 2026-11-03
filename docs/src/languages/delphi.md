@@ -71,7 +71,12 @@ Embarcadero; визуальное редактирование форм этим
 }
 ```
 
-Для Embarcadero используйте DelphiLSP из вашей лицензированной установки Windows:
+Для Embarcadero с установленным DelphiLSP используйте сервер из вашей
+лицензированной установки Windows. **Delphi 10.3 Rio не содержит DelphiLSP**:
+LSP Code Insight появился в
+[Delphi 10.4](https://docwiki.embarcadero.com/RADStudio/Sydney/en/What%27s_New).
+Пример ниже и мост DelphiLSP не обеспечивают семантическую поддержку Rio;
+`pasls` также не заменяет классический Code Insight Delphi 10.3.
 
 ```json [settings]
 {
