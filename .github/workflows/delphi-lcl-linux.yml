@@ -50,4 +50,5 @@ jobs:
         with:
           name: lazarus-lcl-${{ matrix.system }}-x86_64
           path: verification/
+          include-hidden-files: true
           retention-days: 30
