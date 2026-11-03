@@ -88,9 +88,9 @@ impl Render for SecurityModal {
 
         let restricted_count = self.restricted_paths.len();
         let header_label: SharedString = if restricted_count == 1 {
-            "Unrecognized Project".into()
+            "Неизвестный проект".into()
         } else {
-            format!("Unrecognized Projects ({})", restricted_count).into()
+            format!("Неизвестные проекты ({})", restricted_count).into()
         };
 
         let path_style = self.path_style(cx);
@@ -191,23 +191,23 @@ impl Render for SecurityModal {
                         v_flex()
                             .child(
                                 Label::new(
-                                    "Untrusted projects are opened in Restricted Mode to protect your system.",
+                                    "Недоверенные проекты открываются в ограниченном режиме для защиты системы.",
                                 )
                                 .color(Color::Muted),
                             )
                             .child(
                                 Label::new(
-                                    "Review .zed/settings.json for any extensions or commands configured by this project.",
+                                    "Проверьте расширения и команды проекта в файле .zed/settings.json.",
                                 )
                                 .color(Color::Muted),
                             ),
                     )
                     .child(
                         v_flex()
-                            .child(Label::new("Restricted Mode prevents:").color(Color::Muted))
-                            .child(ListBulletItem::new("Project settings from being applied"))
-                            .child(ListBulletItem::new("Language servers from running"))
-                            .child(ListBulletItem::new("MCP Server integrations from installing")),
+                            .child(Label::new("В ограниченном режиме отключены:").color(Color::Muted))
+                            .child(ListBulletItem::new("Применение настроек проекта"))
+                            .child(ListBulletItem::new("Запуск языковых серверов"))
+                            .child(ListBulletItem::new("Установка интеграций MCP-серверов")),
                     )
                     .map(|this| {
                         let Some(trust_label) = trust_label else {
@@ -230,7 +230,7 @@ impl Render for SecurityModal {
                                             "trust-parents",
                                             ToggleState::from(self.trust_parents),
                                         )
-                                        .label("Trust all projects in")
+                                        .label("Доверять всем проектам в")
                                         .on_click(cx.listener(
                                             |security_modal, state: &ToggleState, _, cx| {
                                                 let trust_parents = state.selected();
@@ -277,7 +277,7 @@ impl Render for SecurityModal {
                     .gap_1()
                     .justify_end()
                     .child(
-                        Button::new("rm", "Stay in Restricted Mode")
+                        Button::new("rm", "Остаться в ограниченном режиме")
                             .key_binding(
                                 KeyBinding::for_action(
                                     &ToggleWorktreeSecurity,
@@ -292,7 +292,7 @@ impl Render for SecurityModal {
                             })),
                     )
                     .child(
-                        Button::new("tc", "Trust and Continue")
+                        Button::new("tc", "Доверять и продолжить")
                             .style(ButtonStyle::Filled)
                             .layer(ui::ElevationIndex::ModalSurface)
                             .key_binding(
@@ -317,7 +317,7 @@ impl SecurityModal {
         window: &mut Window,
         cx: &mut Context<Self>,
     ) -> Self {
-        let trust_path_input = cx.new(|cx| InputField::new(window, cx, "Folder to trust"));
+        let trust_path_input = cx.new(|cx| InputField::new(window, cx, "Доверенная папка"));
         let task = cx.spawn(async |this, cx| {
             let home_dir = home_dir_task.await;
             this.update(cx, |this, cx| {
@@ -372,17 +372,19 @@ impl SecurityModal {
         match available_parents.len() {
             0 => {
                 if has_restricted_files {
-                    Some(Cow::Borrowed("Trust all single files"))
+                    Some(Cow::Borrowed("Доверять всем отдельным файлам"))
                 } else {
                     None
                 }
             }
             1 => Some(Cow::Owned(format!(
-                "Trust all projects in the {:} folder",
+                "Доверять всем проектам в папке {:}",
                 self.shorten_path(available_parents[0], path_style)
                     .display()
             ))),
-            _ => Some(Cow::Borrowed("Trust all projects in the parent folders")),
+            _ => Some(Cow::Borrowed(
+                "Доверять всем проектам в родительских папках",
+            )),
         }
     }
 
@@ -533,27 +535,27 @@ fn validate_trust_scope(
 ) -> Result<PathBuf, SharedString> {
     let trimmed = typed.trim();
     if trimmed.is_empty() {
-        return Err("Enter a folder to trust".into());
+        return Err("Введите путь к доверенной папке".into());
     }
     if home_dir.is_none() && trimmed.starts_with('~') {
-        return Err("Home directory not available".into());
+        return Err("Домашняя папка недоступна".into());
     }
     let expanded = match (trimmed.strip_prefix('~'), home_dir) {
         (Some(rest), Some(home_dir)) => {
             let rest = rest.trim_start_matches(path_style.separators_ch());
             if path_style.has_root(Path::new(rest)) {
-                return Err("Path must be relative to the home directory".into());
+                return Err("Путь должен быть относительно домашней папки".into());
             }
             path_style.join(home_dir, Path::new(rest))
         }
         _ => PathBuf::from(trimmed),
     };
     if !path_style.is_absolute(&expanded) {
-        return Err("Enter an absolute folder path".into());
+        return Err("Введите абсолютный путь к папке".into());
     }
 
     if !path_style.starts_with(project, expanded.as_path()) {
-        return Err("Must be a parent folder of the project".into());
+        return Err("Укажите родительскую папку проекта".into());
     }
     Ok(expanded)
 }

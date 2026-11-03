@@ -280,7 +280,7 @@ impl MacPlatform {
 
             for menu_config in menus {
                 let menu = NSMenu::new(self.1);
-                let menu_title = NSString::from_str(&menu_config.name);
+                let menu_title = NSString::from_str(menu_config.title());
                 menu.setTitle(&menu_title);
                 let _: () = msg_send![&menu, setDelegate: delegate];
 
@@ -436,6 +436,7 @@ impl MacPlatform {
                 }
                 MenuItem::Submenu(Menu {
                     name,
+                    display_name,
                     items,
                     disabled,
                 }) => {
@@ -447,7 +448,7 @@ impl MacPlatform {
                     }
                     item.setSubmenu(Some(&submenu));
                     item.setEnabled(!disabled);
-                    item.setTitle(&NSString::from_str(name));
+                    item.setTitle(&NSString::from_str(display_name.as_ref().unwrap_or(name)));
                     item
                 }
                 MenuItem::SystemMenu(OsMenu { name, menu_type }) => {

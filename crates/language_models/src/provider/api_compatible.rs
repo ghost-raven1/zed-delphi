@@ -211,7 +211,7 @@ impl<S: ApiCompatibleProviderSettings> Render for ApiCompatibleProviderConfigura
             v_flex()
                 .on_action(cx.listener(Self::save_api_key))
                 .child(Label::new(format!(
-                    "To use Zed's agent with an {provider_name}-compatible provider, you need to add an API key."
+                    "Для использования агента Zed с провайдером, совместимым с {provider_name}, добавьте ключ API."
                 )))
                 .child(
                     div()
@@ -220,7 +220,7 @@ impl<S: ApiCompatibleProviderSettings> Render for ApiCompatibleProviderConfigura
                 )
                 .child(
                     Label::new(format!(
-                        "You can also set the {env_var_name} environment variable and restart Zed.",
+                        "Также можно задать переменную окружения {env_var_name} и перезапустить Zed.",
                     ))
                     .size(LabelSize::Small)
                     .color(Color::Muted),
@@ -244,22 +244,22 @@ impl<S: ApiCompatibleProviderSettings> Render for ApiCompatibleProviderConfigura
                         .child(
                             div().w_full().overflow_x_hidden().text_ellipsis().child(Label::new(
                                 if env_var_set {
-                                    format!("API key set in {env_var_name} environment variable")
+                                    format!("Ключ API задан в переменной окружения {env_var_name}")
                                 } else {
-                                    format!("API key configured for {}", state.settings.api_url())
+                                    format!("Ключ API настроен для {}", state.settings.api_url())
                                 },
                             )),
                         ),
                 )
                 .child(
                     h_flex().flex_shrink_0().child(
-                        Button::new("reset-api-key", "Reset API Key")
+                        Button::new("reset-api-key", "Сбросить ключ API")
                             .label_size(LabelSize::Small)
                             .start_icon(Icon::new(IconName::Undo).size(IconSize::Small))
                             .layer(ElevationIndex::ModalSurface)
                             .when(env_var_set, |this| {
                                 this.tooltip(Tooltip::text(format!(
-                                    "To reset your API key, unset the {env_var_name} environment variable.",
+                                    "Чтобы сбросить ключ API, удалите переменную окружения {env_var_name}.",
                                 )))
                             })
                             .on_click(cx.listener(|this, _, window, cx| {
@@ -271,7 +271,9 @@ impl<S: ApiCompatibleProviderSettings> Render for ApiCompatibleProviderConfigura
         };
 
         if self.load_credentials_task.is_some() {
-            div().child(Label::new("Loading credentials…")).into_any()
+            div()
+                .child(Label::new("Загрузка учётных данных…"))
+                .into_any()
         } else {
             v_flex()
                 .size_full()
@@ -279,7 +281,7 @@ impl<S: ApiCompatibleProviderSettings> Render for ApiCompatibleProviderConfigura
                 .child(api_key_section)
                 .child(
                     h_flex().w_full().justify_end().child(
-                        Button::new("remove-compatible-provider", "Remove Provider")
+                        Button::new("remove-compatible-provider", "Удалить провайдера")
                             .style(ButtonStyle::OutlinedGhost)
                             .label_size(LabelSize::Small)
                             .start_icon(

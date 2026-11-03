@@ -57,36 +57,32 @@ impl DebuggerPaneItem {
 
     pub(crate) fn to_shared_string(self) -> SharedString {
         match self {
-            DebuggerPaneItem::Console => SharedString::new_static("Console"),
-            DebuggerPaneItem::Variables => SharedString::new_static("Variables"),
-            DebuggerPaneItem::BreakpointList => SharedString::new_static("Breakpoints"),
-            DebuggerPaneItem::Frames => SharedString::new_static("Frames"),
-            DebuggerPaneItem::Modules => SharedString::new_static("Modules"),
-            DebuggerPaneItem::LoadedSources => SharedString::new_static("Sources"),
-            DebuggerPaneItem::Terminal => SharedString::new_static("Terminal"),
-            DebuggerPaneItem::MemoryView => SharedString::new_static("Memory View"),
+            DebuggerPaneItem::Console => SharedString::new_static("Консоль"),
+            DebuggerPaneItem::Variables => SharedString::new_static("Переменные"),
+            DebuggerPaneItem::BreakpointList => SharedString::new_static("Точки останова"),
+            DebuggerPaneItem::Frames => SharedString::new_static("Стек вызовов"),
+            DebuggerPaneItem::Modules => SharedString::new_static("Модули"),
+            DebuggerPaneItem::LoadedSources => SharedString::new_static("Исходники"),
+            DebuggerPaneItem::Terminal => SharedString::new_static("Терминал"),
+            DebuggerPaneItem::MemoryView => SharedString::new_static("Просмотр памяти"),
         }
     }
     pub(crate) fn tab_tooltip(self) -> SharedString {
         let tooltip = match self {
             DebuggerPaneItem::Console => {
-                "Displays program output and allows manual input of debugger commands"
+                "Показывает вывод программы и позволяет вводить команды отладчика"
             }
             DebuggerPaneItem::Variables => {
-                "Shows current values of local and global variables in the current stack frame"
+                "Показывает текущие значения локальных и глобальных переменных в выбранном кадре стека"
             }
-            DebuggerPaneItem::BreakpointList => "Lists all active breakpoints set in the code",
+            DebuggerPaneItem::BreakpointList => "Показывает активные точки останова в коде",
             DebuggerPaneItem::Frames => {
-                "Displays the call stack, letting you navigate between function calls"
+                "Показывает стек вызовов для перехода между вызовами функций"
             }
-            DebuggerPaneItem::Modules => "Shows all modules or libraries loaded by the program",
-            DebuggerPaneItem::LoadedSources => {
-                "Lists all source files currently loaded and used by the debugger"
-            }
-            DebuggerPaneItem::Terminal => {
-                "Provides an interactive terminal session within the debugging environment"
-            }
-            DebuggerPaneItem::MemoryView => "Allows inspection of memory contents",
+            DebuggerPaneItem::Modules => "Показывает модули и библиотеки, загруженные программой",
+            DebuggerPaneItem::LoadedSources => "Показывает исходные файлы, загруженные отладчиком",
+            DebuggerPaneItem::Terminal => "Открывает интерактивный терминал в среде отладки",
+            DebuggerPaneItem::MemoryView => "Позволяет просматривать содержимое памяти",
         };
         SharedString::new_static(tooltip)
     }

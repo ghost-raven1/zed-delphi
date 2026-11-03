@@ -46,7 +46,7 @@ pub(crate) fn settings_popover_menu(view_entity: Entity<TableView>) -> PopoverMe
             IconButton::new("table-settings-trigger", IconName::Filter)
                 .icon_size(IconSize::Small)
                 .size(ButtonSize::Compact),
-            Tooltip::text("Table Settings"),
+            Tooltip::text("Настройки таблицы"),
         )
         .anchor(Anchor::TopRight)
         .menu(move |window, cx| {
@@ -58,34 +58,34 @@ pub(crate) fn settings_popover_menu(view_entity: Entity<TableView>) -> PopoverMe
                     let settings = view_entity.read(cx).settings.clone();
 
                     let menu = toggle_entry(
-                        menu.header("Text Alignment"),
-                        "Top",
-                        Some("Choose vertical text alignment within cells"),
+                        menu.header("Выравнивание текста"),
+                        "Сверху",
+                        Some("Выберите вертикальное выравнивание текста в ячейках"),
                         matches!(settings.vertical_alignment, VerticalAlignment::Top),
                         &view_entity,
                         |settings| settings.vertical_alignment = VerticalAlignment::Top,
                     );
                     let menu = toggle_entry(
                         menu,
-                        "Center",
+                        "По центру",
                         None,
                         matches!(settings.vertical_alignment, VerticalAlignment::Center),
                         &view_entity,
                         |settings| settings.vertical_alignment = VerticalAlignment::Center,
                     );
 
-                    let menu = menu.separator().header("Filter Sort");
+                    let menu = menu.separator().header("Сортировка фильтра");
                     let menu = toggle_entry(
                         menu,
-                        "A-Z, then Count",
-                        Some("Choose how filter values are sorted in the filter menu"),
+                        "По алфавиту, затем по количеству",
+                        Some("Выберите порядок значений в меню фильтра"),
                         settings.filter_sort_order == FilterSortOrder::AlphaThenCount,
                         &view_entity,
                         |settings| settings.filter_sort_order = FilterSortOrder::AlphaThenCount,
                     );
                     let menu = toggle_entry(
                         menu,
-                        "Count, then A-Z",
+                        "По количеству, затем по алфавиту",
                         None,
                         settings.filter_sort_order == FilterSortOrder::CountThenAlpha,
                         &view_entity,
@@ -94,10 +94,10 @@ pub(crate) fn settings_popover_menu(view_entity: Entity<TableView>) -> PopoverMe
 
                     let menu = toggle_entry(
                         menu.separator(),
-                        "Display multiline rows",
+                        "Показывать многострочные записи",
                         Some(
-                            "When enabled, row height grows to show all content. \
-                             When disabled, only the first line is visible — hover a cell to see the rest.",
+                            "Если включено, высота строки увеличивается для показа всего содержимого. \
+                             Если выключено, видна только первая строка; наведите курсор на ячейку для просмотра остального.",
                         ),
                         settings.multiline_cells_enabled,
                         &view_entity,

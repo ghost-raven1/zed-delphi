@@ -417,7 +417,7 @@ impl ConfigOptionSelector {
 
     fn render_trigger_button(&self, _window: &mut Window, _cx: &mut Context<Self>) -> Button {
         let Some(option) = self.current_option() else {
-            return Button::new("config-option-trigger", "Unknown")
+            return Button::new("config-option-trigger", "Неизвестно")
                 .label_size(LabelSize::Small)
                 .color(Color::Muted)
                 .disabled(true);

@@ -1,8 +1,8 @@
 use gpui::{Action as _, App};
 use itertools::Itertools as _;
 use settings::{
-    AudioInputDeviceName, AudioOutputDeviceName, EditPredictionDataCollectionChoice,
-    LanguageSettingsContent, SemanticTokens, SettingsContent,
+    AudioInputDeviceName, AudioOutputDeviceName, LanguageSettingsContent, SemanticTokens,
+    SettingsContent,
 };
 use std::sync::{Arc, OnceLock};
 use strum::{EnumMessage, IntoDiscriminant as _, VariantArray};
@@ -1618,7 +1618,7 @@ fn keymap_page() -> SettingsPage {
             SettingsPageItem::ActionLink(ActionLink {
                 title: "Edit Keybindings".into(),
                 description: Some("Customize keybindings in the keymap editor.".into()),
-                button_text: "Open Keymap".into(),
+                button_text: "Открыть сочетания клавиш".into(),
                 on_click: Arc::new(|settings_window, window, cx| {
                     let Some(original_window) = settings_window.original_window else {
                         return;
@@ -8737,7 +8737,7 @@ fn collaboration_page() -> SettingsPage {
             SettingsPageItem::ActionLink(ActionLink {
                 title: "Test Audio".into(),
                 description: Some("Test your microphone and speaker setup".into()),
-                button_text: "Test Audio".into(),
+                button_text: "Проверить звук".into(),
                 on_click: Arc::new(|_settings_window, window, cx| {
                     open_audio_test_window(window, cx);
                 }),
@@ -9212,7 +9212,7 @@ fn ai_page(cx: &App) -> SettingsPage {
                     },
                 }),
                 metadata: Some(Box::new(SettingsFieldMetadata {
-                    placeholder: Some("e.g. claude"),
+                    placeholder: Some("например, claude"),
                     display_confirm_button: true,
                     display_clear_button: true,
                     confirm_on_focus_out: true,
@@ -11382,7 +11382,7 @@ fn non_editor_language_settings_data() -> Box<[SettingsPageItem]> {
     )
 }
 
-fn edit_prediction_language_settings_section() -> [SettingsPageItem; 5] {
+fn edit_prediction_language_settings_section() -> [SettingsPageItem; 4] {
     [
         SettingsPageItem::SectionHeader("Edit Predictions"),
         SettingsPageItem::SubPageLink(SubPageLink {
@@ -11394,41 +11394,6 @@ fn edit_prediction_language_settings_section() -> [SettingsPageItem; 5] {
             in_json: false,
             files: USER,
             render: render_edit_prediction_setup_page
-        }),
-        SettingsPageItem::SettingItem(SettingItem {
-            title: "Data Collection",
-            description: "Controls whether Zed may collect training data when using Zed's Edit Predictions. Data is only collected for files in projects detected as open source. The default value uses the preference previously set via the status-bar toggle, or false if no preference has been stored.",
-            field: Box::new(SettingField {
-                organization_override: Some(|org_settings| {
-                    const DATA_COLLECTION_DISABLED: EditPredictionDataCollectionChoice = EditPredictionDataCollectionChoice::No;
-
-                    if !org_settings.edit_prediction.is_feedback_enabled {
-                        Some(&DATA_COLLECTION_DISABLED)
-                    } else {
-                        None
-                    }
-                }),
-                json_path: Some("edit_predictions.allow_data_collection"),
-                pick: |settings_content| {
-                    settings_content
-                        .project
-                        .all_languages
-                        .edit_predictions
-                        .as_ref()?
-                        .allow_data_collection
-                        .as_ref()
-                },
-                write: |settings_content, value, _app| {
-                    settings_content
-                        .project
-                        .all_languages
-                        .edit_predictions
-                        .get_or_insert_default()
-                        .allow_data_collection = value;
-                },
-            }),
-            metadata: None,
-            files: USER,
         }),
         SettingsPageItem::SettingItem(SettingItem {
             title: "Show Edit Predictions",

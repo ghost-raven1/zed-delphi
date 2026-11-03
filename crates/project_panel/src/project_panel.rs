@@ -961,20 +961,20 @@ impl ProjectPanel {
                                     true,
                                     window, cx,
                                 )
-                                .detach_and_prompt_err("Failed to open file", window, cx, move |e, _, _| {
+                                .detach_and_prompt_err("Не удалось открыть файл", window, cx, move |e, _, _| {
                                     match e.error_code() {
                                         ErrorCode::Disconnected => if is_via_ssh {
-                                            Some("Disconnected from SSH host".to_string())
+                                            Some("Соединение с SSH-сервером разорвано".to_string())
                                         } else {
-                                            Some("Disconnected from remote project".to_string())
+                                            Some("Соединение с удалённым проектом разорвано".to_string())
                                         },
                                         ErrorCode::UnsharedItem => Some(format!(
-                                            "{} is not shared by the host. This could be because it has been marked as `private`",
+                                            "Сервер не предоставляет доступ к {}. Возможно, ресурс помечен как `private`.",
                                             file_path.display(path_style)
                                         )),
                                         // See note in worktree.rs where this error originates. Returning Some in this case prevents
-                                        // the error popup from saying "Try Again", which is a red herring in this case
-                                        ErrorCode::Internal if e.to_string().contains("File is too large to load") => Some(e.to_string()),
+                                        // the error popup from saying "Повторить", which is a red herring in this case
+                                        ErrorCode::Internal if e.to_string().contains("Файл слишком большой для загрузки") => Some(e.to_string()),
                                         _ => None,
                                     }
                                 });
@@ -1189,17 +1189,20 @@ impl ProjectPanel {
                 menu.context(self.focus_handle.clone()).map(|menu| {
                     if is_read_only {
                         menu.when(is_markdown, |menu| {
-                            menu.action("Open Markdown Preview", Box::new(OpenMarkdownPreview))
+                            menu.action(
+                                "Открыть предпросмотр Markdown",
+                                Box::new(OpenMarkdownPreview),
+                            )
                         })
                         .when(is_svg, |menu| {
-                            menu.action("Open SVG Preview", Box::new(OpenSvgPreview))
+                            menu.action("Открыть предпросмотр SVG", Box::new(OpenSvgPreview))
                         })
                         .when(is_dir, |menu| {
-                            menu.action("Search Inside", Box::new(NewSearchInDirectory))
+                            menu.action("Искать внутри", Box::new(NewSearchInDirectory))
                         })
                     } else {
-                        menu.action("New File", Box::new(NewFile))
-                            .action("New Folder", Box::new(NewDirectory))
+                        menu.action("Новый файл", Box::new(NewFile))
+                            .action("Новая папка", Box::new(NewDirectory))
                             .separator()
                             .when(is_local, |menu| {
                                 menu.action(
@@ -1208,107 +1211,125 @@ impl ProjectPanel {
                                 )
                             })
                             .when(is_local, |menu| {
-                                menu.action("Open in Default App", Box::new(OpenWithSystem))
+                                menu.action(
+                                    "Открыть в приложении по умолчанию",
+                                    Box::new(OpenWithSystem),
+                                )
                             })
-                            .action("Open in Terminal", Box::new(OpenInTerminal))
+                            .action("Открыть в терминале", Box::new(OpenInTerminal))
                             .when(is_markdown, |menu| {
-                                menu.action("Open Markdown Preview", Box::new(OpenMarkdownPreview))
+                                menu.action(
+                                    "Открыть предпросмотр Markdown",
+                                    Box::new(OpenMarkdownPreview),
+                                )
                             })
                             .when(is_svg, |menu| {
-                                menu.action("Open SVG Preview", Box::new(OpenSvgPreview))
+                                menu.action("Открыть предпросмотр SVG", Box::new(OpenSvgPreview))
                             })
                             .when(is_dir, |menu| {
                                 menu.separator()
-                                    .action("Find in Folder…", Box::new(NewSearchInDirectory))
+                                    .action("Найти в папке…", Box::new(NewSearchInDirectory))
                             })
                             .when(is_unfoldable, |menu| {
-                                menu.action("Unfold Directory", Box::new(UnfoldDirectory))
+                                menu.action("Развернуть папку", Box::new(UnfoldDirectory))
                             })
                             .when(is_foldable, |menu| {
-                                menu.action("Fold Directory", Box::new(FoldDirectory))
+                                menu.action("Свернуть папку", Box::new(FoldDirectory))
                             })
                             .when(should_show_compare, |menu| {
-                                menu.separator()
-                                    .action("Compare Marked Files", Box::new(CompareMarkedFiles))
+                                menu.separator().action(
+                                    "Сравнить отмеченные файлы",
+                                    Box::new(CompareMarkedFiles),
+                                )
                             })
                             .separator()
-                            .action("Cut", Box::new(Cut))
-                            .action("Copy", Box::new(Copy))
-                            .action("Duplicate", Box::new(Duplicate))
-                            .action_disabled_when(!has_pasteable_content, "Paste", Box::new(Paste))
+                            .action("Вырезать", Box::new(Cut))
+                            .action("Копировать", Box::new(Copy))
+                            .action("Создать копию", Box::new(Duplicate))
+                            .action_disabled_when(
+                                !has_pasteable_content,
+                                "Вставить",
+                                Box::new(Paste),
+                            )
                             .when(!is_collab, |menu| {
                                 let can_undo = self.undo_manager.can_undo();
                                 let can_redo = self.undo_manager.can_redo();
 
-                                menu.action_disabled_when(!can_undo, "Undo", Box::new(Undo))
-                                    .action_disabled_when(!can_redo, "Redo", Box::new(Redo))
+                                menu.action_disabled_when(!can_undo, "Отменить", Box::new(Undo))
+                                    .action_disabled_when(!can_redo, "Повторить", Box::new(Redo))
                             })
                             .when(is_remote, |menu| {
                                 menu.separator()
-                                    .action("Download...", Box::new(DownloadFromRemote))
+                                    .action("Скачать…", Box::new(DownloadFromRemote))
                             })
                             .separator()
-                            .action("Copy Path", Box::new(zed_actions::workspace::CopyPath))
                             .action(
-                                "Copy Relative Path",
+                                "Копировать путь",
+                                Box::new(zed_actions::workspace::CopyPath),
+                            )
+                            .action(
+                                "Копировать относительный путь",
                                 Box::new(zed_actions::workspace::CopyRelativePath),
                             )
                             .when(has_git_repo, |menu| {
                                 menu.separator()
                                     .when(!is_dir && self.has_git_changes(entry_id), |menu| {
                                         menu.action(
-                                            "Restore File",
+                                            "Восстановить файл",
                                             Box::new(git::RestoreFile { skip_prompt: false }),
                                         )
                                     })
-                                    .action("Add to .gitignore", Box::new(git::AddToGitignore))
+                                    .action("Добавить в .gitignore", Box::new(git::AddToGitignore))
                                     .action(
-                                        "Add to .git/info/exclude",
+                                        "Добавить в .git/info/exclude",
                                         Box::new(git::AddToGitInfoExclude),
                                     )
                                     .when(has_history, |menu| {
-                                        menu.action("View History", Box::new(git::FileHistory))
+                                        menu.action("Показать историю", Box::new(git::FileHistory))
                                     })
                                     .when(!is_dir, |menu| {
                                         menu.action(
-                                            "Open File Permalink",
+                                            "Открыть постоянную ссылку на файл",
                                             git::OpenFilePermalink.boxed_clone(),
                                         )
                                         .action(
-                                            "Copy File Permalink",
+                                            "Копировать постоянную ссылку на файл",
                                             git::CopyFilePermalink.boxed_clone(),
                                         )
                                     })
                             })
                             .when(!should_hide_rename, |menu| {
-                                menu.separator().action("Rename", Box::new(Rename))
+                                menu.separator().action("Переименовать", Box::new(Rename))
                             })
                             .when(!is_root && !is_collab, |menu| {
-                                menu.action("Trash", Box::new(Trash { skip_prompt: false }))
+                                menu.action("В корзину", Box::new(Trash { skip_prompt: false }))
                             })
                             .when(!is_root, |menu| {
-                                menu.action("Delete", Box::new(Delete { skip_prompt: false }))
+                                menu.action("Удалить", Box::new(Delete { skip_prompt: false }))
                             })
                             .when(!is_collab && is_root, |menu| {
                                 menu.separator()
                                     .action(
-                                        "Add Folders to Project…",
+                                        "Добавить папки в проект…",
                                         Box::new(workspace::AddFolderToProject),
                                     )
-                                    .action("Remove from Project", Box::new(RemoveFromProject))
+                                    .action("Убрать из проекта", Box::new(RemoveFromProject))
                             })
                             .when(is_dir && !is_root, |menu| {
                                 menu.separator()
-                                    .action("Expand All", Box::new(ExpandSelectedEntryAndChildren))
                                     .action(
-                                        "Collapse All",
+                                        "Развернуть всё",
+                                        Box::new(ExpandSelectedEntryAndChildren),
+                                    )
+                                    .action(
+                                        "Свернуть всё",
                                         Box::new(CollapseSelectedEntryAndChildren),
                                     )
                             })
                             .when(is_dir && is_root, |menu| {
                                 menu.separator()
-                                    .action("Expand All", Box::new(ExpandAllEntries))
-                                    .action("Collapse All", Box::new(CollapseAllEntries))
+                                    .action("Развернуть всё", Box::new(ExpandAllEntries))
+                                    .action("Свернуть всё", Box::new(CollapseAllEntries))
                             })
                     }
                 })
@@ -2075,7 +2096,7 @@ impl ProjectPanel {
         if !filename.is_empty() {
             if filename.is_empty() {
                 edit_state.validation_state =
-                    ValidationState::Error("File or directory name cannot be empty.".to_string());
+                    ValidationState::Error("Имя файла или папки не может быть пустым.".to_string());
                 cx.notify();
                 return;
             }
@@ -2083,7 +2104,7 @@ impl ProjectPanel {
             let trimmed_filename = filename.trim();
             if trimmed_filename != filename {
                 edit_state.validation_state = ValidationState::Warning(
-                    "File or directory name contains leading or trailing whitespace.".to_string(),
+                    "Имя файла или папки содержит пробелы в начале или конце.".to_string(),
                 );
                 cx.notify();
                 return;
@@ -2092,7 +2113,7 @@ impl ProjectPanel {
 
             let Ok(filename) = RelPath::from_unix_str(trimmed_filename) else {
                 edit_state.validation_state = ValidationState::Warning(
-                    "File or directory name contains leading or trailing whitespace.".to_string(),
+                    "Имя файла или папки содержит пробелы в начале или конце.".to_string(),
                 );
                 cx.notify();
                 return;
@@ -2128,7 +2149,7 @@ impl ProjectPanel {
                 };
                 if already_exists {
                     edit_state.validation_state = ValidationState::Error(format!(
-                        "File or directory '{}' already exists at location. Please choose a different name.",
+                        "Файл или папка «{}» уже существует в этом месте. Выберите другое имя.",
                         filename.as_unix_str()
                     ));
                     cx.notify();
@@ -2314,9 +2335,9 @@ impl ProjectPanel {
                                         notification_id: "excluded-directory".into(),
                                         message: format!(
                                             concat!(
-                                                "Created an excluded directory at {:?}.\n",
-                                                "Alter `file_scan_exclusions` in the settings ",
-                                                "to show it in the panel"
+                                                "Создан исключённый каталог: {:?}.\n",
+                                                "Измените `file_scan_exclusions` в настройках, ",
+                                                "чтобы показать его в панели"
                                             ),
                                             abs_path
                                         ),
@@ -2667,8 +2688,14 @@ impl ProjectPanel {
             let file_name = entry.path.file_name()?.to_string();
 
             let answer = if !action.skip_prompt {
-                let prompt = format!("Discard changes to {}?", MarkdownInlineCode(&file_name));
-                Some(window.prompt(PromptLevel::Info, &prompt, None, &["Restore", "Cancel"], cx))
+                let prompt = format!("Отменить изменения в {}?", MarkdownInlineCode(&file_name));
+                Some(window.prompt(
+                    PromptLevel::Info,
+                    &prompt,
+                    None,
+                    &["Восстановить", "Отмена"],
+                    cx,
+                ))
             } else {
                 None
             };
@@ -2689,7 +2716,7 @@ impl ProjectPanel {
                 if let Err(e) = task.await {
                     panel
                         .update(cx, |panel, cx| {
-                            let message = format!("Failed to restore {}: {}", file_name, e);
+                            let message = format!("Не удалось восстановить {}: {}", file_name, e);
                             let toast = StatusToast::new(message, cx, |this, _| {
                                 this.icon(
                                     Icon::new(IconName::XCircle)
@@ -2761,7 +2788,7 @@ impl ProjectPanel {
                 if let Err(e) = receiver.await? {
                     if let Some(workspace) = workspace.upgrade() {
                         cx.update(|cx| {
-                            let message = format!("Failed to add to .gitignore: {}", e);
+                            let message = format!("Не удалось добавить в .gitignore: {}", e);
                             let toast = StatusToast::new(message, cx, |this, _| {
                                 this.icon(Icon::new(IconName::XCircle).color(Color::Error))
                                     .dismiss_button(true)
@@ -2808,7 +2835,7 @@ impl ProjectPanel {
                 if let Err(e) = receiver.await? {
                     if let Some(workspace) = workspace.upgrade() {
                         cx.update(|cx| {
-                            let message = format!("Failed to add to .git/info/exclude: {}", e);
+                            let message = format!("Не удалось добавить в .git/info/exclude: {}", e);
                             let toast = StatusToast::new(message, cx, |this, _| {
                                 this.icon(Icon::new(IconName::XCircle).color(Color::Error))
                                     .dismiss_button(true)
@@ -2842,11 +2869,11 @@ impl ProjectPanel {
         S: AsRef<str>,
     {
         let (message_start, confirmation_label, detail) = match kind {
-            RemovalKind::Trash => ("Do you want to trash", "Trash", None),
+            RemovalKind::Trash => ("Переместить в корзину", "В корзину", None),
             RemovalKind::Delete => (
-                "Are you sure you want to permanently delete",
-                "Delete",
-                Some("This cannot be undone."),
+                "Удалить безвозвратно",
+                "Удалить",
+                Some("Это действие нельзя отменить."),
             ),
         };
 
@@ -2861,13 +2888,13 @@ impl ProjectPanel {
                     .collect::<Vec<_>>();
                 let omitted_count = names.len().saturating_sub(CUTOFF_POINT);
                 if omitted_count == 1 {
-                    listed_names.push(".. 1 file not shown".into());
+                    listed_names.push("… ещё 1 файл".into());
                 } else if omitted_count > 1 {
-                    listed_names.push(format!(".. {omitted_count} files not shown"));
+                    listed_names.push(format!("… ещё файлов: {omitted_count}"));
                 }
 
                 format!(
-                    "{message_start} the following {} files?\n{}",
+                    "{message_start} следующие файлы ({} шт.)?\n{}",
                     names.len(),
                     listed_names.join("\n")
                 )
@@ -2876,14 +2903,16 @@ impl ProjectPanel {
         match dirty_buffers {
             0 => {}
             1 if names.len() == 1 => {
-                message.push_str("\n\nIt has unsaved changes, which will be lost.");
+                message.push_str("\n\nНесохранённые изменения будут потеряны.");
             }
             1 => {
-                message.push_str("\n\n1 of these has unsaved changes, which will be lost.");
+                message.push_str(
+                    "\n\nВ одном из файлов есть несохранённые изменения. Они будут потеряны.",
+                );
             }
             dirty_buffers => {
                 message.push_str(&format!(
-                    "\n\n{dirty_buffers} of these have unsaved changes, which will be lost."
+                    "\n\nФайлов с несохранёнными изменениями: {dirty_buffers}. Эти изменения будут потеряны."
                 ));
             }
         }
@@ -2950,7 +2979,7 @@ impl ProjectPanel {
                     PromptLevel::Info,
                     &prompt.message,
                     prompt.detail,
-                    &[prompt.confirmation_label, "Cancel"],
+                    &[prompt.confirmation_label, "Отмена"],
                     cx,
                 ))
             } else {
@@ -3036,10 +3065,14 @@ impl ProjectPanel {
         cx: &mut Context<Self>,
     ) {
         let message = match (trash, total_count) {
-            (true, 1) => format!("Failed to trash {failed_count} of {total_count} file."),
-            (true, _) => format!("Failed to trash {failed_count} of {total_count} files."),
-            (false, 1) => format!("Failed to delete {failed_count} of {total_count} file."),
-            (false, _) => format!("Failed to delete {failed_count} of {total_count} files."),
+            (true, 1) => {
+                format!("Не удалось переместить в корзину: {failed_count} из {total_count} файлов.")
+            }
+            (true, _) => {
+                format!("Не удалось переместить в корзину: {failed_count} из {total_count} файлов.")
+            }
+            (false, 1) => format!("Не удалось удалить: {failed_count} из {total_count} файлов."),
+            (false, _) => format!("Не удалось удалить: {failed_count} из {total_count} файлов."),
         };
 
         let toast = StatusToast::new(message, cx, |this, _| {
@@ -3930,7 +3963,7 @@ impl ProjectPanel {
             files: false,
             directories: true,
             multiple: false,
-            prompt: Some("Download".into()),
+            prompt: Some("Скачать".into()),
         });
 
         let fs = self.fs.clone();
@@ -3945,7 +3978,7 @@ impl ProjectPanel {
                             workspace.show_toast(
                                 workspace::Toast::new(
                                     notification_id.clone(),
-                                    format!("Downloading 0/{} files...", total_files),
+                                    format!("Скачивание файлов: 0/{}…", total_files),
                                 ),
                                 cx,
                             );
@@ -3962,7 +3995,7 @@ impl ProjectPanel {
                                     workspace::Toast::new(
                                         notification_id.clone(),
                                         format!(
-                                            "Downloading {}/{} files...",
+                                            "Скачивание файлов: {}/{}…",
                                             index + 1,
                                             total_files
                                         ),
@@ -3998,7 +4031,7 @@ impl ProjectPanel {
                             workspace.show_toast(
                                 workspace::Toast::new(
                                     notification_id.clone(),
-                                    format!("Downloaded {} files", total_files),
+                                    format!("Скачано файлов: {}", total_files),
                                 ),
                                 cx,
                             );
@@ -5078,9 +5111,9 @@ impl ProjectPanel {
                 for (filename, original_path) in &paths_to_replace {
                     let prompt_message = format!(
                         concat!(
-                            "A file or folder with name {} ",
-                            "already exists in the destination folder. ",
-                            "Do you want to replace it?"
+                            "Файл или папка с именем {} ",
+                            "уже существует в папке назначения. ",
+                            "Заменить его?"
                         ),
                         MarkdownInlineCode(filename)
                     );
@@ -5090,7 +5123,7 @@ impl ProjectPanel {
                                 PromptLevel::Info,
                                 &prompt_message,
                                 None,
-                                &["Replace", "Cancel"],
+                                &["Заменить", "Отмена"],
                                 cx,
                             )
                         })?
@@ -6645,7 +6678,7 @@ impl ProjectPanel {
                                         Tooltip::with_meta(
                                             path.to_string_lossy().into_owned(),
                                             None,
-                                            "Symbolic Link",
+                                            "Символическая ссылка",
                                             cx,
                                         )
                                     })
@@ -8155,7 +8188,7 @@ impl Render for ProjectPanel {
                 .size_full()
                 .child(
                     ProjectEmptyState::new(
-                        "Project Panel",
+                        "Панель проекта",
                         focus_handle.clone(),
                         KeyBinding::for_action_in(&workspace::Open::default(), &focus_handle, cx),
                     )
@@ -8226,7 +8259,7 @@ impl Render for DraggedProjectEntryView {
                     .bg(cx.theme().colors().background)
                     .map(|this| {
                         if self.selections.len() > 1 && self.selections.contains(&self.selection) {
-                            this.child(Label::new(format!("{} entries", self.selections.len())))
+                            this.child(Label::new(format!("Элементов: {}", self.selections.len())))
                         } else {
                             this.child(
                                 h_flex()
@@ -8282,7 +8315,7 @@ impl Panel for ProjectPanel {
     }
 
     fn icon_tooltip(&self, _window: &Window, _cx: &App) -> Option<&'static str> {
-        Some("Project Panel")
+        Some("Панель проекта")
     }
 
     fn toggle_action(&self) -> Box<dyn Action> {
@@ -8429,7 +8462,7 @@ fn git_status_indicator(git_status: GitSummary) -> Option<(&'static str, Color)>
 fn explain_move_error(err: anyhow::Error, names: Option<&(String, String)>) -> anyhow::Error {
     match names {
         Some((from, to)) if already_exists_error(&err) => err.context(format!(
-            "Failed to move `{from}` to `{to}`. A file or folder already exists there."
+            "Не удалось переместить `{from}` в `{to}`. В этом месте уже есть файл или папка."
         )),
         _ => err,
     }

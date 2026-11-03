@@ -1,0 +1,400 @@
+pane::SplitHorizontal	Область редактора: Разделить горизонтально
+pane::SplitLeft	Область редактора: разделить слева
+pane::SplitRight	Область редактора: разделить справа
+pane::SplitUp	Область редактора: разделить сверху
+pane::SplitVertical	Область редактора: Разделить вертикально
+pane::SwapItemLeft	Область редактора: Поменять вкладку местами с левой
+pane::SwapItemRight	Область редактора: Поменять вкладку местами с правой
+pane::TogglePinTab	Область редактора: Закрепить или открепить вкладку
+pane::TogglePreviewTab	Область редактора: Переключить режим вкладки предварительного просмотра
+pane::UnpinAllTabs	Область редактора: Открепить все вкладки
+picker::ConfirmCompletion	Список выбора: Принять вариант завершения
+picker::ConfirmInput	Список выбора: Подтвердить ввод
+picker::MultiSelectNext	Список выбора: Добавить следующее совпадение к выделению
+picker::SetPreviewBelow	Список выбора: Показывать предварительный просмотр снизу
+picker::SetPreviewHidden	Список выбора: Скрыть предварительный просмотр
+picker::SetPreviewRight	Список выбора: Показывать предварительный просмотр справа
+picker::ToggleActionsMenu	Список выбора: Показать или скрыть меню действий
+picker::ToggleMultiSelect	Список выбора: Включить или отключить множественный выбор
+picker::TogglePreview	Список выбора: Показать или скрыть предварительный просмотр
+project_panel::CollapseAllEntries	Панель проекта: Свернуть все элементы
+project_panel::CollapseSelectedEntry	Панель проекта: Свернуть выбранный элемент
+project_panel::CollapseSelectedEntryAndChildren	Панель проекта: Свернуть выбранный элемент и его содержимое
+project_panel::CompareMarkedFiles	Панель проекта: Сравнить отмеченные файлы
+project_panel::Copy	Панель проекта: копировать
+project_panel::Cut	Панель проекта: вырезать
+project_panel::Delete	Панель проекта: удалить
+project_panel::DownloadFromRemote	Панель проекта: Загрузить с удалённого узла
+project_panel::Duplicate	Панель проекта: Дублировать
+project_panel::ExpandAllEntries	Панель проекта: Развернуть все элементы
+project_panel::ExpandSelectedEntry	Панель проекта: Развернуть выбранный элемент
+project_panel::ExpandSelectedEntryAndChildren	Панель проекта: Развернуть выбранный элемент и его содержимое
+project_panel::FoldDirectory	Панель проекта: Свернуть папку
+project_panel::NewDirectory	Панель проекта: Создать папку
+project_panel::NewFile	Панель проекта: новый файл
+project_panel::NewSearchInDirectory	Панель проекта: Начать поиск в папке
+project_panel::Open	Панель проекта: открыть
+project_panel::OpenContextMenu	Панель проекта: Открыть контекстное меню
+project_panel::OpenMarkdownPreview	Панель проекта: Открыть просмотр Markdown
+project_panel::OpenPermanent	Панель проекта: Закрепить открытую вкладку
+project_panel::OpenSplitHorizontal	Панель проекта: Открыть с горизонтальным разделением
+project_panel::OpenSplitVertical	Панель проекта: Открыть с вертикальным разделением
+project_panel::OpenSvgPreview	Панель проекта: Открыть просмотр SVG
+project_panel::Paste	Панель проекта: вставить
+project_panel::Redo	Панель проекта: повторить
+project_panel::RemoveFromProject	Панель проекта: Удалить из проекта
+project_panel::Rename	Панель проекта: переименовать
+project_panel::RevealInFileManager	Панель проекта: Показать в файловом менеджере
+project_panel::ScrollCursorBottom	Панель проекта: Прокрутить до курсора у нижнего края
+project_panel::ScrollCursorCenter	Панель проекта: Прокрутить до курсора в центре
+project_panel::ScrollCursorTop	Панель проекта: Прокрутить до курсора у верхнего края
+project_panel::ScrollDown	Панель проекта: Прокрутить вниз
+project_panel::ScrollUp	Панель проекта: Прокрутить вверх
+project_panel::SelectNextDiagnostic	Панель проекта: Выбрать следующую проблему
+project_panel::SelectNextDirectory	Панель проекта: Выбрать следующую папку
+project_panel::SelectNextGitEntry	Панель проекта: Выбрать следующий элемент Git
+project_panel::SelectParent	Панель проекта: Выбрать родительский элемент
+project_panel::SelectPrevDiagnostic	Панель проекта: Выбрать предыдущую проблему
+project_panel::SelectPrevDirectory	Панель проекта: Выбрать предыдущую папку
+project_panel::SelectPrevGitEntry	Панель проекта: Выбрать предыдущий элемент Git
+project_panel::Toggle	Панель проекта: показать или скрыть
+project_panel::ToggleFocus	Панель проекта: переключить фокус
+project_panel::ToggleHideGitIgnore	Панель проекта: Показать или скрыть игнорируемые Git файлы
+project_panel::ToggleHideHidden	Панель проекта: Показать или скрыть скрытые файлы
+project_panel::Trash	Панель проекта: переместить в корзину
+project_panel::Undo	Панель проекта: отменить
+project_panel::UnfoldDirectory	Панель проекта: Развернуть папку
+project_search::NextField	Поиск в проекте: Следующее поле
+project_search::OpenTextFinder	Поиск в проекте: Открыть поиск текста
+project_search::SearchInNew	Поиск в проекте: Искать в новой вкладке
+project_search::ToggleAllSearchResults	Поиск в проекте: Показать или скрыть все результаты поиска
+project_search::ToggleFilters	Поиск в проекте: Показать или скрыть фильтры
+project_search::ToggleFocus	Поиск в проекте: переключить фокус
+project_symbols::Toggle	Проект: перейти к символу
+projects::InitializeDevContainer	Проекты: Инициализировать контейнер разработки
+projects::OpenDevContainer	Проекты: Открыть контейнер разработки
+projects::OpenRecent	Проекты: открыть недавний проект
+projects::OpenRemote	Проекты: открыть удалённый проект
+recent_projects::AddToWorkspace	Недавние проекты: Добавить в рабочую область
+recent_projects::RemoveSelected	Недавние проекты: удалить выбранное
+recent_projects::ToggleActionsMenu	Недавние проекты: Показать или скрыть меню действий
+remote_debug::SimulateDisconnect	Удалённая отладка: Имитировать разрыв соединения
+remote_debug::SimulateTimeout	Удалённая отладка: Имитировать таймаут
+remote_debug::SimulateTimeoutExhausted	Удалённая отладка: Имитировать исчерпание попыток по таймауту
+repl::ClearCurrentOutput	Интерактивная консоль: Очистить текущий вывод
+repl::ClearOutputs	Интерактивная консоль: Очистить вывод
+repl::Interrupt	Интерактивная консоль: Прервать
+repl::RefreshKernelspecs	Интерактивная консоль: Обновить список ядер
+repl::Restart	Интерактивная консоль: перезапустить
+repl::Run	Интерактивная консоль: Выполнить
+repl::RunInPlace	Интерактивная консоль: Выполнить на месте
+repl::Sessions	Интерактивная консоль: Сеансы
+repl::Shutdown	Интерактивная консоль: Завершить работу
+search::CycleMode	Поиск: Переключить режим
+search::FocusSearch	Поиск: Перейти к поиску
+search::NextHistoryQuery	Поиск: Следующий запрос из истории
+search::PreviousHistoryQuery	Поиск: Предыдущий запрос из истории
+search::ReplaceAll	Поиск: заменить всё
+search::ReplaceNext	Поиск: заменить следующее совпадение
+search::SelectAllMatches	Поиск: выделить все совпадения
+search::SelectNextMatch	Поиск: Выбрать следующее совпадение
+search::SelectPreviousMatch	Поиск: Выбрать предыдущее совпадение
+search::ToggleCaseSensitive	Поиск: Включить или отключить учёт регистра
+search::ToggleIncludeIgnored	Поиск: Включить или исключить игнорируемые файлы
+search::ToggleRegex	Поиск: Включить или отключить регулярные выражения
+search::ToggleReplace	Поиск: Показать или скрыть замену
+search::ToggleSelection	Поиск: Переключить выделение
+search::ToggleWholeWord	Поиск: Включить или отключить поиск целого слова
+settings_editor::CollapseNavEntry	Настройки: Свернуть раздел навигации
+settings_editor::ExpandNavEntry	Настройки: Развернуть раздел навигации
+settings_editor::FocusFile	Настройки: Перейти к файлу
+settings_editor::FocusFirstNavEntry	Настройки: Перейти к первому разделу навигации
+settings_editor::FocusLastNavEntry	Настройки: Перейти к последнему разделу навигации
+settings_editor::FocusNextFile	Настройки: Перейти к следующему файлу
+settings_editor::FocusNextNavEntry	Настройки: Перейти к следующему разделу навигации
+settings_editor::FocusNextRootNavEntry	Настройки: Перейти к следующему корневому разделу навигации
+settings_editor::FocusPreviousFile	Настройки: Перейти к предыдущему файлу
+settings_editor::FocusPreviousNavEntry	Настройки: Перейти к предыдущему разделу навигации
+settings_editor::FocusPreviousRootNavEntry	Настройки: Перейти к предыдущему корневому разделу навигации
+settings_editor::Minimize	Настройки: свернуть
+settings_editor::OpenCurrentFile	Настройки: Открыть текущий файл
+settings_editor::ToggleFocusNav	Настройки: Переключить фокус на навигацию
+settings_profile_selector::Toggle	Профили настроек: показать или скрыть
+skill_creator::Cancel	Создание навыков: отменить
+skill_creator::FocusNextField	Создание навыков: Перейти к следующему полю
+skill_creator::FocusPreviousField	Создание навыков: Перейти к предыдущему полю
+skill_creator::SaveSkill	Создание навыков: Сохранить навык
+snippets::ConfigureSnippets	Фрагменты кода: Настроить фрагменты кода
+snippets::OpenFolder	Фрагменты кода: Открыть папку
+stash_picker::DropStashItem	Отложенные изменения: Удалить выбранные отложенные изменения
+stash_picker::ShowStashItem	Отложенные изменения: Показать отложенные изменения
+svg::OpenFollowingPreview	Просмотр SVG: Открыть предварительный просмотр с отслеживанием
+svg::OpenPreview	Просмотр SVG: Открыть предварительный просмотр
+svg::OpenPreviewToTheSide	Просмотр SVG: Открыть предварительный просмотр сбоку
+syntax_tree_view::UseActiveEditor	Синтаксическое дерево: Использовать активный редактор
+tab_switcher::CloseSelectedItem	Переключение вкладок: Закрыть выбранную вкладку
+tab_switcher::OpenInActivePane	Переключение вкладок: Открыть в активной области редактора
+tab_switcher::Toggle	Переключение вкладок: показать или скрыть
+tab_switcher::ToggleAll	Переключение вкладок: Переключить всё
+tabular_data::MoveFocusedCell	Табличные данные: Переместить активную ячейку
+tabular_data::OpenPreview	Табличные данные: Открыть предварительный просмотр
+tabular_data::OpenPreviewToTheSide	Табличные данные: Открыть предварительный просмотр сбоку
+task::Rerun	Задачи: повторить запуск
+task::Spawn	Задачи: запустить задачу
+terminal::Clear	Терминал: очистить
+terminal::Copy	Терминал: копировать
+terminal::Paste	Терминал: вставить
+terminal::PasteText	Терминал: Вставить текст
+terminal::RenameTerminal	Терминал: Переименовать терминал
+terminal::RerunTask	Терминал: Повторно запустить задачу
+terminal::ScrollHalfPageDown	Терминал: Прокрутить на полстраницы вниз
+terminal::ScrollHalfPageUp	Терминал: Прокрутить на полстраницы вверх
+terminal::ScrollLineDown	Терминал: Прокрутить на строку вниз
+terminal::ScrollLineUp	Терминал: Прокрутить на строку вверх
+terminal::ScrollPageDown	Терминал: Прокрутить на страницу вниз
+terminal::ScrollPageUp	Терминал: Прокрутить на страницу вверх
+terminal::ScrollToBottom	Терминал: Прокрутить в конец
+terminal::ScrollToTop	Терминал: Прокрутить в начало
+terminal::SearchTest	Терминал: Проверить поиск
+terminal::SelectAll	Терминал: выделить всё
+terminal::SendKeystroke	Терминал: Отправить нажатие клавиши
+terminal::SendText	Терминал: Отправить текст
+terminal::ShowCharacterPalette	Терминал: Показать палитру символов
+terminal::ToggleViMode	Терминал: Включить или отключить режим vi
+terminal_panel::Toggle	Панель терминала: показать или скрыть
+terminal_panel::ToggleFocus	Панель терминала: переключить фокус
+text_finder::Fold	Поиск текста: свернуть блок
+text_finder::ToProjectSearch	Поиск текста: Перейти к поиску в проекте
+text_finder::Toggle	Поиск текста: показать или скрыть
+text_finder::ToggleFoldAll	Поиск текста: Свернуть или развернуть все блоки
+text_finder::Unfold	Поиск текста: Развернуть блок
+theme::ToggleMode	Оформление: Переключить режим
+theme_selector::Reload	Темы: перезагрузить
+theme_selector::Toggle	Темы: показать или скрыть
+toast::RunAction	Уведомления: Выполнить действие
+toolchain::AddToolchain	Наборы инструментов: Добавить набор инструментов
+toolchain::Select	Наборы инструментов: Выбрать
+variable_list::AddWatch	Переменные: Добавить наблюдаемое выражение
+variable_list::CollapseSelectedEntry	Переменные: Свернуть выбранный элемент
+variable_list::CopyVariableName	Переменные: Копировать имя переменной
+variable_list::CopyVariableValue	Переменные: Копировать значение переменной
+variable_list::EditVariable	Переменные: Изменить переменную
+variable_list::ExpandSelectedEntry	Переменные: Развернуть выбранный элемент
+variable_list::GoToMemory	Переменные: Перейти к памяти
+variable_list::RemoveWatch	Переменные: Удалить наблюдаемое выражение
+vim::AngleBrackets	Vim: Угловые скобки
+vim::AnyBrackets	Vim: Любые скобки
+vim::AnyPair	Vim: Любая парная конструкция
+vim::AnyQuotes	Vim: Любые кавычки
+vim::Argument	Vim: Выделить аргумент функции
+vim::ArgumentRequired	Vim: Обязательный аргумент
+vim::AutoIndent	Vim: Автоматически расставить отступы
+vim::BackQuotes	Vim: Обратные кавычки
+vim::ChangeCase	Vim: Изменить регистр
+vim::ChangeListNewer	Vim: Перейти к более новому изменению
+vim::ChangeListOlder	Vim: Перейти к более старому изменению
+vim::ChangeToEndOfLine	Vim: Изменить текст до конца строки
+vim::Class	Vim: Выделить определение класса
+vim::ClearExchange	Vim: Отменить обмен фрагментов
+vim::ClearOperators	Vim: Сбросить операторы
+vim::ColumnLeft	Vim: Перейти к столбцу слева
+vim::ColumnRight	Vim: Перейти к столбцу справа
+vim::Comment	Vim: Комментарий
+vim::ConvertToLowerCase	Vim: Преобразовать в нижний регистр
+vim::ConvertToRot13	Vim: Преобразовать по ROT13
+vim::ConvertToRot47	Vim: Преобразовать по ROT47
+vim::ConvertToUpperCase	Vim: Преобразовать в верхний регистр
+vim::CountCommand	Vim: Выполнить команду с числовым префиксом
+vim::CurlyBrackets	Vim: Фигурные скобки
+vim::CurrentLine	Vim: Текущая строка
+vim::Decrement	Vim: Уменьшить число
+vim::DeleteLeft	Vim: Удалить слева
+vim::DeleteRight	Vim: Удалить справа
+vim::DeleteToEndOfLine	Vim: Удалить до конца строки
+vim::DoubleQuotes	Vim: Двойные кавычки
+vim::Down	Vim: Вниз
+vim::EndOfDocument	Vim: Перейти в конец документа
+vim::EndOfLine	Vim: Перейти в конец строки
+vim::EndOfLineDownward	Vim: Перейти в конец строки ниже
+vim::EndOfParagraph	Vim: Перейти в конец абзаца
+vim::EndRepeat	Vim: Завершить повторение
+vim::Enter	Vim: Ввести
+vim::EntireFile	Vim: Весь файл
+vim::Exchange	Vim: Обменять фрагменты
+vim::FindCommand	Vim: Найти команду
+vim::FirstNonWhitespace	Vim: Первый непробельный символ
+vim::GoToColumn	Vim: Перейти к столбцу
+vim::GoToNextReference	Vim: Перейти к следующей ссылке
+vim::GoToPercentage	Vim: Перейти к позиции в процентах
+vim::GoToPreviousReference	Vim: Перейти к предыдущей ссылке
+vim::GoToPreviousTab	Vim: Перейти к предыдущей вкладке
+vim::GoToTab	Vim: Перейти к вкладке
+vim::HalfPageLeft	Vim: Прокрутить на полстраницы влево
+vim::HalfPageRight	Vim: Прокрутить на полстраницы вправо
+vim::HelixAppend	Vim: Helix: добавить текст после выделения
+vim::HelixCollapseSelection	Vim: Helix: свернуть выделение
+vim::HelixDelete	Vim: Helix: удалить
+vim::HelixDuplicateAbove	Vim: Helix: дублировать выше
+vim::HelixDuplicateBelow	Vim: Helix: дублировать ниже
+vim::HelixGotoLastModification	Vim: Helix: перейти к последнему изменению
+vim::HelixGotoLine	Vim: Helix: перейти к строке
+vim::HelixInsert	Vim: Helix: вставить текст
+vim::HelixInsertEndOfLine	Vim: Helix: вставить в конце строки
+vim::HelixJumpToWord	Vim: Helix: перейти к слову
+vim::HelixKeepNewestSelection	Vim: Helix: оставить последнее выделение
+vim::HelixPaste	Vim: Helix: вставить из буфера
+vim::HelixReplaceWithYanked	Vim: Helix: заменить скопированным текстом
+vim::HelixSelectLine	Vim: Helix: выделить строку
+vim::HelixSelectNext	Vim: Helix: выделить следующее совпадение
+vim::HelixSelectPrevious	Vim: Helix: выделить предыдущее совпадение
+vim::HelixSelectRegex	Vim: Helix: выделить по регулярному выражению
+vim::HelixSubstitute	Vim: Helix: заменить выделение
+vim::HelixSubstituteNoYank	Vim: Helix: заменить без копирования
+vim::HelixTrimSelections	Vim: Helix: убрать пробелы по краям выделений
+vim::HelixYank	Vim: Helix: копировать
+vim::Increment	Vim: Увеличить число
+vim::Indent	Vim: Увеличить отступ
+vim::IndentObj	Vim: Выделить текст с одинаковым отступом
+vim::InnerObject	Vim: Внутренняя часть объекта
+vim::InsertAfter	Vim: Вставить после
+vim::InsertAtPrevious	Vim: Вставить в предыдущей позиции
+vim::InsertBefore	Vim: Вставить перед
+vim::InsertEmptyLineAbove	Vim: Вставить пустую строку выше
+vim::InsertEmptyLineBelow	Vim: Вставить пустую строку ниже
+vim::InsertEndOfLine	Vim: Вставить в конце строки
+vim::InsertFirstNonWhitespace	Vim: Вставить перед первым непробельным символом
+vim::InsertFromAbove	Vim: Вставить символ из строки выше
+vim::InsertFromBelow	Vim: Вставить символ из строки ниже
+vim::InsertLineAbove	Vim: Вставить строку выше
+vim::InsertLineBelow	Vim: Вставить строку ниже
+vim::JoinLines	Vim: объединить строки
+vim::JoinLinesNoWhitespace	Vim: Объединить строки без пробелов
+vim::Left	Vim: Влево
+vim::LineDown	Vim: На строку вниз
+vim::LineUp	Vim: На строку вверх
+vim::Literal	Vim: Ввести буквальный символ
+vim::Matching	Vim: Перейти к парному символу
+vim::MaximizePane	Vim: Развернуть область редактора
+vim::MenuSelectNext	Vim: Выбрать следующий пункт меню
+vim::MenuSelectPrevious	Vim: Выбрать предыдущий пункт меню
+vim::Method	Vim: Выделить метод или функцию
+vim::MiddleOfLine	Vim: Перейти в середину строки
+vim::MiniBrackets	Vim: Выделить текст в ближайших скобках
+vim::MiniQuotes	Vim: Выделить текст в ближайших кавычках
+vim::MoveToNext	Vim: Перейти к следующему
+vim::MoveToNextMatch	Vim: Перейти к следующему совпадению
+vim::MoveToPrevious	Vim: Перейти к предыдущему
+vim::MoveToPreviousMatch	Vim: Перейти к предыдущему совпадению
+vim::NextComment	Vim: Следующий комментарий
+vim::NextGreaterIndent	Vim: Следующий больший отступ
+vim::NextLesserIndent	Vim: Следующий меньший отступ
+vim::NextLineStart	Vim: Начало следующей строки
+vim::NextMethodEnd	Vim: Конец следующего метода
+vim::NextMethodStart	Vim: Начало следующего метода
+vim::NextSameIndent	Vim: Следующий такой же отступ
+vim::NextSectionEnd	Vim: Конец следующего раздела
+vim::NextSectionStart	Vim: Начало следующего раздела
+vim::NextSubwordEnd	Vim: Конец следующей части слова
+vim::NextSubwordStart	Vim: Начало следующей части слова
+vim::NextWordEnd	Vim: Конец следующего слова
+vim::NextWordStart	Vim: Начало следующего слова
+vim::NormalBefore	Vim: Перейти в обычный режим перед позицией
+vim::Number	Vim: Добавить цифру к числу повторений
+vim::OpenDefaultKeymap	Vim: открыть стандартные сочетания клавиш
+vim::OtherEnd	Vim: Перейти к другому концу выделения
+vim::OtherEndRowAware	Vim: Перейти к другому концу выделения с учётом строк
+vim::Outdent	Vim: Уменьшить отступ
+vim::PageDown	Vim: На страницу вниз
+vim::PageUp	Vim: На страницу вверх
+vim::Paragraph	Vim: Абзац
+vim::Parentheses	Vim: Круглые скобки
+vim::Paste	Vim: вставить
+vim::PreviousComment	Vim: Предыдущий комментарий
+vim::PreviousGreaterIndent	Vim: Предыдущий больший отступ
+vim::PreviousLesserIndent	Vim: Предыдущий меньший отступ
+vim::PreviousLineStart	Vim: Начало предыдущей строки
+vim::PreviousMethodEnd	Vim: Конец предыдущего метода
+vim::PreviousMethodStart	Vim: Начало предыдущего метода
+vim::PreviousSameIndent	Vim: Предыдущий такой же отступ
+vim::PreviousSectionEnd	Vim: Конец предыдущего раздела
+vim::PreviousSectionStart	Vim: Начало предыдущего раздела
+vim::PreviousSubwordEnd	Vim: Конец предыдущей части слова
+vim::PreviousSubwordStart	Vim: Начало предыдущей части слова
+vim::PreviousWordEnd	Vim: Конец предыдущего слова
+vim::PreviousWordStart	Vim: Начало предыдущего слова
+vim::PushAddSurrounds	Vim: Начать добавление обрамления
+vim::PushAutoIndent	Vim: Начать автоматическую расстановку отступов
+vim::PushChange	Vim: Начать изменение текста
+vim::PushChangeSurrounds	Vim: Начать замену обрамления
+vim::PushDelete	Vim: Начать удаление текста
+vim::PushDeleteSurrounds	Vim: Начать удаление обрамления
+vim::PushDigraph	Vim: Начать ввод диграфа
+vim::PushFindBackward	Vim: Начать поиск символа назад
+vim::PushFindForward	Vim: Начать поиск символа вперёд
+vim::PushForcedMotion	Vim: Начать принудительное перемещение
+vim::PushHelixMatch	Vim: Helix: начать поиск парного символа
+vim::PushHelixNext	Vim: Helix: начать переход вперёд
+vim::PushHelixPrevious	Vim: Helix: начать переход назад
+vim::PushHelixSurroundAdd	Vim: Helix: начать добавление обрамления
+vim::PushHelixSurroundDelete	Vim: Helix: начать удаление обрамления
+vim::PushHelixSurroundReplace	Vim: Helix: начать замену обрамления
+vim::PushIndent	Vim: Начать увеличение отступа
+vim::PushJump	Vim: Начать переход
+vim::PushLiteral	Vim: Начать ввод буквального символа
+vim::PushLowercase	Vim: Начать перевод в нижний регистр
+vim::PushMark	Vim: Начать установку метки
+vim::PushObject	Vim: Начать выбор текстового объекта
+vim::PushOppositeCase	Vim: Начать инверсию регистра
+vim::PushOutdent	Vim: Начать уменьшение отступа
+vim::PushRecordRegister	Vim: Начать запись регистра
+vim::PushRegister	Vim: Выбрать регистр
+vim::PushReplace	Vim: Начать замену
+vim::PushReplaceWithRegister	Vim: Начать замену содержимым регистра
+vim::PushReplayRegister	Vim: Начать воспроизведение регистра
+vim::PushRewrap	Vim: Начать переразбиение строк
+vim::PushRot13	Vim: Начать преобразование ROT13
+vim::PushRot47	Vim: Начать преобразование ROT47
+vim::PushShellCommand	Vim: Начать ввод команды оболочки
+vim::PushSneak	Vim: Начать быстрый поиск по двум символам
+vim::PushSneakBackward	Vim: Начать быстрый поиск по двум символам назад
+vim::PushToggleBlockComments	Vim: Начать переключение блочного комментария
+vim::PushToggleComments	Vim: Начать переключение комментариев
+vim::PushUppercase	Vim: Начать перевод в верхний регистр
+vim::PushYank	Vim: Начать копирование
+vim::Quotes	Vim: Кавычки
+vim::Redo	Vim: повторить
+vim::Repeat	Vim: Повторить
+vim::RepeatFind	Vim: Повторить поиск
+vim::RepeatFindReversed	Vim: Повторить поиск в обратном направлении
+vim::ReplayLastRecording	Vim: Воспроизвести последнюю запись
+vim::ResetPaneSizes	Vim: Сбросить размеры областей редактора
+vim::ResizePaneDown	Vim: Увеличить область редактора вниз
+vim::ResizePaneLeft	Vim: Увеличить область редактора влево
+vim::ResizePaneRight	Vim: Увеличить область редактора вправо
+vim::ResizePaneUp	Vim: Увеличить область редактора вверх
+vim::RestoreVisualSelection	Vim: Восстановить визуальное выделение
+vim::Rewrap	Vim: Переразбить строки
+vim::Right	Vim: Вправо
+vim::ScrollDown	Vim: Прокрутить вниз
+vim::ScrollUp	Vim: Прокрутить вверх
+vim::Search	Vim: Найти
+vim::SearchSubmit	Vim: Выполнить поиск
+vim::SearchUnderCursor	Vim: Найти слово под курсором
+vim::SearchUnderCursorPrevious	Vim: Найти слово под курсором в обратном направлении
+vim::SelectLargerSyntaxNode	Vim: Выделить внешний синтаксический узел
+vim::SelectNext	Vim: выделить следующее совпадение
+vim::SelectNextMatch	Vim: Выбрать следующее совпадение
+vim::SelectNextSyntaxNode	Vim: Выделить следующий синтаксический узел
+vim::SelectPrevious	Vim: выделить предыдущее совпадение
+vim::SelectPreviousMatch	Vim: Выбрать предыдущее совпадение
+vim::SelectPreviousSyntaxNode	Vim: Выделить предыдущий синтаксический узел
+vim::SelectRegister	Vim: Выбрать регистр
+vim::SelectSmallerSyntaxNode	Vim: Выделить внутренний синтаксический узел
+vim::Sentence	Vim: Предложение
+vim::SentenceBackward	Vim: Перейти к предыдущему предложению
+vim::SentenceForward	Vim: Перейти к следующему предложению
+vim::ShellCommand	Vim: Выполнить команду оболочки
+vim::ShowLocation	Vim: Показать расположение
+vim::SquareBrackets	Vim: Квадратные скобки
+vim::StartOfDocument	Vim: Перейти в начало документа
+vim::StartOfLine	Vim: Перейти в начало строки

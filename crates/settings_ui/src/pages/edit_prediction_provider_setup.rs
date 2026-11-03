@@ -88,7 +88,7 @@ pub(crate) fn render_edit_prediction_setup_page(
                 IconName::AiOpenAiCompat,
                 "OpenAI Compatible API",
                 ApiKeyDocs::Custom {
-                    message: "The API key sent as Authorization: Bearer {key}.".into(),
+                    message: "Ключ API, передаваемый как Authorization: Bearer {key}.".into(),
                 },
                 open_ai_compatible_api_token(cx),
                 |cx| open_ai_compatible_api_url(cx),
@@ -129,7 +129,9 @@ fn render_provider_dropdown(window: &mut Window, cx: &mut App) -> AnyElement {
     let current_provider = AllLanguageSettings::get_global(cx)
         .edit_predictions
         .provider;
-    let current_provider_name = current_provider.display_name().unwrap_or("No provider set");
+    let current_provider_name = current_provider
+        .display_name()
+        .unwrap_or("Провайдер не выбран");
 
     let menu = ContextMenu::build(window, cx, move |mut menu, _, cx| {
         let available_providers = get_available_providers(cx);
@@ -155,7 +157,7 @@ fn render_provider_dropdown(window: &mut Window, cx: &mut App) -> AnyElement {
         .id("provider-selector")
         .min_w_0()
         .gap_1p5()
-        .child(SettingsSectionHeader::new("Active Provider").no_padding(true))
+        .child(SettingsSectionHeader::new("Активный провайдер").no_padding(true))
         .child(
             h_flex()
                 .pt_2p5()
@@ -167,9 +169,9 @@ fn render_provider_dropdown(window: &mut Window, cx: &mut App) -> AnyElement {
                         .w_full()
                         .min_w_0()
                         .max_w_1_2()
-                        .child(Label::new("Provider"))
+                        .child(Label::new("Провайдер"))
                         .child(
-                            Label::new("Select which provider to use for edit predictions.")
+                            Label::new("Выберите провайдера для предсказания правок.")
                                 .size(LabelSize::Small)
                                 .color(Color::Muted),
                         ),
@@ -261,39 +263,39 @@ fn render_api_key_provider(
             .flex_wrap()
             .gap_0p5()
             .child(
-                Label::new("Visit the")
+                Label::new("Откройте")
                     .size(LabelSize::Small)
                     .color(Color::Muted),
             )
             .child(
-                ButtonLink::new(format!("{title} dashboard"), dashboard_url)
+                ButtonLink::new(format!("панель управления {title}"), dashboard_url)
                     .no_icon(true)
                     .label_size(LabelSize::Small)
                     .label_color(Color::Muted),
             )
             .child(
-                Label::new("to generate an API key.")
+                Label::new("для создания ключа API.")
                     .size(LabelSize::Small)
                     .color(Color::Muted),
             ),
     };
 
     let configured_card_label = if is_from_env_var {
-        "API Key Set in Environment Variable"
+        "Ключ API задан в переменной окружения"
     } else {
-        "API Key Configured"
+        "Ключ API настроен"
     };
 
     let container = if has_key {
         base_container.child(header).child(
             ConfiguredApiCard::new(format!("{title}-reset-key"), configured_card_label)
-                .button_label("Reset Key")
+                .button_label("Сбросить ключ")
                 .button_tab_index(0)
                 .disabled(is_from_env_var)
                 .when_some(env_var_name, |this, env_var_name| {
                     this.when(is_from_env_var, |this| {
                         this.tooltip_label(format!(
-                            "To reset your API key, unset the {} environment variable.",
+                            "Чтобы сбросить ключ API, удалите переменную окружения {}.",
                             env_var_name
                         ))
                     })
@@ -315,12 +317,12 @@ fn render_api_key_provider(
                         .min_w_0()
                         .max_w_1_2()
                         .gap_0p5()
-                        .child(Label::new("API Key"))
+                        .child(Label::new("Ключ API"))
                         .child(description)
                         .when_some(env_var_name, |this, env_var_name| {
                             this.child({
                                 let label = format!(
-                                    "Or set the {} env var and restart Zed.",
+                                    "Или задайте переменную окружения {} и перезапустите Zed.",
                                     env_var_name.as_ref()
                                 );
                                 Label::new(label).size(LabelSize::Small).color(Color::Muted)
@@ -331,7 +333,7 @@ fn render_api_key_provider(
                     SettingsInputField::new(format!("{}-api-key-input", title))
                         .tab_index(0)
                         .with_placeholder("xxxxxxxxxxxxxxxxxxxx")
-                        .aria_label(format!("{} API Key", title))
+                        .aria_label(format!("Ключ API {}", title))
                         .on_confirm(move |api_key, _window, cx| {
                             write_key(api_key.filter(|key| !key.is_empty()), cx);
                         }),
@@ -377,8 +379,8 @@ fn render_ollama_provider(
 fn ollama_settings() -> Box<[SettingsPageItem]> {
     Box::new([
         SettingsPageItem::SettingItem(SettingItem {
-            title: "API URL",
-            description: "The base URL of your Ollama server.",
+            title: "Адрес API",
+            description: "Базовый URL вашего сервера Ollama.",
             field: Box::new(SettingField {
                 organization_override: None,
                 pick: |settings| {
@@ -411,8 +413,8 @@ fn ollama_settings() -> Box<[SettingsPageItem]> {
             files: USER,
         }),
         SettingsPageItem::SettingItem(SettingItem {
-            title: "Model",
-            description: "The Ollama model to use for edit predictions.",
+            title: "Модель",
+            description: "Модель Ollama для предсказания правок.",
             field: Box::new(SettingField {
                 organization_override: None,
                 pick: |settings| {
@@ -445,8 +447,8 @@ fn ollama_settings() -> Box<[SettingsPageItem]> {
             files: USER,
         }),
         SettingsPageItem::SettingItem(SettingItem {
-            title: "Prompt Format",
-            description: "The prompt format to use when requesting predictions. Set to Infer to have the format inferred based on the model name.",
+            title: "Формат запроса",
+            description: "Формат запроса предсказаний. Выберите Infer, чтобы определять формат по имени модели.",
             field: Box::new(SettingField {
                 organization_override: None,
                 pick: |settings| {
@@ -476,8 +478,8 @@ fn ollama_settings() -> Box<[SettingsPageItem]> {
             metadata: None,
         }),
         SettingsPageItem::SettingItem(SettingItem {
-            title: "Max Output Tokens",
-            description: "The maximum number of tokens to generate.",
+            title: "Максимум выходных токенов",
+            description: "Максимальное число генерируемых токенов.",
             field: Box::new(SettingField {
                 organization_override: None,
                 pick: |settings| {
@@ -507,8 +509,8 @@ fn ollama_settings() -> Box<[SettingsPageItem]> {
             files: USER,
         }),
         SettingsPageItem::SettingItem(SettingItem {
-            title: "Prediction Debounce",
-            description: "Delay in milliseconds before automatically requesting a prediction after typing stops. Set to 0 to request predictions immediately.",
+            title: "Задержка предсказания",
+            description: "Задержка в миллисекундах перед автоматическим запросом предсказания после остановки ввода. Значение 0 запрашивает предсказание сразу.",
             field: Box::new(SettingField {
                 organization_override: None,
                 pick: |settings| {
@@ -543,8 +545,8 @@ fn ollama_settings() -> Box<[SettingsPageItem]> {
 fn open_ai_compatible_settings() -> Box<[SettingsPageItem]> {
     Box::new([
         SettingsPageItem::SettingItem(SettingItem {
-            title: "API URL",
-            description: "The URL of your OpenAI-compatible server's completions API.",
+            title: "Адрес API",
+            description: "URL API дополнений вашего сервера, совместимого с OpenAI.",
             field: Box::new(SettingField {
                 organization_override: None,
                 pick: |settings| {
@@ -577,8 +579,8 @@ fn open_ai_compatible_settings() -> Box<[SettingsPageItem]> {
             files: USER,
         }),
         SettingsPageItem::SettingItem(SettingItem {
-            title: "Model",
-            description: "The model string to pass to the OpenAI-compatible server.",
+            title: "Модель",
+            description: "Имя модели, передаваемое серверу, совместимому с OpenAI.",
             field: Box::new(SettingField {
                 organization_override: None,
                 pick: |settings| {
@@ -611,8 +613,8 @@ fn open_ai_compatible_settings() -> Box<[SettingsPageItem]> {
             files: USER,
         }),
         SettingsPageItem::SettingItem(SettingItem {
-            title: "Prompt Format",
-            description: "The prompt format to use when requesting predictions. Set to Infer to have the format inferred based on the model name.",
+            title: "Формат запроса",
+            description: "Формат запроса предсказаний. Выберите Infer, чтобы определять формат по имени модели.",
             field: Box::new(SettingField {
                 organization_override: None,
                 pick: |settings| {
@@ -642,8 +644,8 @@ fn open_ai_compatible_settings() -> Box<[SettingsPageItem]> {
             metadata: None,
         }),
         SettingsPageItem::SettingItem(SettingItem {
-            title: "Max Output Tokens",
-            description: "The maximum number of tokens to generate.",
+            title: "Максимум выходных токенов",
+            description: "Максимальное число генерируемых токенов.",
             field: Box::new(SettingField {
                 organization_override: None,
                 pick: |settings| {
@@ -673,8 +675,8 @@ fn open_ai_compatible_settings() -> Box<[SettingsPageItem]> {
             files: USER,
         }),
         SettingsPageItem::SettingItem(SettingItem {
-            title: "Prediction Debounce",
-            description: "Delay in milliseconds before automatically requesting a prediction after typing stops. Set to 0 to request predictions immediately.",
+            title: "Задержка предсказания",
+            description: "Задержка в миллисекундах перед автоматическим запросом предсказания после остановки ввода. Значение 0 запрашивает предсказание сразу.",
             field: Box::new(SettingField {
                 organization_override: None,
                 pick: |settings| {
@@ -709,8 +711,8 @@ fn open_ai_compatible_settings() -> Box<[SettingsPageItem]> {
 fn codestral_settings() -> Box<[SettingsPageItem]> {
     Box::new([
         SettingsPageItem::SettingItem(SettingItem {
-            title: "API URL",
-            description: "The API URL to use for Codestral.",
+            title: "Адрес API",
+            description: "URL API для Codestral.",
             field: Box::new(SettingField {
                 organization_override: None,
                 pick: |settings| {
@@ -743,8 +745,8 @@ fn codestral_settings() -> Box<[SettingsPageItem]> {
             files: USER,
         }),
         SettingsPageItem::SettingItem(SettingItem {
-            title: "Max Tokens",
-            description: "The maximum number of tokens to generate.",
+            title: "Максимум токенов",
+            description: "Максимальное число генерируемых токенов.",
             field: Box::new(SettingField {
                 organization_override: None,
                 pick: |settings| {
@@ -774,8 +776,8 @@ fn codestral_settings() -> Box<[SettingsPageItem]> {
             files: USER,
         }),
         SettingsPageItem::SettingItem(SettingItem {
-            title: "Model",
-            description: "The Codestral model id to use.",
+            title: "Модель",
+            description: "Идентификатор используемой модели Codestral.",
             field: Box::new(SettingField {
                 organization_override: None,
                 pick: |settings| {
@@ -808,8 +810,8 @@ fn codestral_settings() -> Box<[SettingsPageItem]> {
             files: USER,
         }),
         SettingsPageItem::SettingItem(SettingItem {
-            title: "Prediction Debounce",
-            description: "Delay in milliseconds before automatically requesting a prediction after typing stops. Set to 0 to request predictions immediately.",
+            title: "Задержка предсказания",
+            description: "Задержка в миллисекундах перед автоматическим запросом предсказания после остановки ввода. Значение 0 запрашивает предсказание сразу.",
             field: Box::new(SettingField {
                 organization_override: None,
                 pick: |settings| {
@@ -843,8 +845,8 @@ fn codestral_settings() -> Box<[SettingsPageItem]> {
 
 fn mercury_settings() -> Box<[SettingsPageItem]> {
     Box::new([SettingsPageItem::SettingItem(SettingItem {
-        title: "Prediction Debounce",
-        description: "Delay in milliseconds before automatically requesting a prediction after typing stops. Set to 0 to request predictions immediately.",
+        title: "Задержка предсказания",
+        description: "Задержка в миллисекундах перед автоматическим запросом предсказания после остановки ввода. Значение 0 запрашивает предсказание сразу.",
         field: Box::new(SettingField {
             organization_override: None,
             pick: |settings| {
@@ -877,8 +879,8 @@ fn mercury_settings() -> Box<[SettingsPageItem]> {
 
 fn zed_settings() -> Box<[SettingsPageItem]> {
     Box::new([SettingsPageItem::SettingItem(SettingItem {
-        title: "Prediction Debounce",
-        description: "Delay in milliseconds before automatically requesting a prediction after typing stops. Set to 0 to request predictions immediately.",
+        title: "Задержка предсказания",
+        description: "Задержка в миллисекундах перед автоматическим запросом предсказания после остановки ввода. Значение 0 запрашивает предсказание сразу.",
         field: Box::new(SettingField {
             organization_override: None,
             pick: |settings| {
@@ -934,8 +936,8 @@ fn render_zed_provider(
 
 fn copilot_settings() -> Box<[SettingsPageItem]> {
     Box::new([SettingsPageItem::SettingItem(SettingItem {
-        title: "Prediction Debounce",
-        description: "Delay in milliseconds before automatically requesting a prediction after typing stops. Set to 0 to request predictions immediately.",
+        title: "Задержка предсказания",
+        description: "Задержка в миллисекундах перед автоматическим запросом предсказания после остановки ввода. Значение 0 запрашивает предсказание сразу.",
         field: Box::new(SettingField {
             organization_override: None,
             pick: |settings| {

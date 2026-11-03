@@ -68,9 +68,9 @@ impl DiffHunkRenderer for StagedDiffHunkRenderer {
             .block_mouse_except_scroll()
             .shadow_md()
             .child(
-                Button::new(("unstage", row as u64), "Unstage")
+                Button::new(("unstage", row as u64), "Убрать из индекса")
                     .alpha(if status.is_pending() { 0.66 } else { 1.0 })
-                    .tooltip(Tooltip::text("Unstage Hunk"))
+                    .tooltip(Tooltip::text("Убрать фрагмент из индекса"))
                     .on_click({
                         let editor = editor.clone();
                         move |_event, window, cx| {
@@ -184,7 +184,7 @@ impl StagedDiff {
             DiffMultibuffer::new(
                 branch_diff,
                 Capability::ReadOnly,
-                "No staged changes",
+                "Нет изменений в индексе",
                 move |editor, cx| {
                     editor.set_diff_hunk_renderer(Some(Arc::new(StagedDiffHunkRenderer)), cx);
                     editor.rhs_editor().update(cx, |rhs_editor, _cx| {
@@ -303,11 +303,11 @@ impl Item for StagedDiff {
     }
 
     fn tab_tooltip_text(&self, _: &App) -> Option<SharedString> {
-        Some("Staged Changes".into())
+        Some("Изменения в индексе".into())
     }
 
     fn tab_content_text(&self, _detail: usize, _cx: &App) -> SharedString {
-        "Staged Changes".into()
+        "Изменения в индексе".into()
     }
 
     fn telemetry_event_text(&self) -> Option<&'static str> {
@@ -610,7 +610,7 @@ impl Render for StagedDiffToolbar {
                             .icon_size(IconSize::Small)
                             .disabled(!button_states.prev_next)
                             .tooltip(Tooltip::for_action_title_in(
-                                "Go to Previous Hunk",
+                                "Предыдущий фрагмент",
                                 &GoToPreviousHunk,
                                 &focus_handle,
                             ))
@@ -623,7 +623,7 @@ impl Render for StagedDiffToolbar {
                             .icon_size(IconSize::Small)
                             .disabled(!button_states.prev_next)
                             .tooltip(Tooltip::for_action_title_in(
-                                "Go to Next Hunk",
+                                "Следующий фрагмент",
                                 &GoToHunk,
                                 &focus_handle,
                             ))
@@ -637,9 +637,9 @@ impl Render for StagedDiffToolbar {
                 h_group_sm()
                     .when(button_states.selection, |this| {
                         this.child(
-                            Button::new("unstage", "Unstage")
+                            Button::new("unstage", "Убрать из индекса")
                                 .disabled(!button_states.unstage)
-                                .tooltip(Tooltip::text("Unstage Selected Hunks"))
+                                .tooltip(Tooltip::text("Убрать выбранные фрагменты из индекса"))
                                 .on_click(cx.listener(|this, _, window, cx| {
                                     this.unstage_selected_staged_hunks(false, window, cx)
                                 })),
@@ -647,10 +647,10 @@ impl Render for StagedDiffToolbar {
                     })
                     .when(!button_states.selection, |this| {
                         this.child(
-                            Button::new("unstage", "Unstage")
+                            Button::new("unstage", "Убрать из индекса")
                                 .disabled(!button_states.unstage)
                                 .tooltip(Tooltip::for_action_title_in(
-                                    "Unstage and Go to Next Hunk",
+                                    "Убрать из индекса и перейти к следующему фрагменту",
                                     &UnstageAndNext,
                                     &focus_handle,
                                 ))
@@ -662,11 +662,11 @@ impl Render for StagedDiffToolbar {
             )
             .child(Divider::vertical())
             .child(
-                Button::new("unstage-all", "Unstage All")
+                Button::new("unstage-all", "Убрать всё из индекса")
                     .width(rems_from_px(80_f32))
                     .disabled(!button_states.unstage_all)
                     .tooltip(Tooltip::for_action_title_in(
-                        "Unstage All Changes",
+                        "Убрать все изменения из индекса",
                         &UnstageAll,
                         &focus_handle,
                     ))
@@ -674,7 +674,7 @@ impl Render for StagedDiffToolbar {
             )
             .child(Divider::vertical())
             .child(
-                Button::new("commit", "Commit")
+                Button::new("commit", "Коммит")
                     .tooltip(Tooltip::for_action_title_in(
                         "Commit",
                         &Commit,
@@ -812,7 +812,7 @@ mod tests {
                     .serialized_item_kind(),
                 "StagedDiff"
             );
-            assert_eq!(active_item.tab_content_text(0, cx), "Staged Changes");
+            assert_eq!(active_item.tab_content_text(0, cx), "Изменения в индексе");
             assert!(!active_item.can_save(cx));
         });
     }
@@ -1035,7 +1035,7 @@ mod tests {
                     .serialized_item_kind(),
                 "StagedDiff"
             );
-            assert_eq!(active_item.tab_content_text(0, cx), "Staged Changes");
+            assert_eq!(active_item.tab_content_text(0, cx), "Изменения в индексе");
             assert!(!active_item.can_save(cx));
             assert_eq!(workspace.items_of_type::<ProjectDiff>(cx).count(), 0);
             assert_eq!(workspace.items_of_type::<StagedDiff>(cx).count(), 1);

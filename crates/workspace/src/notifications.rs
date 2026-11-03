@@ -365,23 +365,23 @@ impl Render for LanguageServerPrompt {
                                             "copy-description",
                                             request.message.clone(),
                                         )
-                                        .tooltip_label("Copy Description"),
+                                        .tooltip_label("Копировать описание"),
                                     )
                                     .child(
                                         IconButton::new(close_id, close_icon)
                                             .tooltip(move |_window, cx| {
                                                 if suppress {
                                                     Tooltip::with_meta(
-                                                        "Suppress",
+                                                        "Скрыть",
                                                         Some(&SuppressNotification),
-                                                        "Click to close",
+                                                        "Нажмите, чтобы закрыть",
                                                         cx,
                                                     )
                                                 } else {
                                                     Tooltip::with_meta(
-                                                        "Close",
+                                                        "Закрыть",
                                                         Some(&menu::Cancel),
-                                                        "Suppress with shift-click",
+                                                        "Shift + щелчок — скрыть",
                                                         cx,
                                                     )
                                                 }
@@ -847,7 +847,7 @@ pub mod simple_message_notification {
                     )
                     .icon_size(IconSize::XSmall)
                     .icon_color(Color::Muted),
-                    Tooltip::text("More Options"),
+                    Tooltip::text("Дополнительные действия"),
                 )
                 .menu(move |window, cx| {
                     let entries = entries.clone();
@@ -1058,7 +1058,7 @@ pub mod simple_message_notification {
                 .when_some(copy_text, |el, text| {
                     el.child(
                         CopyButton::new("copy-notification-message", text)
-                            .tooltip_label("Copy Message"),
+                            .tooltip_label("Копировать сообщение"),
                     )
                 })
                 .when(show_close_button, |el| {
@@ -1067,20 +1067,20 @@ pub mod simple_message_notification {
                             .tooltip(move |_window, cx| {
                                 if suppress {
                                     Tooltip::with_meta(
-                                        "Suppress",
+                                        "Скрыть",
                                         Some(&SuppressNotification),
-                                        "Click to Close",
+                                        "Нажмите, чтобы закрыть",
                                         cx,
                                     )
                                 } else if show_suppress_button {
                                     Tooltip::with_meta(
-                                        "Close",
+                                        "Закрыть",
                                         Some(&menu::Cancel),
-                                        "Shift-click to Suppress",
+                                        "Shift + щелчок — скрыть",
                                         cx,
                                     )
                                 } else {
-                                    Tooltip::for_action("Close", &menu::Cancel, cx)
+                                    Tooltip::for_action("Закрыть", &menu::Cancel, cx)
                                 }
                             })
                             .on_click(cx.listener(move |_, _, _, cx| {
@@ -1634,7 +1634,7 @@ where
             Ok(value) => Some(value),
             Err(err) => {
                 log::error!("Showing error notification in workspace: {err:?}");
-                workspace.show_error(format!("Error: {err}"), cx);
+                workspace.show_error(format!("Ошибка: {err}"), cx);
                 None
             }
         }
@@ -1649,7 +1649,7 @@ where
             Ok(value) => Some(value),
             Err(err) => {
                 log::error!("{err:?}");
-                let message = format!("Error: {err}");
+                let message = format!("Ошибка: {err}");
                 workspace
                     .update(cx, |workspace, cx| workspace.show_error(message, cx))
                     .ok();
@@ -1662,7 +1662,7 @@ where
         match self {
             Ok(value) => Some(value),
             Err(err) => {
-                let message = format!("Error: {err}");
+                let message = format!("Ошибка: {err}");
                 log::error!("Showing error notification in app: {message}");
                 show_app_notification(workspace_error_notification_id(), cx, {
                     move |cx| {

@@ -13,6 +13,7 @@ pub struct UpdateButton {
     icon_animate: bool,
     icon_color: Option<Color>,
     message: SharedString,
+    id: SharedString,
     tooltip: Option<Box<dyn Fn(&mut Window, &mut App) -> AnyView + 'static>>,
     disabled: bool,
     show_dismiss: bool,
@@ -23,11 +24,13 @@ pub struct UpdateButton {
 
 impl UpdateButton {
     pub fn new(icon: IconName, message: impl Into<SharedString>) -> Self {
+        let message = message.into();
         Self {
+            id: message.clone(),
             icon,
             icon_animate: false,
             icon_color: None,
-            message: message.into(),
+            message,
             tooltip: None,
             disabled: false,
             show_dismiss: false,
@@ -99,44 +102,57 @@ impl UpdateButton {
         self
     }
 
+    /// Changes presentation without changing the button identity.
+    fn message(mut self, message: &'static str) -> Self {
+        self.message = message.into();
+        self
+    }
+
     pub fn checking() -> Self {
         Self::new(IconName::LoadCircle, "Checking for Zed Updates…")
+            .message("Проверка обновлений Zed…")
             .icon_animate(true)
             .disabled(true)
     }
 
     pub fn downloading(progress: Option<f32>) -> Self {
         Self::new(IconName::Download, "Downloading Zed Update…")
+            .message("Загрузка обновления Zed…")
             .progress(progress)
             .disabled(true)
     }
 
     pub fn installing(version: impl Into<SharedString>) -> Self {
         Self::new(IconName::LoadCircle, "Installing Zed Update…")
+            .message("Установка обновления Zed…")
             .icon_animate(true)
             .tooltip(version)
             .disabled(true)
     }
 
     pub fn up_to_date() -> Self {
-        Self::new(IconName::Check, "Up to Date").disabled(true)
+        Self::new(IconName::Check, "Up to Date")
+            .message("Установлена последняя версия")
+            .disabled(true)
     }
 
     pub fn updated(version: impl Into<SharedString>) -> Self {
         Self::new(IconName::Download, "Restart to Update")
+            .message("Перезапустить для обновления")
             .tooltip(version)
             .with_dismiss()
     }
 
     pub fn errored(error: impl Into<SharedString>) -> Self {
         Self::new(IconName::Warning, "Failed to Update")
+            .message("Не удалось обновить")
             .icon_color(Color::Warning)
             .tooltip(error)
             .with_dismiss()
     }
 
     pub fn version_tooltip_message(version: impl std::fmt::Display) -> String {
-        format!("Update to Version: {version}")
+        format!("Обновление до версии: {version}")
     }
 
     pub fn downloading_tooltip_message(
@@ -146,7 +162,7 @@ impl UpdateButton {
         let message = Self::version_tooltip_message(version);
         match progress {
             Some(progress) => format!(
-                "{message} ({:.0}% downloaded)",
+                "{message} ({:.0}% загружено)",
                 progress.clamp(0.0, 1.0) * 100.0
             ),
             None => message,
@@ -187,8 +203,8 @@ impl RenderOnce for UpdateButton {
 
         let tooltip = self.tooltip;
 
-        let button_id = ElementId::Name(self.message.clone());
-        let dismiss_button_id = ElementId::Name(format!("dismiss-{}", self.message).into());
+        let button_id = ElementId::Name(self.id.clone());
+        let dismiss_button_id = ElementId::Name(format!("dismiss-{}", self.id).into());
 
         let label_row = h_flex()
             .h_full()
@@ -214,7 +230,7 @@ impl RenderOnce for UpdateButton {
                         IconButton::new(dismiss_button_id, IconName::Close)
                             .icon_size(IconSize::Indicator)
                             .when_some(self.on_dismiss, |this, handler| this.on_click(handler))
-                            .tooltip(Tooltip::text("Dismiss")),
+                            .tooltip(Tooltip::text("Закрыть")),
                     ),
                 )
             })
@@ -287,6 +303,15 @@ mod tests {
     use std::rc::Rc;
     use std::time::Duration;
 
+    #[test]
+    fn translated_status_preserves_button_identity() {
+        let button = UpdateButton::updated("1.0");
+        assert_eq!(button.id.as_ref(), "Restart to Update");
+        assert_eq!(button.message.as_ref(), "Перезапустить для обновления");
+        let custom = UpdateButton::new(IconName::Check, "custom status");
+        assert_eq!(custom.id, custom.message);
+    }
+
     struct TestTooltip {
         rendered: Rc<Cell<u32>>,
     }
@@ -317,7 +342,7 @@ mod tests {
                         cx.new(|_| TestTooltip { rendered }).into()
                     }),
                 )
-                .child(UpdateButton::updated("Update to Version: 1.0.0"))
+                .child(UpdateButton::updated("Обновление до версии: 1.0.0"))
         }
     }
 

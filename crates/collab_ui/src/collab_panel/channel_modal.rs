@@ -174,12 +174,12 @@ impl Render for ChannelModal {
                                         ui::ToggleState::Unselected
                                     },
                                 )
-                                .label("Public")
+                                .label("Публичный")
                                 .on_click(cx.listener(Self::set_channel_visibility)),
                             )
                             .children(
                                 (visibility == ChannelVisibility::Public).then_some(
-                                    Button::new("copy-link", "Copy Link")
+                                    Button::new("copy-link", "Копировать ссылку")
                                         .label_size(LabelSize::Small)
                                         .on_click(cx.listener(move |this, _, _, cx| {
                                             if let Some(channel) = this
@@ -207,7 +207,7 @@ impl Render for ChannelModal {
                                     .when(mode == Mode::ManageMembers, |this| {
                                         this.border_color(cx.theme().colors().border)
                                     })
-                                    .child(Label::new("Manage Members"))
+                                    .child(Label::new("Управление участниками"))
                                     .on_click(cx.listener(|this, _, window, cx| {
                                         this.set_mode(Mode::ManageMembers, window, cx);
                                     })),
@@ -222,7 +222,7 @@ impl Render for ChannelModal {
                                     .when(mode == Mode::InviteMembers, |this| {
                                         this.border_color(cx.theme().colors().border)
                                     })
-                                    .child(Label::new("Invite Members"))
+                                    .child(Label::new("Пригласить участников"))
                                     .on_click(cx.listener(|this, _, window, cx| {
                                         this.set_mode(Mode::InviteMembers, window, cx);
                                     })),
@@ -262,7 +262,7 @@ impl PickerDelegate for ChannelModalDelegate {
     }
 
     fn placeholder_text(&self, _window: &mut Window, _cx: &mut App) -> Arc<str> {
-        "Search collaborator by username...".into()
+        "Поиск участника по имени пользователя…".into()
     }
 
     fn match_count(&self) -> usize {
@@ -428,20 +428,20 @@ impl PickerDelegate for ChannelModalDelegate {
                         Mode::ManageMembers => slot
                             .children(
                                 if request_status == Some(proto::channel_member::Kind::Invitee) {
-                                    Some(Label::new("Invited"))
+                                    Some(Label::new("Приглашён"))
                                 } else {
                                     None
                                 },
                             )
                             .children(match membership.map(|m| m.role) {
-                                Some(ChannelRole::Admin) => Some(Label::new("Admin")),
-                                Some(ChannelRole::Guest) => Some(Label::new("Guest")),
+                                Some(ChannelRole::Admin) => Some(Label::new("Администратор")),
+                                Some(ChannelRole::Guest) => Some(Label::new("Гость")),
                                 _ => None,
                             })
                             .when(!is_me, |el| {
                                 el.child(IconButton::new("ellipsis", IconName::Ellipsis))
                             })
-                            .when(is_me, |el| el.child(Label::new("You").color(Color::Muted)))
+                            .when(is_me, |el| el.child(Label::new("Вы").color(Color::Muted)))
                             .children(
                                 if let (Some((menu, _)), true) = (&self.context_menu, selected) {
                                     Some(
@@ -458,10 +458,10 @@ impl PickerDelegate for ChannelModalDelegate {
                             ),
                         Mode::InviteMembers => match request_status {
                             Some(proto::channel_member::Kind::Invitee) => {
-                                slot.children(Some(Label::new("Invited")))
+                                slot.children(Some(Label::new("Приглашён")))
                             }
                             Some(proto::channel_member::Kind::Member) => {
-                                slot.children(Some(Label::new("Member")))
+                                slot.children(Some(Label::new("Участник")))
                             }
                             _ => slot,
                         },
@@ -531,7 +531,7 @@ impl ChannelModalDelegate {
                 cx.notify();
             })
         })
-        .detach_and_prompt_err("Failed to update role", window, cx, |_, _, _| None);
+        .detach_and_prompt_err("Не удалось изменить роль", window, cx, |_, _, _| None);
         Some(())
     }
 
@@ -572,7 +572,7 @@ impl ChannelModalDelegate {
                 cx.notify();
             })
         })
-        .detach_and_prompt_err("Failed to remove member", window, cx, |_, _, _| None);
+        .detach_and_prompt_err("Не удалось удалить участника", window, cx, |_, _, _| None);
         Some(())
     }
 
@@ -603,7 +603,12 @@ impl ChannelModalDelegate {
                 cx.notify();
             })
         })
-        .detach_and_prompt_err("Failed to invite member", window, cx, |_, _, _| None);
+        .detach_and_prompt_err(
+            "Не удалось пригласить участника",
+            window,
+            cx,
+            |_, _, _| None,
+        );
     }
 
     fn show_context_menu(
@@ -622,21 +627,25 @@ impl ChannelModalDelegate {
 
             if role == ChannelRole::Admin || role == ChannelRole::Member {
                 let picker = picker.clone();
-                menu = menu.entry("Demote to Guest", None, move |window, cx| {
-                    picker.update(cx, |picker, cx| {
-                        picker
-                            .delegate
-                            .set_user_role(user_id, ChannelRole::Guest, window, cx);
-                    })
-                });
+                menu = menu.entry(
+                    "Назначить гостем",
+                    None,
+                    move |window, cx| {
+                        picker.update(cx, |picker, cx| {
+                            picker
+                                .delegate
+                                .set_user_role(user_id, ChannelRole::Guest, window, cx);
+                        })
+                    },
+                );
             }
 
             if role == ChannelRole::Admin || role == ChannelRole::Guest {
                 let picker = picker.clone();
                 let label = if role == ChannelRole::Guest {
-                    "Promote to Member"
+                    "Назначить участником"
                 } else {
-                    "Demote to Member"
+                    "Назначить участником"
                 };
 
                 menu = menu.entry(label, None, move |window, cx| {
@@ -650,17 +659,21 @@ impl ChannelModalDelegate {
 
             if role == ChannelRole::Member || role == ChannelRole::Guest {
                 let picker = picker.clone();
-                menu = menu.entry("Promote to Admin", None, move |window, cx| {
-                    picker.update(cx, |picker, cx| {
-                        picker
-                            .delegate
-                            .set_user_role(user_id, ChannelRole::Admin, window, cx);
-                    })
-                });
+                menu = menu.entry(
+                    "Назначить администратором",
+                    None,
+                    move |window, cx| {
+                        picker.update(cx, |picker, cx| {
+                            picker
+                                .delegate
+                                .set_user_role(user_id, ChannelRole::Admin, window, cx);
+                        })
+                    },
+                );
             };
 
             menu = menu.separator();
-            menu = menu.entry("Remove from Channel", None, {
+            menu = menu.entry("Удалить из канала", None, {
                 let picker = picker.clone();
                 move |window, cx| {
                     picker.update(cx, |picker, cx| {

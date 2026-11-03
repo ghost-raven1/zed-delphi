@@ -626,7 +626,7 @@ impl Editor {
         // Create the prompt editor for the review input
         let prompt_editor = cx.new(|cx| {
             let mut editor = Editor::single_line(window, cx);
-            editor.set_placeholder_text("Add a review comment...", window, cx);
+            editor.set_placeholder_text("Добавьте комментарий к проверке…", window, cx);
             editor
         });
 
@@ -1046,7 +1046,9 @@ impl Editor {
                     .border_color(icon_color.opacity(0.5))
             })
             .child(Icon::new(IconName::Plus).size(IconSize::Small))
-            .tooltip(Tooltip::text("Add Review (drag to select multiple lines)"))
+            .tooltip(Tooltip::text(
+                "Добавить отзыв (перетащите для выделения нескольких строк)",
+            ))
             .on_mouse_down(
                 gpui::MouseButton::Left,
                 cx.listener(move |editor, _event: &gpui::MouseDownEvent, window, cx| {
@@ -1526,7 +1528,7 @@ impl Editor {
                 .ok();
             }
             Err(err) => {
-                let message = format!("Failed to copy permalink to line: {err}");
+                let message = format!("Не удалось скопировать постоянную ссылку на строку: {err}");
 
                 anyhow::Result::<()>::Err(err).log_err();
 
@@ -1567,7 +1569,7 @@ impl Editor {
                 .ok();
             }
             Err(err) => {
-                let message = format!("Failed to open permalink to line: {err}");
+                let message = format!("Не удалось открыть постоянную ссылку на строку: {err}");
 
                 anyhow::Result::<()>::Err(err).log_err();
 
@@ -2512,9 +2514,9 @@ impl Editor {
                     let start_line = start + 1;
                     let end_line = end + 1;
                     if start_line == end_line {
-                        format!("Line {start_line}")
+                        format!("Строка {start_line}")
                     } else {
-                        format!("Lines {start_line}-{end_line}")
+                        format!("Строки {start_line}–{end_line}")
                     }
                 })
                 .collect();
@@ -2643,7 +2645,7 @@ impl Editor {
                                 IconButton::new("diff-review-close", IconName::Close)
                                     .icon_color(ui::Color::Muted)
                                     .icon_size(action_icon_size)
-                                    .tooltip(Tooltip::text("Close"))
+                                    .tooltip(Tooltip::text("Закрыть"))
                                     .on_click(|_, window, cx| {
                                         window
                                             .dispatch_action(Box::new(crate::actions::Cancel), cx);
@@ -2653,7 +2655,7 @@ impl Editor {
                                 IconButton::new("diff-review-add", IconName::Return)
                                     .icon_color(ui::Color::Muted)
                                     .icon_size(action_icon_size)
-                                    .tooltip(Tooltip::text("Add comment"))
+                                    .tooltip(Tooltip::text("Добавить комментарий"))
                                     .on_click(|_, window, cx| {
                                         window.dispatch_action(
                                             Box::new(crate::actions::SubmitDiffReviewComment),
@@ -2813,7 +2815,7 @@ impl Editor {
                         )
                         .icon_color(ui::Color::Muted)
                         .icon_size(action_icon_size)
-                        .tooltip(Tooltip::text("Cancel"))
+                        .tooltip(Tooltip::text("Отмена"))
                         .on_click(move |_, window, cx| {
                             window.dispatch_action(
                                 Box::new(crate::actions::CancelEditReviewComment {
@@ -2830,7 +2832,7 @@ impl Editor {
                         )
                         .icon_color(ui::Color::Muted)
                         .icon_size(action_icon_size)
-                        .tooltip(Tooltip::text("Confirm"))
+                        .tooltip(Tooltip::text("Подтвердить"))
                         .on_click(move |_, window, cx| {
                             window.dispatch_action(
                                 Box::new(crate::actions::ConfirmEditReviewComment {
@@ -3081,13 +3083,13 @@ pub fn render_diff_hunk_controls(
         .shadow_md()
         .when(show_stage_or_unstage, |el| {
             el.child(if status.has_secondary_hunk() {
-                Button::new(("stage", row as u64), "Stage")
+                Button::new(("stage", row as u64), "Добавить в индекс")
                     .alpha(if status.is_pending() { 0.66 } else { 1.0 })
                     .tooltip({
                         let focus_handle = editor.focus_handle(cx);
                         move |_window, cx| {
                             Tooltip::for_action_in(
-                                "Stage Hunk",
+                                "Добавить блок изменений в индекс",
                                 &::git::ToggleStaged,
                                 &focus_handle,
                                 cx,
@@ -3108,13 +3110,13 @@ pub fn render_diff_hunk_controls(
                         }
                     })
             } else {
-                Button::new(("unstage", row as u64), "Unstage")
+                Button::new(("unstage", row as u64), "Убрать из индекса")
                     .alpha(if status.is_pending() { 0.66 } else { 1.0 })
                     .tooltip({
                         let focus_handle = editor.focus_handle(cx);
                         move |_window, cx| {
                             Tooltip::for_action_in(
-                                "Unstage Hunk",
+                                "Убрать блок изменений из индекса",
                                 &::git::ToggleStaged,
                                 &focus_handle,
                                 cx,
@@ -3138,12 +3140,12 @@ pub fn render_diff_hunk_controls(
         })
         .when(show_restore, |el| {
             el.child(
-                Button::new(("restore", row as u64), "Restore")
+                Button::new(("restore", row as u64), "Восстановить")
                     .tooltip({
                         let focus_handle = editor.focus_handle(cx);
                         move |_window, cx| {
                             Tooltip::for_action_in(
-                                "Restore Hunk",
+                                "Восстановить блок изменений",
                                 &::git::Restore,
                                 &focus_handle,
                                 cx,
@@ -3172,7 +3174,12 @@ pub fn render_diff_hunk_controls(
                     .tooltip({
                         let focus_handle = editor.focus_handle(cx);
                         move |_window, cx| {
-                            Tooltip::for_action_in("Next Hunk", &GoToHunk, &focus_handle, cx)
+                            Tooltip::for_action_in(
+                                "Следующий блок изменений",
+                                &GoToHunk,
+                                &focus_handle,
+                                cx,
+                            )
                         }
                     })
                     .on_click({
@@ -3203,7 +3210,7 @@ pub fn render_diff_hunk_controls(
                         let focus_handle = editor.focus_handle(cx);
                         move |_window, cx| {
                             Tooltip::for_action_in(
-                                "Previous Hunk",
+                                "Предыдущий блок изменений",
                                 &GoToPreviousHunk,
                                 &focus_handle,
                                 cx,

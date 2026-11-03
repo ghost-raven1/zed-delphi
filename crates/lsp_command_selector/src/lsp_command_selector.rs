@@ -193,7 +193,7 @@ impl PickerDelegate for LspCommandSelectorDelegate {
     }
 
     fn placeholder_text(&self, _window: &mut Window, _cx: &mut App) -> Arc<str> {
-        "Select a language server command…".into()
+        "Выберите команду языкового сервера…".into()
     }
 
     fn match_count(&self) -> usize {
@@ -370,7 +370,7 @@ impl PickerDelegate for LspCommandSelectorDelegate {
                         .gap_2()
                         .justify_between()
                         .child(
-                            Label::new("Arguments")
+                            Label::new("Аргументы")
                                 .size(LabelSize::Small)
                                 .color(Color::Muted),
                         )
@@ -393,7 +393,7 @@ impl PickerDelegate for LspCommandSelectorDelegate {
                 .map(|footer| match &self.execution {
                     Execution::Idle => footer,
                     Execution::Running { .. } => footer.child(
-                        Label::new("Executing command…")
+                        Label::new("Выполнение команды…")
                             .size(LabelSize::Small)
                             .color(Color::Muted),
                     ),

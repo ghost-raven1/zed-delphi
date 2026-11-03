@@ -76,13 +76,13 @@ impl Render for ActiveBufferEncoding {
         }
 
         let (disabled, tooltip_text) = if self.is_dirty {
-            (true, "Save file to change encoding")
+            (true, "Сохраните файл, чтобы изменить кодировку")
         } else if self.is_shared {
-            (true, "Cannot change encoding during collaboration")
+            (true, "Нельзя изменить кодировку при совместной работе")
         } else if self.is_via_remote_server {
-            (true, "Cannot change encoding of remote server file")
+            (true, "Нельзя изменить кодировку файла на удалённом сервере")
         } else {
-            (false, "Reopen with Encoding")
+            (false, "Открыть повторно с кодировкой")
         };
 
         div().child(

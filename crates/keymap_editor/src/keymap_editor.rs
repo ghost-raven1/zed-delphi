@@ -582,7 +582,7 @@ impl KeymapEditor {
 
         let filter_editor = cx.new(|cx| {
             let mut editor = Editor::single_line(window, cx);
-            editor.set_placeholder_text("Filter action names…", window, cx);
+            editor.set_placeholder_text("Поиск команд…", window, cx);
             editor
         });
 
@@ -898,8 +898,14 @@ impl KeymapEditor {
             );
 
             let index = processed_bindings.len();
-            let string_match_candidate =
-                StringMatchCandidate::new(index, &action_information.humanized_name);
+            let string_match_candidate = StringMatchCandidate::new(
+                index,
+                &format!(
+                    "{} {}",
+                    action_information.humanized_name,
+                    command_palette::humanize_action_name(action_name)
+                ),
+            );
             processed_bindings.push(ProcessedBinding::new_mapped(
                 keystroke_text,
                 binding,
@@ -921,8 +927,14 @@ impl KeymapEditor {
                 action_documentation,
                 humanized_action_names,
             );
-            let string_match_candidate =
-                StringMatchCandidate::new(index, &action_information.humanized_name);
+            let string_match_candidate = StringMatchCandidate::new(
+                index,
+                &format!(
+                    "{} {}",
+                    action_information.humanized_name,
+                    command_palette::humanize_action_name(action_name)
+                ),
+            );
 
             processed_bindings.push(ProcessedBinding::Unmapped(action_information));
             string_match_candidates.push(string_match_candidate);
@@ -1108,29 +1120,29 @@ impl KeymapEditor {
             let context_menu = ContextMenu::build(window, cx, |menu, _window, _cx| {
                 menu.context(self.focus_handle.clone())
                     .when(selected_binding_is_unmapped, |this| {
-                        this.action("Create", Box::new(CreateBinding))
+                        this.action("Создать", Box::new(CreateBinding))
                     })
                     .action_disabled_when(
                         selected_binding_is_non_interactable,
-                        "Edit",
+                        "Изменить",
                         Box::new(EditBinding),
                     )
                     .action_disabled_when(
                         selected_binding_is_non_interactable,
-                        "Delete",
+                        "Удалить",
                         Box::new(DeleteBinding),
                     )
                     .separator()
-                    .action("Copy Action", Box::new(CopyAction))
+                    .action("Копировать команду", Box::new(CopyAction))
                     .action_disabled_when(
                         selected_binding_has_no_context,
-                        "Copy Context",
+                        "Копировать контекст",
                         Box::new(CopyContext),
                     )
                     .separator()
                     .action_disabled_when(
                         selected_binding_has_no_context,
-                        "Show Matching Keybindings",
+                        "Показать совпадающие сочетания",
                         Box::new(ShowMatchingKeybinds),
                     )
             });
@@ -1171,7 +1183,7 @@ impl KeymapEditor {
             base_button_style(index, IconName::Warning)
                 .icon_color(Color::Warning)
                 .disabled(true)
-                .tooltip(Tooltip::text("This action is unbound"))
+                .tooltip(Tooltip::text("Сочетание клавиш не назначено"))
         } else if self.filter_state != FilterState::Conflicts
             && let Some(conflict) = conflict
         {
@@ -1180,9 +1192,13 @@ impl KeymapEditor {
                     .icon_color(Color::Warning)
                     .tooltip(|_window, cx| {
                         Tooltip::with_meta(
-                            "View conflicts",
+                            "Показать конфликты",
                             Some(&ToggleConflictFilter),
-                            concat!("Use ", ui::alt_key_name!(), "+click to show all conflicts"),
+                            concat!(
+                                "Нажмите ",
+                                ui::alt_key_name!(),
+                                "+щелчок, чтобы показать все конфликты"
+                            ),
                             cx,
                         )
                     })
@@ -1199,9 +1215,9 @@ impl KeymapEditor {
                 base_button_style(index, IconName::Info)
                     .tooltip(|_window, cx| {
                         Tooltip::with_meta(
-                            "Edit this binding",
+                            "Изменить сочетание",
                             Some(&ShowMatchingKeybinds),
-                            "This binding is overridden by other bindings.",
+                            "Это сочетание переопределено другими сочетаниями.",
                             cx,
                         )
                     })
@@ -1214,12 +1230,12 @@ impl KeymapEditor {
                 base_button_style(index, IconName::Info)
                     .tooltip(|_window, cx| {
                         Tooltip::with_meta(
-                            "Show matching keybinds",
+                            "Показать совпадающие сочетания",
                             Some(&ShowMatchingKeybinds),
                             concat!(
-                                "This binding is overridden by other bindings.\nUse ",
+                                "Это сочетание переопределено другими сочетаниями.\nНажмите ",
                                 ui::alt_key_name!(),
-                                "+click to edit this binding"
+                                "+щелчок, чтобы изменить сочетание"
                             ),
                             cx,
                         )
@@ -1245,7 +1261,12 @@ impl KeymapEditor {
                 })
                 .when(
                     self.show_hover_menus && !self.context_menu_deployed(),
-                    |this| this.tooltip(Tooltip::for_action_title("Edit Keybinding", &EditBinding)),
+                    |this| {
+                        this.tooltip(Tooltip::for_action_title(
+                            "Изменить сочетание клавиш",
+                            &EditBinding,
+                        ))
+                    },
                 )
                 .on_click(cx.listener(move |this, _, window, cx| {
                     this.select_index(index, None, window, cx);
@@ -1259,15 +1280,15 @@ impl KeymapEditor {
         let hint = match (self.filter_state, &self.search_mode) {
             (FilterState::Conflicts, _) => {
                 if self.keybinding_conflict_state.any_user_binding_conflicts() {
-                    "No conflicting keybinds found that match the provided query"
+                    "По запросу не найдено конфликтующих сочетаний"
                 } else {
-                    "No conflicting keybinds found"
+                    "Конфликтующие сочетания не найдены"
                 }
             }
             (FilterState::All, SearchMode::KeyStroke { .. }) => {
-                "No keybinds found matching the entered keystrokes"
+                "Для введённых клавиш сочетания не найдены"
             }
-            (FilterState::All, SearchMode::Normal) => "No matches found for the provided query",
+            (FilterState::All, SearchMode::Normal) => "По запросу ничего не найдено",
         };
 
         Label::new(hint).color(Color::Muted).into_any_element()
@@ -1644,9 +1665,9 @@ impl KeymapEditor {
 
                         menu = menu
                             .context(focus_handle.clone())
-                            .header("Filters")
+                            .header("Фильтры")
                             .map(add_filter(
-                                "Conflicts",
+                                "Конфликты",
                                 matches!(filter_state, FilterState::Conflicts),
                                 Some(ToggleConflictFilter.boxed_clone()),
                                 &focus_handle,
@@ -1654,7 +1675,7 @@ impl KeymapEditor {
                                 None,
                             ))
                             .map(add_filter(
-                                "No Action",
+                                "Без команды",
                                 show_no_action_bindings,
                                 Some(ToggleNoActionBindings.boxed_clone()),
                                 &focus_handle,
@@ -1662,9 +1683,9 @@ impl KeymapEditor {
                                 None,
                             ))
                             .separator()
-                            .header("Categories")
+                            .header("Категории")
                             .map(add_filter(
-                                "User",
+                                "Пользовательские",
                                 source_filters.user,
                                 None,
                                 &focus_handle,
@@ -1674,7 +1695,7 @@ impl KeymapEditor {
                                 }),
                             ))
                             .map(add_filter(
-                                "Default",
+                                "Стандартные",
                                 source_filters.zed_defaults,
                                 None,
                                 &focus_handle,
@@ -1709,7 +1730,7 @@ impl KeymapEditor {
                         self.keybinding_conflict_state.any_user_binding_conflicts(),
                         |this| this.indicator(Indicator::dot().color(Color::Warning)),
                     ),
-                Tooltip::text("Filters"),
+                Tooltip::text("Фильтры"),
             );
 
         fn add_filter(
@@ -1751,7 +1772,7 @@ impl HumanizedActionNameCache {
         let cache = HashMap::from_iter(cx.all_action_names().iter().map(|&action_name| {
             (
                 action_name,
-                command_palette::humanize_action_name(action_name).into(),
+                command_palette::localized_action_name(action_name).into(),
             )
         }));
         Self { cache }
@@ -1975,7 +1996,7 @@ impl Item for KeymapEditor {
     type Event = ();
 
     fn tab_content_text(&self, _detail: usize, _cx: &App) -> ui::SharedString {
-        "Keymap Editor".into()
+        "Сочетания клавиш".into()
     }
 }
 
@@ -1985,7 +2006,7 @@ impl Render for KeymapEditor {
             let button = IconButton::new("keystrokes-exact-match", IconName::CaseSensitive)
                 .tooltip(move |_window, cx| {
                     Tooltip::for_action(
-                        "Toggle Exact Match Mode",
+                        "Переключить точное совпадение",
                         &ToggleExactKeystrokeMatching,
                         cx,
                     )
@@ -2080,7 +2101,7 @@ impl Render for KeymapEditor {
                                             let focus_handle = focus_handle.clone();
                                             move |_window, cx| {
                                                 Tooltip::for_action_in(
-                                                    "Search by Keystrokes",
+                                                    "Поиск по клавишам",
                                                     &ToggleKeystrokeSearch,
                                                     &focus_handle,
                                                     cx,
@@ -2098,7 +2119,7 @@ impl Render for KeymapEditor {
                                         self.render_filter_dropdown(focus_handle, cx)
                                     )
                                     .child(
-                                        Button::new("edit-in-json", "Edit in JSON")
+                                        Button::new("edit-in-json", "Изменить в JSON")
                                             .key_binding(
                                                 ui::KeyBinding::for_action_in(&zed_actions::OpenKeymapFile, &focus_handle, cx)
                                                     .map(|kb| kb.size(rems_from_px(10_f32))),
@@ -2111,7 +2132,7 @@ impl Render for KeymapEditor {
                                             })
                                     )
                                     .child(
-                                        Button::new("create", "Create Keybinding")
+                                        Button::new("create", "Создать сочетание клавиш")
                                             .style(ButtonStyle::Outlined)
                                             .key_binding(
                                                 ui::KeyBinding::for_action_in(&OpenCreateKeybindingModal, &focus_handle, cx)
@@ -2149,7 +2170,7 @@ impl Render for KeymapEditor {
                     .width_config(ColumnWidthConfig::redistributable(
                         self.current_widths.clone(),
                     ))
-                    .header(vec!["", "Action", "Arguments", "Keystrokes", "Context", "Source"])
+                    .header(vec!["", "Команда", "Аргументы", "Клавиши", "Контекст", "Источник"])
                     .uniform_list(
                         "keymap-editor-table",
                         row_count,
@@ -2262,7 +2283,13 @@ impl Render for KeymapEditor {
 
                                     let source = binding
                                         .keybind_source()
-                                        .map(|source| source.name())
+                                        .map(|source| match source {
+                                            KeybindSource::User => "Пользовательские",
+                                            KeybindSource::Vim => "Vim",
+                                            KeybindSource::Base => "Базовые",
+                                            KeybindSource::Default => "Стандартные",
+                                            KeybindSource::Unknown => "Неизвестный",
+                                        })
                                         .unwrap_or_default()
                                         .into_any_element();
 
@@ -2345,21 +2372,21 @@ impl Render for KeymapEditor {
                                                 let overriding_binding = this.keybindings.get(conflict.index);
                                                 let context = overriding_binding.and_then(|binding| {
                                                     match conflict.override_source {
-                                                        KeybindSource::User  => Some("your keymap"),
-                                                        KeybindSource::Vim => Some("the vim keymap"),
-                                                        KeybindSource::Base => Some("your base keymap"),
+                                                        KeybindSource::User  => Some("ваших сочетаний клавиш"),
+                                                        KeybindSource::Vim => Some("сочетаний Vim"),
+                                                        KeybindSource::Base => Some("базовых сочетаний клавиш"),
                                                         _ => {
                                                             log::error!("Unexpected override from the {} keymap", conflict.override_source.name());
                                                             None
                                                         }
-                                                    }.map(|source| format!("This keybinding is overridden by the '{}' binding from {}.", binding.action().humanized_name, source))
-                                                }).unwrap_or_else(|| "This binding is overridden.".to_string());
+                                                    }.map(|source| format!("Это сочетание переопределено командой «{}» из {}.", binding.action().humanized_name, source))
+                                                }).unwrap_or_else(|| "Это сочетание переопределено.".to_string());
 
                                                 row.tooltip(Tooltip::text(context))
                                             },
                                         )
                                         .when(is_unbound_by_unbind, |row| {
-                                            row.tooltip(Tooltip::text("This action is unbound"))
+                                            row.tooltip(Tooltip::text("Сочетание клавиш не назначено"))
                                         }),
                                 )
                                 .border_2()
@@ -2526,8 +2553,8 @@ impl KeybindingEditorModal {
             .new(|cx| KeystrokeInput::new(editing_keybind.keystrokes().map(Vec::from), window, cx));
 
         let context_editor: Entity<InputField> = cx.new(|cx| {
-            let input = InputField::new(window, cx, "Keybinding Context")
-                .label("Edit Context")
+            let input = InputField::new(window, cx, "Контекст сочетания")
+                .label("Изменить контекст")
                 .label_size(LabelSize::Default);
 
             if let Some(context) = editing_keybind
@@ -2573,7 +2600,7 @@ impl KeybindingEditorModal {
 
             let humanized_names: HashMap<&'static str, SharedString> = actions
                 .iter()
-                .map(|&name| (name, command_palette::humanize_action_name(name).into()))
+                .map(|&name| (name, command_palette::localized_action_name(name).into()))
                 .collect();
 
             let action_name_to_static: HashMap<String, &'static str> = actions
@@ -2582,8 +2609,8 @@ impl KeybindingEditorModal {
                 .collect();
 
             let editor = cx.new(|cx| {
-                let input = InputField::new(window, cx, "Type an action name")
-                    .label("Action")
+                let input = InputField::new(window, cx, "Введите название команды")
+                    .label("Команда")
                     .label_size(LabelSize::Default);
 
                 let editor_entity = input.editor();
@@ -2742,13 +2769,13 @@ impl KeybindingEditorModal {
             let action_name_str = selector.read(cx).text(cx);
 
             if action_name_str.is_empty() {
-                anyhow::bail!("Action name is required");
+                anyhow::bail!("Укажите команду");
             }
 
             self.action_name_to_static
                 .get(&action_name_str)
                 .copied()
-                .ok_or_else(|| anyhow::anyhow!("Action '{}' not found", action_name_str))
+                .ok_or_else(|| anyhow::anyhow!("Команда '{}' не найдена", action_name_str))
         } else {
             Ok(self.editing_keybind.action().name)
         }
@@ -2765,12 +2792,13 @@ impl KeybindingEditorModal {
         let value = action_arguments
             .as_ref()
             .map(|args| {
-                serde_json::from_str(args).context("Failed to parse action arguments as JSON")
+                serde_json::from_str(args)
+                    .context("Не удалось разобрать аргументы команды как JSON")
             })
             .transpose()?;
 
         cx.build_action(action_name, value)
-            .context("Failed to validate action arguments")?;
+            .context("Не удалось проверить аргументы команды")?;
         Ok(action_arguments)
     }
 
@@ -2778,7 +2806,7 @@ impl KeybindingEditorModal {
         let new_keystrokes = self
             .keybind_editor
             .read_with(cx, |editor, _| editor.keystrokes().to_vec());
-        anyhow::ensure!(!new_keystrokes.is_empty(), "Keystrokes cannot be empty");
+        anyhow::ensure!(!new_keystrokes.is_empty(), "Укажите сочетание клавиш");
         Ok(new_keystrokes)
     }
 
@@ -2789,7 +2817,8 @@ impl KeybindingEditorModal {
         let Some(context) = new_context.is_empty().not().then_some(new_context) else {
             return Ok(None);
         };
-        gpui::KeyBindingContextPredicate::parse(&context).context("Failed to parse key context")?;
+        gpui::KeyBindingContextPredicate::parse(&context)
+            .context("Не удалось разобрать контекст клавиш")?;
 
         Ok(Some(context))
     }
@@ -2842,11 +2871,11 @@ impl KeybindingEditorModal {
                 Some(name) => {
                      if remaining_conflict_amount > 0 {
                         format!(
-                            "Your keybind would conflict with the \"{}\" action and {} other bindings",
+                            "Сочетание конфликтует с командой «{}» и другими сочетаниями: {}",
                             name, remaining_conflict_amount
                         )
                     } else {
-                        format!("Your keybind would conflict with the \"{}\" action", name)
+                        format!("Сочетание конфликтует с командой «{}»", name)
                     }
                 }
                 None => {
@@ -2854,7 +2883,7 @@ impl KeybindingEditorModal {
                         "Could not find action in keybindings with index {}",
                         first_conflict_index
                     );
-                    "Your keybind would conflict with other actions".to_string()
+                    "Сочетание конфликтует с другими командами".to_string()
                 }
             };
 
@@ -2876,7 +2905,7 @@ impl KeybindingEditorModal {
             .map_err(InputError::error)?;
 
         let humanized_action_name: SharedString =
-            command_palette::humanize_action_name(action_name).into();
+            command_palette::localized_action_name(action_name).into();
 
         let action_information = ActionInformation::new(
             action_name,
@@ -2914,7 +2943,7 @@ impl KeybindingEditorModal {
                                 fallback: keymap.table_interaction_state.read(cx).scroll_offset(),
                             });
                             let status_toast = StatusToast::new(
-                                format!("Saved edits to the {} action.", humanized_action_name),
+                                format!("Изменения команды {} сохранены.", humanized_action_name),
                                 cx,
                                 move |this, _cx| {
                                     this.icon(
@@ -3124,7 +3153,7 @@ impl Render for KeybindingEditorModal {
                                     )
                                 })
                                 .when(self.creating, |this| {
-                                    this.child(Label::new("Create Keybinding"))
+                                    this.child(Label::new("Создать сочетание клавиш"))
                                 }),
                         ),
                     )
@@ -3141,24 +3170,14 @@ impl Render for KeybindingEditorModal {
                                 .child(
                                     v_flex()
                                         .gap_1()
-                                        .child(Label::new("Edit Keystroke"))
+                                        .child(Label::new("Изменить клавиши"))
                                         .child(self.keybind_editor.clone())
                                         .child(h_flex().gap_px().when(
                                             matching_bindings_count > 0,
                                             |this| {
                                                 let label = format!(
-                                                    "There {} {} {} with the same keystrokes.",
-                                                    if matching_bindings_count == 1 {
-                                                        "is"
-                                                    } else {
-                                                        "are"
-                                                    },
+                                                    "Совпадающих сочетаний клавиш: {}.",
                                                     matching_bindings_count,
-                                                    if matching_bindings_count == 1 {
-                                                        "binding"
-                                                    } else {
-                                                        "bindings"
-                                                    }
                                                 );
 
                                                 this.child(
@@ -3167,7 +3186,7 @@ impl Render for KeybindingEditorModal {
                                                         .color(Color::Muted),
                                                 )
                                                 .child(
-                                                    Button::new("show_matching", "View")
+                                                    Button::new("show_matching", "Показать")
                                                         .label_size(LabelSize::Small)
                                                         .end_icon(
                                                             Icon::new(IconName::ArrowUpRight)
@@ -3189,7 +3208,7 @@ impl Render for KeybindingEditorModal {
                                     this.child(
                                         v_flex()
                                             .gap_1()
-                                            .child(Label::new("Edit Arguments"))
+                                            .child(Label::new("Изменить аргументы"))
                                             .child(editor),
                                     )
                                 })
@@ -3208,10 +3227,10 @@ impl Render for KeybindingEditorModal {
                             h_flex()
                                 .gap_1()
                                 .child(
-                                    Button::new("cancel", "Cancel")
+                                    Button::new("cancel", "Отмена")
                                         .on_click(cx.listener(|_, _, _, cx| cx.emit(DismissEvent))),
                                 )
-                                .child(Button::new("save-btn", "Save").on_click(cx.listener(
+                                .child(Button::new("save-btn", "Сохранить").on_click(cx.listener(
                                     |this, _event, _window, cx| {
                                         this.save_or_display_error(cx);
                                     },
@@ -3416,7 +3435,7 @@ impl ActionArgumentsEditor {
             editor.set_text(arguments, window, cx);
         } else {
             // TODO: default value from schema?
-            editor.set_placeholder_text("Action Arguments", window, cx);
+            editor.set_placeholder_text("Аргументы команды", window, cx);
         }
     }
 

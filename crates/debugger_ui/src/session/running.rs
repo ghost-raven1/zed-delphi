@@ -615,7 +615,11 @@ fn render_debugger_tab_bar(
                     .tooltip({
                         let focus_handle = focus_handle.clone();
                         move |_window, cx| {
-                            let zoomed_text = if zoomed { "Minimize" } else { "Expand" };
+                            let zoomed_text = if zoomed {
+                                "Свернуть"
+                            } else {
+                                "Развернуть"
+                            };
                             Tooltip::for_action_in(
                                 zoomed_text,
                                 &ToggleExpandItem,
@@ -1124,7 +1128,7 @@ impl RunningState {
                 }).ok();
 
                 let Some(process_id) = rx.await.ok().flatten() else {
-                    bail!("No process selected with config that contains {}", PROCESS_ID_PLACEHOLDER.as_str())
+                    bail!("Не выбран процесс для конфигурации, содержащей {}", PROCESS_ID_PLACEHOLDER.as_str())
                 };
 
                 Self::substitute_process_id_in_config(&mut config, process_id);
@@ -1132,7 +1136,7 @@ impl RunningState {
 
             let request_type = match dap_registry
                 .adapter(&adapter)
-                .with_context(|| format!("{adapter}: is not a valid adapter name")) {
+                .with_context(|| format!("Недопустимое имя адаптера: {adapter}")) {
                     Ok(adapter) => adapter.request_kind(&config).await,
                     Err(e) => Err(e)
                 };
@@ -1160,12 +1164,12 @@ impl RunningState {
                         let task = match task {
                             Some(task) => task.await,
                             None => None,
-                        }.with_context(|| format!("Couldn't find task template for {build:?}"))?;
+                        }.with_context(|| format!("Не найден шаблон задачи для {build:?}"))?;
                         (task, None)
                     }
                 };
                 let Some(mut task) = task_template.resolve_task("debug-build-task", &task_context) else {
-                    anyhow::bail!("Could not resolve task variables within a debug scenario");
+                    anyhow::bail!("Не удалось подставить переменные задачи в сценарии отладки");
                 };
 
                 let locator_name = if let Some(locator_name) = locator_name {
@@ -1250,10 +1254,10 @@ impl RunningState {
                 let exit_status = terminal
                     .read_with(cx, |terminal, cx| terminal.wait_for_completed_task(cx))
                     .await
-                    .context("Failed to wait for completed task")?;
+                    .context("Не удалось дождаться завершения задачи")?;
 
                 if !exit_status.success() {
-                    anyhow::bail!("Build failed");
+                    anyhow::bail!("Ошибка сборки");
                 }
                 Some((task.resolved.clone(), locator_name, extra_config))
             } else {
@@ -1264,7 +1268,7 @@ impl RunningState {
             } else if let Some((task, locator_name, extra_config)) = build_output {
                 let locator_name =
                     locator_name.with_context(|| {
-                        format!("Could not find a valid locator for a build task and configure is invalid with error: {}", request_type.err()
+                        format!("Не найден подходящий обработчик задачи сборки; конфигурация содержит ошибку: {}", request_type.err()
                             .map(|err| err.to_string())
                             .unwrap_or_default())
                     })?;
@@ -1283,7 +1287,7 @@ impl RunningState {
 
                 let scenario = dap_registry
                     .adapter(&adapter)
-                    .with_context(|| anyhow!("{adapter}: is not a valid adapter name"))?.config_from_zed_format(zed_config)
+                    .with_context(|| anyhow!("Недопустимое имя адаптера: {adapter}"))?.config_from_zed_format(zed_config)
                     .await?;
                 config = scenario.config;
                 util::merge_non_null_json_value_into(extra_config, &mut config);
@@ -1293,7 +1297,7 @@ impl RunningState {
                 let Err(e) = request_type else {
                     unreachable!();
                 };
-                anyhow::bail!("Zed cannot determine how to run this debug scenario. `build` field was not provided and Debug Adapter won't accept provided configuration because: {e}");
+                anyhow::bail!("Не удалось запустить сценарий отладки: поле `build` не задано, а адаптер отладки отклонил конфигурацию: {e}");
             };
 
             Ok(DebugTaskDefinition {
@@ -1369,7 +1373,7 @@ impl RunningState {
             .clone()
             .filter(|title| !title.is_empty())
             .or_else(|| command.clone())
-            .unwrap_or_else(|| "Debug terminal".to_string());
+            .unwrap_or_else(|| "Терминал отладки".to_string());
         let kind = task::SpawnInTerminal {
             id: task::TaskId("debug".to_string()),
             full_label: title.clone(),
@@ -1416,7 +1420,7 @@ impl RunningState {
                 terminal
                     .pid()
                     .map(|pid| pid.as_u32())
-                    .context("Terminal was spawned but PID was not available")
+                    .context("Терминал запущен, но идентификатор процесса недоступен")
             })
         });
 

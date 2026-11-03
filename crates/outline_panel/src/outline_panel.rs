@@ -1072,7 +1072,7 @@ impl OutlinePanel {
         cx.new(|cx| {
             let filter_editor = cx.new(|cx| {
                 let mut editor = Editor::single_line(window, cx);
-                editor.set_placeholder_text("Search buffer symbols…", window, cx);
+                editor.set_placeholder_text("Поиск символов в файле…", window, cx);
                 editor
             });
             let filter_update_subscription = cx.subscribe_in(
@@ -1812,17 +1812,20 @@ impl OutlinePanel {
                     ui::utils::reveal_in_file_manager_label(false),
                     Box::new(RevealInFileManager),
                 )
-                .action("Open in Terminal", Box::new(OpenInTerminal))
+                .action("Открыть в терминале", Box::new(OpenInTerminal))
                 .when(is_unfoldable, |menu| {
-                    menu.action("Unfold Directory", Box::new(UnfoldDirectory))
+                    menu.action("Развернуть папку", Box::new(UnfoldDirectory))
                 })
                 .when(is_foldable, |menu| {
-                    menu.action("Fold Directory", Box::new(FoldDirectory))
+                    menu.action("Свернуть папку", Box::new(FoldDirectory))
                 })
                 .separator()
-                .action("Copy Path", Box::new(zed_actions::workspace::CopyPath))
                 .action(
-                    "Copy Relative Path",
+                    "Копировать путь",
+                    Box::new(zed_actions::workspace::CopyPath),
+                )
+                .action(
+                    "Копировать относительный путь",
                     Box::new(zed_actions::workspace::CopyRelativePath),
                 )
         });
@@ -2696,9 +2699,9 @@ impl OutlinePanel {
                             .map(|icon| icon.color(color).into_any_element());
                             (icon, name)
                         }
-                        None => (None, "Untitled".to_string()),
+                        None => (None, "Без названия".to_string()),
                     },
-                    None => (None, "Unknown buffer".to_string()),
+                    None => (None, "Неизвестный буфер".to_string()),
                 };
                 (
                     ElementId::from(("buffer", external_file.buffer_id.to_proto())),
@@ -2924,16 +2927,20 @@ impl OutlinePanel {
         h_flex()
             .id("expand-collapse")
             .role(gpui::Role::Button)
-            .aria_label(if is_expanded { "Collapse" } else { "Expand" })
+            .aria_label(if is_expanded {
+                "Свернуть"
+            } else {
+                "Развернуть"
+            })
             .aria_expanded(is_expanded)
             .flex_none()
             .cursor_pointer()
             .rounded_sm()
             .hover(|style| style.bg(cx.theme().colors().ghost_element_hover))
             .tooltip(Tooltip::text(if is_expanded {
-                "Collapse"
+                "Свернуть"
             } else {
-                "Expand"
+                "Развернуть"
             }))
             .on_click(
                 cx.listener(move |panel, event: &gpui::ClickEvent, window, cx| {
@@ -5263,9 +5270,9 @@ impl OutlinePanel {
     ) -> impl IntoElement {
         let contents = if self.cached_entries.is_empty() {
             let header = if query.is_some() {
-                "No matches for query"
+                "Совпадений не найдено"
             } else {
-                "No outlines available"
+                "Структура кода недоступна"
             };
 
             v_flex()
@@ -5288,7 +5295,7 @@ impl OutlinePanel {
                     h_flex()
                         .gap_1()
                         .justify_center()
-                        .child(Label::new("Toggle Panel With").color(Color::Muted))
+                        .child(Label::new("Открыть или скрыть панель:").color(Color::Muted))
                         .child({
                             let key_binding = match self.position(window, cx) {
                                 DockPosition::Left => {
@@ -5461,18 +5468,18 @@ impl OutlinePanel {
 
     fn render_filter_footer(&mut self, pinned: bool, cx: &mut Context<Self>) -> Div {
         let (pin_button_id, icon, icon_tooltip) = if pinned {
-            ("unpin_button", IconName::Unpin, "Unpin Outline")
+            ("unpin_button", IconName::Unpin, "Открепить структуру")
         } else {
-            ("pin_button", IconName::Pin, "Pin Active Outline")
+            ("pin_button", IconName::Pin, "Закрепить текущую структуру")
         };
 
         let has_query = self.query(cx).is_some();
         let show_symbols_toggle = self.multi_buffer_active(cx);
         let hide_symbols = self.hide_symbols_active(cx);
         let (hide_symbols_icon, hide_symbols_tooltip) = if hide_symbols {
-            (IconName::FileCodeOff, "Show Symbols")
+            (IconName::FileCodeOff, "Показать символы")
         } else {
-            (IconName::FileCode, "Hide Symbols")
+            (IconName::FileCode, "Скрыть символы")
         };
 
         h_flex()
@@ -5498,7 +5505,7 @@ impl OutlinePanel {
                         this.child(
                             IconButton::new("clear_filter", IconName::Close)
                                 .shape(IconButtonShape::Square)
-                                .tooltip(Tooltip::text("Clear Filter"))
+                                .tooltip(Tooltip::text("Очистить фильтр"))
                                 .on_click(cx.listener(|outline_panel, _, window, cx| {
                                     outline_panel.filter_editor.update(cx, |editor, cx| {
                                         editor.set_text("", window, cx);
@@ -5630,7 +5637,7 @@ impl Panel for OutlinePanel {
     }
 
     fn icon_tooltip(&self, _window: &Window, _: &App) -> Option<&'static str> {
-        Some("Outline Panel")
+        Some("Структура кода")
     }
 
     fn toggle_action(&self) -> Box<dyn Action> {

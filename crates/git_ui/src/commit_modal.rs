@@ -296,7 +296,7 @@ impl CommitModal {
                             })
                             .when(has_previous_commit, |this| {
                                 this.toggleable_entry(
-                                    "Amend",
+                                    "Дополнить коммит",
                                     amend_enabled,
                                     IconPosition::Start,
                                     Some(Box::new(Amend)),
@@ -313,7 +313,7 @@ impl CommitModal {
                                 )
                             })
                             .toggleable_entry(
-                                "Signoff",
+                                "Добавить Signed-off-by",
                                 signoff_enabled,
                                 IconPosition::Start,
                                 Some(Box::new(Signoff)),
@@ -327,7 +327,7 @@ impl CommitModal {
                                 },
                             )
                             .item(
-                                ContextMenuEntry::new("Skip Hooks")
+                                ContextMenuEntry::new("Пропустить хуки")
                                     .toggleable(IconPosition::Start, skip_hooks_enabled)
                                     .action(Box::new(SkipHooks))
                                     .handler(move |window, cx| {
@@ -383,7 +383,7 @@ impl CommitModal {
             .as_ref()
             .and_then(|repo| repo.read(cx).branch.as_ref())
             .map(|b| b.name().to_owned())
-            .unwrap_or_else(|| "<no branch>".to_owned());
+            .unwrap_or_else(|| "<нет ветки>".to_owned());
 
         let branch_picker_button = Button::new("branch_picker_button", branch)
             .label_size(LabelSize::Small)
@@ -409,7 +409,7 @@ impl CommitModal {
             .with_handle(self.branch_list_handle.clone())
             .trigger_with_tooltip(
                 branch_picker_button,
-                Tooltip::for_action_title("Switch Branch", &zed_actions::git::Branch),
+                Tooltip::for_action_title("Переключить ветку", &zed_actions::git::Branch),
             )
             .anchor(Anchor::BottomLeft)
             .offset(gpui::Point {
@@ -420,7 +420,7 @@ impl CommitModal {
         let focus_handle = self.focus_handle(cx);
 
         let close_kb_hint = ui::KeyBinding::for_action(&menu::Cancel, cx).map(|close_kb| {
-            KeybindingHint::new(close_kb, cx.theme().colors().editor_background).suffix("Cancel")
+            KeybindingHint::new(close_kb, cx.theme().colors().editor_background).suffix("Отмена")
         });
 
         h_flex()
@@ -689,7 +689,7 @@ impl Render for CommitModal {
                                 )
                                 .child(
                                     Label::new(format!(
-                                        "Commit message title exceeds {max_title_length}-character limit."
+                                        "Заголовок коммита превышает ограничение в {max_title_length} символов."
                                     ))
                                     .size(LabelSize::Small),
                                 ),

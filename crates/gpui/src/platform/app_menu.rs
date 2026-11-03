@@ -5,6 +5,9 @@ pub struct Menu {
     /// The name of the menu
     pub name: SharedString,
 
+    /// Optional visible title; `name` remains the stable menu identity.
+    pub display_name: Option<SharedString>,
+
     /// The items in the menu
     pub items: Vec<MenuItem>,
 
@@ -17,9 +20,21 @@ impl Menu {
     pub fn new(name: impl Into<SharedString>) -> Self {
         Self {
             name: name.into(),
+            display_name: None,
             items: vec![],
             disabled: false,
         }
+    }
+
+    /// Sets the visible title without changing shortcuts or OS menu identity.
+    pub fn display_name(mut self, title: impl Into<SharedString>) -> Self {
+        self.display_name = Some(title.into());
+        self
+    }
+
+    /// Returns the visible title, falling back to the stable name.
+    pub fn title(&self) -> &SharedString {
+        self.display_name.as_ref().unwrap_or(&self.name)
     }
 
     /// Set items to be in this menu
@@ -38,6 +53,7 @@ impl Menu {
     pub fn owned(self) -> OwnedMenu {
         OwnedMenu {
             name: self.name.to_string().into(),
+            display_name: self.display_name,
             items: self.items.into_iter().map(|item| item.owned()).collect(),
             disabled: self.disabled,
         }
@@ -239,11 +255,21 @@ pub struct OwnedMenu {
     /// The name of the menu
     pub name: SharedString,
 
+    /// Optional visible title; `name` remains the stable menu identity.
+    pub display_name: Option<SharedString>,
+
     /// The items in the menu
     pub items: Vec<OwnedMenuItem>,
 
     /// Whether this menu is disabled
     pub disabled: bool,
+}
+
+impl OwnedMenu {
+    /// Returns the visible title without changing the menu's identity.
+    pub fn title(&self) -> &SharedString {
+        self.display_name.as_ref().unwrap_or(&self.name)
+    }
 }
 
 /// The different kinds of items that can be in a menu
@@ -363,6 +389,17 @@ mod tests {
     use crate::Menu;
 
     #[test]
+    fn translated_title_preserves_menu_identity_after_ownership_transfer() {
+        let menu = Menu::new("Window").display_name("Окно");
+        assert_eq!(menu.name.as_ref(), "Window");
+        assert_eq!(menu.title().as_ref(), "Окно");
+        let owned = menu.owned();
+        assert_eq!(owned.name.as_ref(), "Window");
+        assert_eq!(owned.title().as_ref(), "Окно");
+        assert_eq!(Menu::new("Custom").title().as_ref(), "Custom");
+    }
+
+    #[test]
     fn test_menu() {
         let menu = Menu::new("App")
             .items(vec![
@@ -410,6 +447,7 @@ mod tests {
 
         let submenu = MenuItem::submenu(super::Menu {
             name: "Submenu".into(),
+            display_name: None,
             items: vec![],
             disabled: true,
         });

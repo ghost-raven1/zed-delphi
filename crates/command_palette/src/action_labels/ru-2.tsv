@@ -1,0 +1,400 @@
+editor::Newline	Редактор: Вставить перевод строки
+editor::NewlineAbove	Редактор: Вставить перевод строки выше
+editor::NewlineBelow	Редактор: Вставить перевод строки ниже
+editor::NextEditPrediction	Редактор: Следующее предложенное изменение
+editor::NextScreen	Редактор: Следующий экран
+editor::NextSnippetTabstop	Редактор: Следующая позиция фрагмента кода
+editor::OpenContextMenu	Редактор: Открыть контекстное меню
+editor::OpenDocs	Редактор: Открыть документацию
+editor::OpenExcerpts	Редактор: Открыть фрагменты
+editor::OpenExcerptsSplit	Редактор: Открыть фрагменты в соседнем редакторе
+editor::OpenGitBlameCommit	Редактор: Открыть коммит автора строки
+editor::OpenPermalinkToLine	Редактор: Открыть постоянную ссылку на строку
+editor::OpenProposedChangesEditor	Редактор: Открыть редактор предлагаемых изменений
+editor::OpenSelectedFilename	Редактор: Открыть файл с выбранным именем
+editor::OpenSelectionsInMultibuffer	Редактор: Открыть выделения в составном буфере
+editor::OpenUrl	Редактор: Открыть URL
+editor::OrganizeImports	Редактор: Упорядочить импорты
+editor::Outdent	Редактор: Уменьшить отступ
+editor::PageDown	Редактор: На страницу вниз
+editor::PageUp	Редактор: На страницу вверх
+editor::Paste	Редактор: вставить
+editor::PreviousEditPrediction	Редактор: Предыдущее предложенное изменение
+editor::PreviousSnippetTabstop	Редактор: Предыдущая позиция фрагмента кода
+editor::Redo	Редактор: повторить
+editor::RedoSelection	Редактор: Повторить изменение выделения
+editor::ReloadFile	Редактор: перезагрузить файл
+editor::Rename	Редактор: переименовать
+editor::RestartLanguageServer	Редактор: Перезапустить языковой сервер
+editor::RevealInFileManager	Редактор: Показать в файловом менеджере
+editor::ReverseLines	Редактор: Обратить порядок строк
+editor::Rewrap	Редактор: Переразбить строки
+editor::RotateSelectionsBackward	Редактор: Циклически сдвинуть выделения назад
+editor::RotateSelectionsForward	Редактор: Циклически сдвинуть выделения вперёд
+editor::RunFlycheck	Редактор: Запустить проверку кода
+editor::SaveLocation	Редактор: Сохранить расположение
+editor::ScrollCursorBottom	Редактор: Прокрутить до курсора у нижнего края
+editor::ScrollCursorCenter	Редактор: Прокрутить до курсора в центре
+editor::ScrollCursorCenterTopBottom	Редактор: Переключить положение курсора: центр, верх, низ
+editor::ScrollCursorTop	Редактор: Прокрутить до курсора у верхнего края
+editor::SelectAll	Редактор: выделить всё
+editor::SelectAllMatches	Редактор: выделить все совпадения
+editor::SelectAroundDelimiters	Редактор: Выделить вместе с разделителями
+editor::SelectDown	Редактор: Выделить вниз
+editor::SelectDownByLines	Редактор: Выделить вниз по строкам
+editor::SelectEnclosingSymbol	Редактор: Выделить содержащий символ
+editor::SelectInsideDelimiters	Редактор: Выделить внутри разделителей
+editor::SelectLargerSyntaxNode	Редактор: Выделить внешний синтаксический узел
+editor::SelectLeft	Редактор: Выделить влево
+editor::SelectLine	Редактор: выделить строку
+editor::SelectNext	Редактор: выделить следующее совпадение
+editor::SelectNextSyntaxNode	Редактор: Выделить следующий синтаксический узел
+editor::SelectPageDown	Редактор: Выделить на страницу вниз
+editor::SelectPageUp	Редактор: Выделить на страницу вверх
+editor::SelectPrevious	Редактор: выделить предыдущее совпадение
+editor::SelectPreviousSyntaxNode	Редактор: Выделить предыдущий синтаксический узел
+editor::SelectRight	Редактор: Выделить вправо
+editor::SelectSmallerSyntaxNode	Редактор: Выделить внутренний синтаксический узел
+editor::SelectToBeginning	Редактор: Выделить до начала
+editor::SelectToBeginningOfLine	Редактор: Выделить до начала строки
+editor::SelectToEnd	Редактор: Выделить до конца
+editor::SelectToEndOfExcerpt	Редактор: Выделить до конца фрагмента
+editor::SelectToEndOfLargerSyntaxNode	Редактор: Выделить до конца внешнего синтаксического узла
+editor::SelectToEndOfLine	Редактор: Выделить до конца строки
+editor::SelectToEndOfParagraph	Редактор: Выделить до конца абзаца
+editor::SelectToEndOfPreviousExcerpt	Редактор: Выделить до конца предыдущего фрагмента
+editor::SelectToNextSubwordEnd	Редактор: Выделить до конца следующей части слова
+editor::SelectToNextWordEnd	Редактор: Выделить до конца следующего слова
+editor::SelectToPreviousSubwordStart	Редактор: Выделить до начала предыдущей части слова
+editor::SelectToPreviousWordStart	Редактор: Выделить до начала предыдущего слова
+editor::SelectToStartOfExcerpt	Редактор: Выделить до начала фрагмента
+editor::SelectToStartOfLargerSyntaxNode	Редактор: Выделить до начала внешнего синтаксического узла
+editor::SelectToStartOfNextExcerpt	Редактор: Выделить до начала следующего фрагмента
+editor::SelectToStartOfParagraph	Редактор: Выделить до начала абзаца
+editor::SelectUp	Редактор: Выделить вверх
+editor::SelectUpByLines	Редактор: Выделить вверх по строкам
+editor::SendReviewToAgent	Редактор: Отправить результаты проверки агенту
+editor::SetMark	Редактор: Установить метку
+editor::ShowCharacterPalette	Редактор: Показать палитру символов
+editor::ShowCompletions	Редактор: показать варианты завершения
+editor::ShowEditPrediction	Редактор: Показать предложенное изменение
+editor::ShowSignatureHelp	Редактор: показать сигнатуру функции
+editor::ShowWordCompletions	Редактор: Показать варианты завершения слова
+editor::ShuffleLines	Редактор: Перемешать строки
+editor::SignatureHelpNext	Редактор: Показать следующую сигнатуру
+editor::SignatureHelpPrevious	Редактор: Показать предыдущую сигнатуру
+editor::SortLinesByLength	Редактор: Сортировать строки по длине
+editor::SortLinesCaseInsensitive	Редактор: сортировать строки без учёта регистра
+editor::SortLinesCaseSensitive	Редактор: сортировать строки с учётом регистра
+editor::SpawnNearestTask	Редактор: Запустить ближайшую задачу
+editor::SplitSelectionIntoLines	Редактор: Разбить выделение на строки
+editor::StopLanguageServer	Редактор: Остановить языковой сервер
+editor::SubmitDiffReviewComment	Редактор: Отправить комментарий к изменениям
+editor::SwapSelectionEnds	Редактор: Поменять концы выделения местами
+editor::SwitchSourceHeader	Редактор: Переключиться между исходником и заголовком
+editor::Tab	Редактор: Перейти по Tab
+editor::ToggleAllDiffHunks	Редактор: Показать или скрыть все блоки изменений
+editor::ToggleAutoSignatureHelp	Редактор: Включить или отключить автоматические подсказки сигнатур
+editor::ToggleBlockComments	Редактор: Добавить или убрать блочный комментарий
+editor::ToggleBookmark	Редактор: Установить или убрать закладку
+editor::ToggleBookmarkWithLabel	Редактор: Установить или убрать именованную закладку
+editor::ToggleBreadcrumb	Редактор: Показать или скрыть цепочку навигации
+editor::ToggleBreakpoint	Редактор: установить или убрать точку останова
+editor::ToggleCase	Редактор: Переключить регистр
+editor::ToggleCodeActions	Редактор: показать действия с кодом
+editor::ToggleCodeLens	Редактор: Показать или скрыть Code Lens
+editor::ToggleComments	Редактор: закомментировать или раскомментировать
+editor::ToggleDiagnostics	Редактор: Показать или скрыть диагностику
+editor::ToggleEditPrediction	Редактор: Включить или отключить предлагаемые изменения
+editor::ToggleFocus	Редактор: переключить фокус
+editor::ToggleFold	Редактор: Свернуть или развернуть блок
+editor::ToggleFoldAll	Редактор: Свернуть или развернуть все блоки
+editor::ToggleFoldRecursive	Редактор: Рекурсивно свернуть или развернуть блоки
+editor::ToggleGitBlameInline	Редактор: Показать или скрыть авторов строк в редакторе
+editor::ToggleIndentGuides	Редактор: Показать или скрыть направляющие отступов
+editor::ToggleInlayHints	Редактор: показать или скрыть встроенные подсказки
+editor::ToggleInlineDiagnostics	Редактор: Показать или скрыть диагностику в строках
+editor::ToggleInlineValues	Редактор: Показать или скрыть значения в строках
+editor::ToggleLineNumbers	Редактор: показать или скрыть номера строк
+editor::ToggleMinimap	Редактор: Показать или скрыть миникарту
+editor::ToggleRelativeLineNumbers	Редактор: Показать или скрыть относительные номера строк
+editor::ToggleReviewCommentsExpanded	Редактор: Развернуть или свернуть комментарии к изменениям
+editor::ToggleSelectedDiffHunks	Редактор: Показать или скрыть выбранные блоки изменений
+editor::ToggleSelectionMenu	Редактор: Показать или скрыть меню выделения
+editor::ToggleSemanticHighlights	Редактор: Показать или скрыть семантическую подсветку
+editor::ToggleSoftWrap	Редактор: переключить перенос строк
+editor::ToggleSplitDiff	Редактор: Переключить раздельное сравнение
+editor::ToggleTabBar	Редактор: Показать или скрыть панель вкладок
+editor::Transpose	Редактор: Поменять соседние символы местами
+editor::Undo	Редактор: отменить
+editor::UndoSelection	Редактор: Отменить изменение выделения
+editor::UnfoldAll	Редактор: развернуть всё
+editor::UnfoldLines	Редактор: развернуть строки
+editor::UnfoldRecursive	Редактор: Развернуть рекурсивно
+editor::UniqueLinesCaseInsensitive	Редактор: Удалить повторяющиеся строки без учёта регистра
+editor::UniqueLinesCaseSensitive	Редактор: Удалить повторяющиеся строки с учётом регистра
+editor::UnwrapSyntaxNode	Редактор: Убрать обрамляющий синтаксический узел
+editor::ViewBookmarks	Редактор: Просмотреть закладки
+editor::WrapSelectionsInTag	Редактор: Обрамить выделения тегом
+editor::WrapWithAbbreviation	Редактор: Обрамить с помощью сокращения
+encoding_selector::Toggle	Кодировка: показать или скрыть
+feedback::EmailZed	Обратная связь: Написать разработчикам Zed
+feedback::FileBugReport	Обратная связь: Сообщить об ошибке
+feedback::RequestFeature	Обратная связь: Предложить функцию
+file_finder::OpenWithoutDismiss	Файлы: Открыть без закрытия списка
+file_finder::SelectPrevious	Файлы: выделить предыдущее совпадение
+file_finder::Toggle	Файлы: перейти к файлу
+git::Add	Git: Добавить
+git::AddToGitInfoExclude	Git: Добавить в git/info/exclude
+git::AddToGitignore	Git: Добавить в .gitignore
+git::Amend	Git: Дополнить последний коммит
+git::ApplyCurrentStash	Git: Применить выбранные отложенные изменения
+git::Blame	Git: Показать авторов строк
+git::Branch	Git: Ветка
+git::Cancel	Git: отменить
+git::CheckoutBranch	Git: Переключиться на ветку
+git::Clone	Git: Клонировать
+git::Commit	Git: Создать коммит
+git::CompareWithBranch	Git: Сравнить с веткой
+git::CopyBranchName	Git: Копировать имя ветки
+git::CopyFilePermalink	Git: Копировать постоянную ссылку на файл
+git::CreatePullRequest	Git: Создать запрос на слияние
+git::CreateRemote	Git: Добавить удалённый репозиторий
+git::CreateTagAtHead	Git: Создать метку на HEAD
+git::CreateWorktree	Git: Создать рабочее дерево
+git::Diff	Git: Показать изменения
+git::DiffBranch	Git: Сравнить ветку
+git::DiffHead	Git: Сравнить с HEAD
+git::DropCurrentStash	Git: Удалить текущие отложенные изменения
+git::ExpandCommitEditor	Git: Развернуть редактор коммита
+git::Fetch	Git: Получить изменения
+git::FetchFrom	Git: Получить изменения из репозитория
+git::FileHistory	Git: История файла
+git::FilterRemotes	Git: Отфильтровать удалённые репозитории
+git::ForcePush	Git: Принудительно отправить изменения
+git::GenerateCommitMessage	Git: Составить сообщение коммита
+git::Init	Git: Инициализировать
+git::LeaderAndFollower	Git: Ведущий и ведомый
+git::OpenFileAtHead	Git: Открыть файл на HEAD
+git::OpenFileDiff	Git: Открыть изменения файла
+git::OpenFilePermalink	Git: Открыть постоянную ссылку на файл
+git::OpenModifiedFiles	Git: Открыть изменённые файлы
+git::OpenWorktreeInNewWindow	Git: Открыть рабочее дерево в новом окне
+git::PopCurrentStash	Git: Применить и удалить текущие отложенные изменения
+git::Pull	Git: Получить и объединить изменения
+git::PullRebase	Git: Получить изменения с перебазированием
+git::Push	Git: Отправить изменения
+git::PushTo	Git: Отправить в выбранный репозиторий
+git::RenameBranch	Git: Переименовать ветку
+git::Restore	Git: Восстановить
+git::RestoreAndNext	Git: Восстановить и перейти дальше
+git::RestoreFile	Git: Восстановить файл
+git::RestoreTrackedFiles	Git: Восстановить отслеживаемые файлы
+git::ReviewDiff	Git: Проверить изменения
+git::SelectRepo	Git: Выбрать репозиторий
+git::Signoff	Git: Добавить отметку Signed-off-by
+git::SkipHooks	Git: Пропустить Git hooks
+git::StageAll	Git: Подготовить все изменения к коммиту
+git::StageAndNext	Git: Подготовить изменение к коммиту и перейти дальше
+git::StageFile	Git: Подготовить файл к коммиту
+git::StageRange	Git: Подготовить диапазон к коммиту
+git::StageSection	Git: Подготовить раздел к коммиту
+git::StashAll	Git: Отложить все изменения
+git::StashApply	Git: Применить отложенные изменения
+git::StashPop	Git: Применить и удалить отложенные изменения
+git::StashStaged	Git: Отложить подготовленные изменения
+git::StashTracked	Git: Отложить изменения отслеживаемых файлов
+git::Switch	Git: Переключить
+git::SwitchWorktree	Git: Переключить рабочее дерево
+git::ToggleCommitEditor	Git: Показать или скрыть редактор коммита
+git::ToggleDiffBase	Git: Переключить базу сравнения изменений
+git::ToggleFillCommitEditor	Git: Включить или отключить заполнение редактора коммита
+git::ToggleStaged	Git: Переключить подготовку к коммиту
+git::TrashUntrackedFiles	Git: Переместить неотслеживаемые файлы в корзину
+git::Uncommit	Git: Отменить коммит, сохранив изменения
+git::UnstageAll	Git: Убрать все изменения из подготовки к коммиту
+git::UnstageAndNext	Git: Убрать изменение из подготовки и перейти дальше
+git::UnstageFile	Git: Убрать файл из подготовки к коммиту
+git::UnstageSection	Git: Убрать раздел из подготовки к коммиту
+git::ViewCommit	Git: Просмотреть коммит
+git::ViewFile	Git: Просмотреть файл
+git::ViewStagedChanges	Git: Просмотреть подготовленные изменения
+git::ViewStash	Git: Просмотреть отложенные изменения
+git::ViewUncommittedChanges	Git: Просмотреть незакоммиченные изменения
+git::ViewUnstagedChanges	Git: Просмотреть неподготовленные изменения
+git::Worktree	Git: Рабочее дерево
+git_graph::CopyCommitSha	Граф Git: Копировать SHA коммита
+git_graph::CopyCommitTag	Граф Git: Копировать метку коммита
+git_graph::FocusNextTabStop	Граф Git: Перейти к следующему элементу по Tab
+git_graph::FocusPreviousTabStop	Граф Git: Перейти к предыдущему элементу по Tab
+git_graph::FocusSearch	Граф Git: Перейти к поиску
+git_graph::Open	Граф Git: открыть
+git_graph::OpenAtCommit	Граф Git: Открыть на выбранном коммите
+git_graph::OpenCommitView	Граф Git: Открыть просмотр коммита
+git_graph::ScrollDown	Граф Git: Прокрутить вниз
+git_graph::ScrollUp	Граф Git: Прокрутить вверх
+git_graph::ToggleChangedFilesView	Граф Git: Показать или скрыть изменённые файлы
+git_onboarding::OpenGitIntegrationOnboarding	Настройка Git: Открыть настройку интеграции Git
+git_panel::ActivateChangesTab	Панель Git: Открыть вкладку изменений
+git_panel::ActivateHistoryTab	Панель Git: Открыть вкладку истории
+git_panel::Close	Панель Git: закрыть
+git_panel::CollapseSelectedEntry	Панель Git: Свернуть выбранный элемент
+git_panel::ExpandSelectedEntry	Панель Git: Развернуть выбранный элемент
+git_panel::FirstEntry	Панель Git: Первый элемент
+git_panel::FocusChanges	Панель Git: Перейти к изменениям
+git_panel::FocusEditor	Панель Git: Перейти в редактор
+git_panel::LastEntry	Панель Git: Последний элемент
+git_panel::NextEntry	Панель Git: Следующий элемент
+git_panel::OpenMenu	Панель Git: Открыть меню
+git_panel::PreviousEntry	Панель Git: Предыдущий элемент
+git_panel::SetGroupByNone	Панель Git: Отключить группировку
+git_panel::SetGroupByStaging	Панель Git: Группировать по подготовке к коммиту
+git_panel::SetGroupByStatus	Панель Git: Группировать по состоянию
+git_panel::SetSortByName	Панель Git: Сортировать по имени
+git_panel::SetSortByPath	Панель Git: Сортировать по пути
+git_panel::Toggle	Панель Git: показать или скрыть
+git_panel::ToggleFillCoAuthors	Панель Git: Включить или отключить заполнение соавторов
+git_panel::ToggleFocus	Панель Git: переключить фокус
+git_panel::ToggleTreeView	Панель Git: Переключить древовидное представление
+git_panel::ViewStagedChanges	Панель Git: Просмотреть подготовленные изменения
+git_panel::ViewUnstagedChanges	Панель Git: Просмотреть неподготовленные изменения
+git_picker::ActivateBranchesTab	Выбор Git: Открыть вкладку веток
+git_picker::ActivateStashTab	Выбор Git: Открыть вкладку отложенных изменений
+go_to_line::Toggle	Редактор: перейти к строке или столбцу
+highlights_tree_view::ToggleSemanticTokens	Дерево подсветки: Показать или скрыть семантические токены
+highlights_tree_view::ToggleSyntaxTokens	Дерево подсветки: Показать или скрыть синтаксические токены
+highlights_tree_view::ToggleTextHighlights	Дерево подсветки: Показать или скрыть подсветку текста
+icon_theme_selector::Toggle	Темы значков: показать или скрыть
+image_viewer::FitToView	Просмотр изображений: Вписать в область просмотра
+image_viewer::ResetZoom	Просмотр изображений: Сбросить масштаб
+image_viewer::ZoomIn	Просмотр изображений: Увеличить масштаб
+image_viewer::ZoomOut	Просмотр изображений: Уменьшить масштаб
+image_viewer::ZoomToActualSize	Просмотр изображений: Показать в натуральном размере
+inline_assistant::ThumbsDownResult	Встроенный помощник: Оценить результат отрицательно
+inline_assistant::ThumbsUpResult	Встроенный помощник: Оценить результат положительно
+journal::NewJournalEntry	Журнал: Создать запись журнала
+keymap_editor::CopyAction	Сочетания клавиш: Копировать действие
+keymap_editor::CopyContext	Сочетания клавиш: Копировать контекст
+keymap_editor::CreateBinding	Сочетания клавиш: Создать сочетание клавиш
+keymap_editor::DeleteBinding	Сочетания клавиш: Удалить сочетание клавиш
+keymap_editor::EditBinding	Сочетания клавиш: Изменить сочетание клавиш
+keymap_editor::OpenCreateKeybindingModal	Сочетания клавиш: Открыть создание сочетания клавиш
+keymap_editor::ShowMatchingKeybinds	Сочетания клавиш: Показать подходящие сочетания клавиш
+keymap_editor::ToggleConflictFilter	Сочетания клавиш: Включить или отключить фильтр конфликтов
+keymap_editor::ToggleExactKeystrokeMatching	Сочетания клавиш: Включить или отключить точное сопоставление клавиш
+keymap_editor::ToggleKeystrokeSearch	Сочетания клавиш: Переключить поиск по сочетанию клавиш
+keymap_editor::ToggleNoActionBindings	Сочетания клавиш: Показать или скрыть сочетания без действия
+keystroke_input::ClearKeystrokes	Ввод сочетаний клавиш: Очистить ввод сочетания клавиш
+keystroke_input::StartRecording	Ввод сочетаний клавиш: Начать запись
+keystroke_input::StopRecording	Ввод сочетаний клавиш: Остановить запись
+language_selector::Toggle	Язык программирования: показать или скрыть
+line_ending_selector::Toggle	Окончания строк: показать или скрыть
+lsp_command_selector::Toggle	Команды языкового сервера: показать или скрыть
+lsp_command_selector::ToggleArgumentsFocus	Команды языкового сервера: Переключить фокус на аргументы
+lsp_tool::ToggleMenu	Инструменты языкового сервера: Показать или скрыть меню
+markdown::CloseAndReturnToEditor	Markdown: Закрыть и вернуться в редактор
+markdown::Copy	Markdown: копировать
+markdown::CopyAsMarkdown	Markdown: Копировать как Markdown
+markdown::OpenFollowingPreview	Markdown: Открыть предварительный просмотр с отслеживанием
+markdown::OpenPreview	Markdown: Открыть предварительный просмотр
+markdown::OpenPreviewToTheSide	Markdown: Открыть предварительный просмотр сбоку
+markdown::ScrollDown	Markdown: Прокрутить вниз
+markdown::ScrollDownByItem	Markdown: Прокрутить вниз на элемент
+markdown::ScrollPageDown	Markdown: Прокрутить на страницу вниз
+markdown::ScrollPageUp	Markdown: Прокрутить на страницу вверх
+markdown::ScrollToBottom	Markdown: Прокрутить в конец
+markdown::ScrollToTop	Markdown: Прокрутить в начало
+markdown::ScrollUp	Markdown: Прокрутить вверх
+markdown::ScrollUpByItem	Markdown: Прокрутить вверх на элемент
+markdown::ToggleBlockQuote	Markdown: Добавить или убрать цитату
+menu::Cancel	Меню: отменить
+menu::Confirm	Меню: подтвердить
+menu::EndSlot	Меню: Выполнить дополнительное действие пункта
+menu::Restart	Меню: перезапустить
+menu::SecondaryConfirm	Меню: Дополнительное подтверждение
+menu::SelectChild	Меню: Выбрать дочерний элемент
+menu::SelectFirst	Меню: Выбрать первый элемент
+menu::SelectLast	Меню: Выбрать последний элемент
+menu::SelectNext	Меню: выделить следующее совпадение
+menu::SelectParent	Меню: Выбрать родительский элемент
+menu::SelectPrevious	Меню: выделить предыдущее совпадение
+multi_workspace::CloseWorkspaceSidebar	Рабочие области: Закрыть боковую панель рабочей области
+multi_workspace::FocusWorkspaceSidebar	Рабочие области: Перейти к боковой панели рабочей области
+multi_workspace::MoveProjectDown	Рабочие области: Переместить проект вниз
+multi_workspace::MoveProjectToNewWindow	Рабочие области: Переместить проект в новое окно
+multi_workspace::MoveProjectUp	Рабочие области: Переместить проект вверх
+multi_workspace::NewThread	Рабочие области: Создать диалог
+multi_workspace::NextProject	Рабочие области: Следующий проект
+multi_workspace::NextThread	Рабочие области: Следующий диалог
+multi_workspace::PreviousProject	Рабочие области: Предыдущий проект
+multi_workspace::PreviousThread	Рабочие области: Предыдущий диалог
+multi_workspace::ToggleWorkspaceSidebar	Рабочие области: Показать или скрыть боковую панель рабочей области
+new_process_modal::ActivateAttachTab	Запуск процесса: Открыть вкладку подключения к процессу
+new_process_modal::ActivateDebugTab	Запуск процесса: Открыть вкладку отладки
+new_process_modal::ActivateLaunchTab	Запуск процесса: Открыть вкладку запуска
+new_process_modal::ActivateTaskTab	Запуск процесса: Открыть вкладку задач
+notebook::AddCodeBlock	Блокнот: Добавить блок кода
+notebook::AddMarkdownBlock	Блокнот: Добавить блок Markdown
+notebook::ClearOutputs	Блокнот: Очистить вывод
+notebook::DeleteCell	Блокнот: Удалить ячейку
+notebook::EnterCommandMode	Блокнот: Перейти в командный режим
+notebook::EnterEditMode	Блокнот: Перейти в режим редактирования
+notebook::InterruptKernel	Блокнот: Прервать выполнение ядра
+notebook::MoveCellDown	Блокнот: Переместить ячейку вниз
+notebook::MoveCellUp	Блокнот: Переместить ячейку вверх
+notebook::NotebookMoveDown	Блокнот: Переместиться вниз в блокноте
+notebook::NotebookMoveUp	Блокнот: Переместиться вверх в блокноте
+notebook::OpenNotebook	Блокнот: Открыть блокнот
+notebook::RestartKernel	Блокнот: Перезапустить ядро
+notebook::Run	Блокнот: Выполнить
+notebook::RunAll	Блокнот: Выполнить всё
+notebook::RunAndAdvance	Блокнот: Выполнить и перейти дальше
+onboarding::Finish	Первоначальная настройка: Завершить первоначальную настройку
+onboarding::OpenAccount	Первоначальная настройка: Открыть аккаунт
+onboarding::ResetHints	Первоначальная настройка: Сбросить подсказки
+onboarding::SignIn	Первоначальная настройка: Войти в аккаунт
+outline::Toggle	Редактор: перейти к символу
+outline_panel::CollapseAllEntries	Панель структуры кода: Свернуть все элементы
+outline_panel::CollapseSelectedEntry	Панель структуры кода: Свернуть выбранный элемент
+outline_panel::ExpandAllEntries	Панель структуры кода: Развернуть все элементы
+outline_panel::ExpandSelectedEntry	Панель структуры кода: Развернуть выбранный элемент
+outline_panel::FoldDirectory	Панель структуры кода: Свернуть папку
+outline_panel::OpenSelectedEntry	Панель структуры кода: Открыть выбранный элемент
+outline_panel::RevealInFileManager	Панель структуры кода: Показать в файловом менеджере
+outline_panel::ScrollCursorBottom	Панель структуры кода: Прокрутить до курсора у нижнего края
+outline_panel::ScrollCursorCenter	Панель структуры кода: Прокрутить до курсора в центре
+outline_panel::ScrollCursorTop	Панель структуры кода: Прокрутить до курсора у верхнего края
+outline_panel::ScrollDown	Панель структуры кода: Прокрутить вниз
+outline_panel::ScrollUp	Панель структуры кода: Прокрутить вверх
+outline_panel::SelectParent	Панель структуры кода: Выбрать родительский элемент
+outline_panel::Toggle	Панель структуры кода: показать или скрыть
+outline_panel::ToggleActiveEditorPin	Панель структуры кода: Закрепить или открепить активный редактор
+outline_panel::ToggleFocus	Панель структуры кода: переключить фокус
+outline_panel::ToggleSymbols	Панель структуры кода: Показать или скрыть символы
+outline_panel::UnfoldDirectory	Панель структуры кода: Развернуть папку
+pane::ActivateItem	Область редактора: Активировать вкладку
+pane::ActivateLastItem	Область редактора: Перейти к последней вкладке
+pane::ActivateNextItem	Область редактора: перейти к следующей вкладке
+pane::ActivatePreviousItem	Область редактора: перейти к предыдущей вкладке
+pane::AlternateFile	Область редактора: Перейти к связанному файлу
+pane::CloseActiveItem	Область редактора: закрыть активную вкладку
+pane::CloseAllItems	Область редактора: закрыть все вкладки
+pane::CloseCleanItems	Область редактора: закрыть сохранённые вкладки
+pane::CloseItemsToTheLeft	Область редактора: закрыть вкладки слева
+pane::CloseItemsToTheRight	Область редактора: закрыть вкладки справа
+pane::CloseMultibufferItems	Область редактора: Закрыть вкладки составного буфера
+pane::CloseOtherItems	Область редактора: Закрыть остальные вкладки
+pane::DeploySearch	Область редактора: Открыть поиск
+pane::GoBack	Область редактора: назад
+pane::GoForward	Область редактора: вперёд
+pane::GoToNewerTag	Область редактора: Перейти к более новой метке
+pane::GoToOlderTag	Область редактора: Перейти к более старой метке
+pane::JoinAll	Область редактора: Объединить всё
+pane::JoinIntoNext	Область редактора: Объединить со следующим
+pane::ReopenClosedItem	Область редактора: Открыть закрытую вкладку
+pane::RevealInProjectPanel	Область редактора: показать в панели проекта
+pane::SplitAndMoveDown	Область редактора: Разделить редактор и переместить вниз
+pane::SplitAndMoveLeft	Область редактора: Разделить редактор и переместить влево
+pane::SplitAndMoveRight	Область редактора: Разделить редактор и переместить вправо
+pane::SplitAndMoveUp	Область редактора: Разделить редактор и переместить вверх
+pane::SplitDown	Область редактора: разделить снизу

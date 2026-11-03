@@ -865,14 +865,14 @@ impl Item for BufferDiagnosticsEditor {
     }
 
     fn tab_content_text(&self, _detail: usize, _app: &App) -> SharedString {
-        "Buffer Diagnostics".into()
+        "Диагностика файла".into()
     }
 
     fn tab_tooltip_text(&self, cx: &App) -> Option<SharedString> {
         let path_style = self.project.read(cx).path_style(cx);
         Some(
             format!(
-                "Buffer Diagnostics - {}",
+                "Диагностика файла — {}",
                 self.project_path.path.display(path_style)
             )
             .into(),
@@ -900,8 +900,8 @@ impl Render for BufferDiagnosticsEditor {
 
         let child = if error_count + warning_count == 0 {
             let label = match warning_count {
-                0 => "No problems in",
-                _ => "No errors in",
+                0 => "Нет проблем в",
+                _ => "Нет ошибок в",
             };
 
             v_flex()
@@ -919,7 +919,7 @@ impl Render for BufferDiagnosticsEditor {
                         .child(
                             Button::new("open-file", filename)
                                 .style(ButtonStyle::Transparent)
-                                .tooltip(Tooltip::text("Open File"))
+                                .tooltip(Tooltip::text("Открыть файл"))
                                 .on_click(cx.listener(|buffer_diagnostics, _, window, cx| {
                                     if let Some(workspace) = Workspace::for_window(window, cx) {
                                         workspace.update(cx, |workspace, cx| {
@@ -939,8 +939,8 @@ impl Render for BufferDiagnosticsEditor {
                 )
                 .when(self.summary.warning_count > 0, |div| {
                     let label = match self.summary.warning_count {
-                        1 => "Show 1 warning".into(),
-                        warning_count => format!("Show {} warnings", warning_count),
+                        1 => "Показать предупреждение".into(),
+                        warning_count => format!("Показать предупреждения: {}", warning_count),
                     };
 
                     div.child(

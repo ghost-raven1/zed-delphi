@@ -181,12 +181,15 @@ impl Render for ProfileSelector {
         }
 
         if !self.provider.profiles_supported(cx) {
-            return Button::new("tools-not-supported-button", "Tools Unsupported")
-                .disabled(true)
-                .label_size(LabelSize::Small)
-                .color(Color::Muted)
-                .tooltip(Tooltip::text("This model does not support tools."))
-                .into_any_element();
+            return Button::new(
+                "tools-not-supported-button",
+                "Инструменты не поддерживаются",
+            )
+            .disabled(true)
+            .label_size(LabelSize::Small)
+            .color(Color::Muted)
+            .tooltip(Tooltip::text("Эта модель не поддерживает инструменты."))
+            .into_any_element();
         }
 
         let picker = self.ensure_picker(window, cx);
@@ -231,7 +234,7 @@ impl Render for ProfileSelector {
                     .gap_1()
                     .child(
                         container()
-                            .child(Label::new("Change Profile"))
+                            .child(Label::new("Изменить профиль"))
                             .child(KeyBinding::for_action(&ToggleProfileSelector, cx)),
                     )
                     .child(
@@ -239,7 +242,7 @@ impl Render for ProfileSelector {
                             .pt_1()
                             .border_t_1()
                             .border_color(cx.theme().colors().border_variant)
-                            .child(Label::new("Cycle Through Profiles"))
+                            .child(Label::new("Переключать профили"))
                             .child(KeyBinding::for_action(&CycleModeSelector, cx)),
                     )
                     .into_any()
@@ -752,7 +755,7 @@ impl PickerDelegate for ProfilePickerDelegate {
                                                 .color(Color::Warning),
                                         )
                                         .child(
-                                            Label::new("Disabled in Restricted Mode")
+                                            Label::new("Недоступно в ограниченном режиме")
                                                 .size(LabelSize::Small),
                                         ),
                                 )
@@ -790,7 +793,7 @@ impl PickerDelegate for ProfilePickerDelegate {
                         .border_color(cx.theme().colors().border_variant)
                         .p_1p5()
                         .child(
-                            Button::new("configure", "Configure")
+                            Button::new("configure", "Настроить")
                                 .full_width()
                                 .style(ButtonStyle::Outlined)
                                 .key_binding(
@@ -817,7 +820,7 @@ impl PickerDelegate for ProfilePickerDelegate {
                             .border_color(cx.theme().colors().border_variant)
                             .p_1p5()
                             .child(
-                                Button::new("restricted-mode", "Restricted Mode")
+                                Button::new("restricted-mode", "Ограниченный режим")
                                     .full_width()
                                     .style(ButtonStyle::Tinted(TintColor::Warning))
                                     .color(Color::Warning)
@@ -827,7 +830,7 @@ impl PickerDelegate for ProfilePickerDelegate {
                                             .color(Color::Warning),
                                     )
                                     .tooltip(Tooltip::text(
-                                        "Some tools are disabled. Click to review trust settings.",
+                                        "Некоторые инструменты отключены. Нажмите, чтобы проверить настройки доверия.",
                                     ))
                                     .on_click(|_, window, cx| {
                                         window.dispatch_action(

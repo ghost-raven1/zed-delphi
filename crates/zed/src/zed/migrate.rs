@@ -115,8 +115,8 @@ impl MigrationBanner {
         };
 
         let migration_text = format!(
-            "Your {} file uses deprecated settings which can be \
-            automatically updated. A backup will be saved to `{}`",
+            "Файл {} содержит устаревшие настройки, которые можно \
+            обновить автоматически. Резервная копия будет сохранена в `{}`",
             file_type, backup_file_name
         );
 
@@ -238,7 +238,7 @@ impl Render for MigrationBanner {
                     ),
             )
             .child(
-                Button::new("backup-and-migrate", "Backup and Update").on_click({
+                Button::new("backup-and-migrate", "Создать копию и обновить").on_click({
                     let workspace = self.workspace.clone();
                     move |_, window, cx| {
                         let fs = <dyn Fs>::global(cx);

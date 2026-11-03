@@ -6,13 +6,13 @@ use util::ResultExt as _;
 
 const PULL_REQUEST_HINTS: &[(&str, &str)] = &[
     // GitHub: "Create a pull request for 'branch' on GitHub by visiting:"
-    ("Create a pull request", "Create Pull Request"),
+    ("Create a pull request", "Создать запрос на слияние"),
     // Bitbucket: "Create pull request for branch:"
-    ("Create pull request", "Create Pull Request"),
+    ("Create pull request", "Создать запрос на слияние"),
     // GitLab: "To create a merge request for branch, visit:"
-    ("create a merge request", "Create Merge Request"),
+    ("create a merge request", "Создать запрос на слияние"),
     // GitLab: "View merge request for branch:"
-    ("View merge request", "View Merge Request"),
+    ("View merge request", "Открыть запрос на слияние"),
 ];
 
 #[derive(Clone)]
@@ -84,13 +84,13 @@ pub fn format_output(action: &RemoteAction, output: RemoteCommandOutput) -> Succ
         RemoteAction::Fetch(remote) => {
             if output.stderr.is_empty() {
                 SuccessMessage {
-                    message: "Fetch: Already up to date".into(),
+                    message: "Получение обновлений: уже актуально".into(),
                     style: SuccessStyle::Toast,
                 }
             } else {
                 let message = match remote {
-                    Some(remote) => format!("Synchronized with {}", remote.name),
-                    None => "Synchronized with remotes".into(),
+                    Some(remote) => format!("Синхронизировано с {}", remote.name),
+                    None => "Синхронизировано с удалёнными репозиториями".into(),
                 };
                 SuccessMessage {
                     message,
@@ -117,20 +117,18 @@ pub fn format_output(action: &RemoteAction, output: RemoteCommandOutput) -> Succ
             };
             if output.stdout.ends_with("Already up to date.\n") {
                 SuccessMessage {
-                    message: "Pull: Already up to date".into(),
+                    message: "Получение изменений: уже актуально".into(),
                     style: SuccessStyle::Toast,
                 }
             } else if output.stdout.starts_with("Updating") {
                 let files_changed = get_changes(&output).log_err();
                 let message = if let Some(files_changed) = files_changed {
                     format!(
-                        "Received {} file change{} from {}",
-                        files_changed,
-                        if files_changed == 1 { "" } else { "s" },
-                        remote_ref.name
+                        "Получены изменения файлов ({} шт.) из {}",
+                        files_changed, remote_ref.name
                     )
                 } else {
-                    format!("Fast forwarded from {}", remote_ref.name)
+                    format!("Ветка обновлена из {} без слияния", remote_ref.name)
                 };
                 SuccessMessage {
                     message,
@@ -140,13 +138,11 @@ pub fn format_output(action: &RemoteAction, output: RemoteCommandOutput) -> Succ
                 let files_changed = get_changes(&output).log_err();
                 let message = if let Some(files_changed) = files_changed {
                     format!(
-                        "Merged {} file change{} from {}",
-                        files_changed,
-                        if files_changed == 1 { "" } else { "s" },
-                        remote_ref.name
+                        "Объединены изменения файлов ({} шт.) из {}",
+                        files_changed, remote_ref.name
                     )
                 } else {
-                    format!("Merged from {}", remote_ref.name)
+                    format!("Изменения из {} объединены", remote_ref.name)
                 };
                 SuccessMessage {
                     message,
@@ -154,12 +150,12 @@ pub fn format_output(action: &RemoteAction, output: RemoteCommandOutput) -> Succ
                 }
             } else if output.stdout.contains("Successfully rebased") {
                 SuccessMessage {
-                    message: format!("Successfully rebased from {}", remote_ref.name),
+                    message: format!("Изменения успешно перенесены поверх {}", remote_ref.name),
                     style: SuccessStyle::ToastWithLog { output },
                 }
             } else {
                 SuccessMessage {
-                    message: format!("Successfully pulled from {}", remote_ref.name),
+                    message: format!("Изменения из {} получены", remote_ref.name),
                     style: SuccessStyle::ToastWithLog { output },
                 }
             }
@@ -167,17 +163,17 @@ pub fn format_output(action: &RemoteAction, output: RemoteCommandOutput) -> Succ
         RemoteAction::Push(branch_name, remote_ref) => {
             if output.stderr.ends_with("Everything up-to-date\n") {
                 SuccessMessage {
-                    message: "Push: Everything is up-to-date".to_string(),
+                    message: "Отправка: всё уже актуально".to_string(),
                     style: SuccessStyle::Toast,
                 }
             } else if let Some((label, url)) = extract_pull_request_link(&output) {
                 SuccessMessage {
-                    message: format!("Pushed {} to {}", branch_name, remote_ref.name),
+                    message: format!("Ветка {} отправлена в {}", branch_name, remote_ref.name),
                     style: SuccessStyle::PushPrLink { label, url },
                 }
             } else {
                 SuccessMessage {
-                    message: format!("Pushed {} to {}", branch_name, remote_ref.name),
+                    message: format!("Ветка {} отправлена в {}", branch_name, remote_ref.name),
                     style: SuccessStyle::ToastWithLog { output },
                 }
             }
@@ -215,8 +211,8 @@ mod tests {
 
         let msg = format_output(&action, output);
         if let SuccessStyle::PushPrLink { label, url } = msg.style {
-            assert_eq!(msg.message, "Pushed test_branch to test_remote");
-            assert_eq!(label, "Create Pull Request");
+            assert_eq!(msg.message, "Ветка test_branch отправлена в test_remote");
+            assert_eq!(label, "Создать запрос на слияние");
             assert_eq!(url, "https://example.com/test/test/pull/new/test");
         } else {
             panic!("Expected PushPrLink variant");
@@ -249,8 +245,8 @@ mod tests {
         let msg = format_output(&action, output);
 
         if let SuccessStyle::PushPrLink { label, url } = msg.style {
-            assert_eq!(msg.message, "Pushed test_branch to test_remote");
-            assert_eq!(label, "Create Merge Request");
+            assert_eq!(msg.message, "Ветка test_branch отправлена в test_remote");
+            assert_eq!(label, "Создать запрос на слияние");
             assert_eq!(
                 url,
                 "https://example.com/test/test/-/merge_requests/new?merge_request%5Bsource_branch%5D=test"
@@ -275,7 +271,7 @@ mod tests {
         assert_eq!(
             extract_pull_request_link(&output),
             Some((
-                "Create Pull Request",
+                "Создать запрос на слияние",
                 "https://bitbucket.example.com/projects/TEST/repos/test/pull-requests?create&sourceBranch=refs/heads/test".to_string()
             ))
         );
@@ -313,8 +309,8 @@ mod tests {
         let msg = format_output(&action, output);
 
         if let SuccessStyle::PushPrLink { label, url } = msg.style {
-            assert_eq!(msg.message, "Pushed test_branch to test_remote");
-            assert_eq!(label, "View Merge Request");
+            assert_eq!(msg.message, "Ветка test_branch отправлена в test_remote");
+            assert_eq!(label, "Открыть запрос на слияние");
             assert_eq!(url, "https://example.com/test/test/-/merge_requests/99999");
         } else {
             panic!("Expected PushPrLink variant")

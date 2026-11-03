@@ -99,9 +99,9 @@ impl RenderOnce for EnumVariantDropdown {
                     let on_change = self.on_change.clone();
                     menu = menu.toggleable_entry(
                         if self.should_do_title_case {
-                            label.to_title_case()
+                            crate::localization::option_text(&label.to_title_case())
                         } else {
-                            label.to_string()
+                            crate::localization::option_text(label)
                         },
                         index == self.selected_index,
                         IconPosition::End,
@@ -118,9 +118,9 @@ impl RenderOnce for EnumVariantDropdown {
         DropdownMenu::new(
             self.id,
             if self.should_do_title_case {
-                current_value_label.to_title_case()
+                crate::localization::option_text(&current_value_label.to_title_case())
             } else {
-                current_value_label.to_string()
+                crate::localization::option_text(current_value_label)
             },
             context_menu,
         )

@@ -29,8 +29,8 @@ pub enum GitPickerTab {
 impl Display for GitPickerTab {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let label = match self {
-            GitPickerTab::Branches => "Branches",
-            GitPickerTab::Stashes => "Stashes",
+            GitPickerTab::Branches => "Ветки",
+            GitPickerTab::Stashes => "Отложенные изменения",
         };
         write!(f, "{}", label)
     }
@@ -209,7 +209,7 @@ impl GitPicker {
                     )
                     .tooltip(move |_, cx| {
                         Tooltip::for_action_in(
-                            "Toggle Branch Picker",
+                            "Открыть выбор ветки",
                             &ActivateBranchesTab,
                             &branches_focus_handle,
                             cx,
@@ -226,7 +226,7 @@ impl GitPicker {
                     )
                     .tooltip(move |_, cx| {
                         Tooltip::for_action_in(
-                            "Toggle Stash Picker",
+                            "Открыть отложенные изменения",
                             &ActivateStashTab,
                             &stash_focus_handle,
                             cx,

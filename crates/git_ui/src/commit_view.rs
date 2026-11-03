@@ -165,7 +165,7 @@ impl Addon for CommitDiffAddon {
         menu.when_some(file_to_open, |menu, file| {
             let commit_view = self.commit_view.clone();
             menu.entry(
-                "Open File in Project",
+                "Открыть файл в проекте",
                 Some(Box::new(OpenFileAtHead)),
                 move |window, cx| {
                     commit_view
@@ -362,7 +362,7 @@ impl CommitView {
                 let is_binary = file.is_binary;
 
                 let new_text = if is_binary {
-                    "(binary file not shown)".to_string()
+                    "(двоичный файл не показан)".to_string()
                 } else {
                     raw_new_text
                 };
@@ -555,12 +555,12 @@ impl CommitView {
             .justify_center()
             .gap_2()
             .child(
-                Label::new("This commit is at the boundary of a shallow clone.")
+                Label::new("Этот коммит находится на границе неполного клона.")
                     .color(Color::Muted),
             )
             .child(
                 Label::new(
-                    "Its parent history was not fetched, so the changes it introduced cannot be shown.",
+                    "Предыдущая история не загружена, поэтому изменения этого коммита недоступны.",
                 )
                 .color(Color::Muted),
             )
@@ -578,13 +578,13 @@ impl CommitView {
                                 if fetch_in_flight {
                                     "Fetching…"
                                 } else {
-                                    "Fetch Missing History"
+                                    "Загрузить недостающую историю"
                                 },
                             )
                                 .style(ButtonStyle::Filled)
                                 .disabled(fetch_in_flight)
                                 .tooltip(Tooltip::text(
-                                    "Run `git fetch --unshallow` to download the full history, then show this commit's changes.",
+                                    "Выполнить `git fetch --unshallow`, чтобы загрузить полную историю и показать изменения коммита.",
                                 ))
                                 .on_click(move |_, window, cx| {
                                     let fetch = crate::commit_tooltip::fetch_unshallow(
@@ -621,16 +621,16 @@ impl CommitView {
                         Button::new(
                             "load-shallow-snapshot",
                             if file_filter.is_some() {
-                                "Load File Snapshot"
+                                "Загрузить снимок файла"
                             } else {
-                                "Load Full Snapshot"
+                                "Загрузить полный снимок"
                             },
                         )
                             .style(ButtonStyle::Outlined)
                             .tooltip(Tooltip::text(if file_filter.is_some() {
-                                "Show this file's full contents at this commit as added."
+                                "Показать полное содержимое файла в этом коммите как добавленное."
                             } else {
-                                "Show every file at this commit as added. This can be slow in large repositories."
+                                "Показать все файлы в этом коммите как добавленные. В большом репозитории это может занять время."
                             }))
                             .on_click(move |_, window, cx| {
                                 Self::open_with_options(
@@ -763,9 +763,9 @@ impl CommitView {
         let has_more = self.commit.message.trim().contains('\n');
         let is_expanded = self.message_expanded;
         let expand_tooltip = if is_expanded {
-            "Fold Commit Description"
+            "Свернуть описание коммита"
         } else {
-            "Expand Commit Description"
+            "Развернуть описание коммита"
         };
 
         v_flex()
@@ -838,7 +838,7 @@ impl CommitView {
                     )
                     .when(self.stash.is_none(), |this| {
                         this.child(
-                            Button::new("sha", "Commit SHA")
+                            Button::new("sha", "SHA коммита")
                                 .start_icon(
                                     Icon::new(copy_icon)
                                         .size(IconSize::Small)
@@ -848,7 +848,7 @@ impl CommitView {
                                     let commit_sha = commit_sha.clone();
                                     move |_, cx| {
                                         Tooltip::with_meta(
-                                            "Copy Commit SHA",
+                                            "Копировать SHA коммита",
                                             None,
                                             commit_sha.clone(),
                                             cx,
@@ -924,7 +924,9 @@ impl CommitView {
             async move |repository, sha, stash, commit_view, workspace, cx| {
                 let result = repository.update(cx, |repo, cx| {
                     if !stash_matches_index(&sha, stash, repo) {
-                        return Err(anyhow::anyhow!("Stash has changed, not applying"));
+                        return Err(anyhow::anyhow!(
+                            "Отложенные изменения изменились; применение отменено"
+                        ));
                     }
                     Ok(repo.stash_apply(Some(stash), cx))
                 });
@@ -951,7 +953,9 @@ impl CommitView {
             async move |repository, sha, stash, commit_view, workspace, cx| {
                 let result = repository.update(cx, |repo, cx| {
                     if !stash_matches_index(&sha, stash, repo) {
-                        return Err(anyhow::anyhow!("Stash has changed, pop aborted"));
+                        return Err(anyhow::anyhow!(
+                            "Отложенные изменения изменились; извлечение отменено"
+                        ));
                     }
                     Ok(repo.stash_pop(Some(stash), cx))
                 });
@@ -978,7 +982,9 @@ impl CommitView {
             async move |repository, sha, stash, commit_view, workspace, cx| {
                 let result = repository.update(cx, |repo, cx| {
                     if !stash_matches_index(&sha, stash, repo) {
-                        return Err(anyhow::anyhow!("Stash has changed, drop aborted"));
+                        return Err(anyhow::anyhow!(
+                            "Отложенные изменения изменились; удаление отменено"
+                        ));
                     }
                     Ok(repo.stash_drop(Some(stash), cx))
                 });
@@ -1469,7 +1475,7 @@ impl Render for CommitViewToolbar {
                     .icon_size(IconSize::Small)
                     .tooltip(move |_, cx| {
                         Tooltip::for_action(
-                            "Buffer Search",
+                            "Поиск в буфере",
                             &zed_actions::buffer_search::Deploy::find(),
                             cx,
                         )
@@ -1485,7 +1491,7 @@ impl Render for CommitViewToolbar {
                 this.child(
                     IconButton::new("show-in-git-graph", IconName::GitGraph)
                         .icon_size(IconSize::Small)
-                        .tooltip(Tooltip::text("Show in Git Graph"))
+                        .tooltip(Tooltip::text("Показать на графе Git"))
                         .on_click(move |_, window, cx| {
                             window.dispatch_action(
                                 Box::new(crate::git_graph::OpenAtCommit {
@@ -1500,7 +1506,7 @@ impl Render for CommitViewToolbar {
 
                     IconButton::new("view_on_provider", icon)
                         .icon_size(IconSize::Small)
-                        .tooltip(Tooltip::text(format!("View on {}", provider_name)))
+                        .tooltip(Tooltip::text(format!("Открыть на {}", provider_name)))
                         .on_click(move |_, _, cx| cx.open_url(&url))
                 }))
             })

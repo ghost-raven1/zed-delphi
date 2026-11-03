@@ -1,4 +1,5 @@
 mod components;
+mod localization;
 mod page_data;
 pub mod pages;
 
@@ -531,12 +532,12 @@ fn init_renderers(cx: &mut App) {
                     settings_window,
                     item,
                     settings_file,
-                    Button::new("open-in-settings-file", "Edit in settings.json")
+                    Button::new("open-in-settings-file", "Изменить в settings.json")
                         .style(ButtonStyle::Outlined)
                         .size(ButtonSize::Medium)
                         .tab_index(0_isize)
                         .tooltip(Tooltip::for_action_title_in(
-                            "Edit in settings.json",
+                            "Изменить в settings.json",
                             &OpenCurrentFile,
                             &settings_window.focus_handle,
                         ))
@@ -894,7 +895,7 @@ fn open_settings_editor_with(
         cx.open_window(
             WindowOptions {
                 titlebar: Some(TitlebarOptions {
-                    title: Some("Zed — Settings".into()),
+                    title: Some("Zed — Настройки".into()),
                     appears_transparent: true,
                     traffic_light_position: Some(point(px(12.0), px(12.0))),
                 }),
@@ -1200,7 +1201,7 @@ impl SettingsPageItem {
 
         match self {
             SettingsPageItem::SectionHeader(header) => {
-                SettingsSectionHeader::new(SharedString::new_static(header)).into_any_element()
+                SettingsSectionHeader::new(localization::text(header)).into_any_element()
             }
             SettingsPageItem::SettingItem(setting_item) => {
                 let (field_with_padding, _) =
@@ -1228,12 +1229,12 @@ impl SettingsPageItem {
                                 .relative()
                                 .w_full()
                                 .max_w_1_2()
-                                .child(Label::new(sub_page_link.title.clone()))
+                                .child(Label::new(sub_page_link.display_title()))
                                 .when_some(
                                     sub_page_link.description.as_ref(),
                                     |this, description| {
                                         this.child(
-                                            Label::new(description.clone())
+                                            Label::new(localization::text(description))
                                                 .size(LabelSize::Small)
                                                 .color(Color::Muted),
                                         )
@@ -1243,9 +1244,9 @@ impl SettingsPageItem {
                         .child(
                             Button::new(
                                 ("sub-page".into(), sub_page_link.title.clone()),
-                                "Configure",
+                                "Настроить",
                             )
-                            .aria_label(format!("Configure {}", sub_page_link.title))
+                            .aria_label(format!("Настроить: {}", sub_page_link.display_title()))
                             .tab_index(0_isize)
                             .end_icon(
                                 Icon::new(IconName::ChevronRight)
@@ -1364,12 +1365,12 @@ impl SettingsPageItem {
                                 .relative()
                                 .w_full()
                                 .max_w_1_2()
-                                .child(Label::new(action_link.title.clone()))
+                                .child(Label::new(localization::text(&action_link.title)))
                                 .when_some(
                                     action_link.description.as_ref(),
                                     |this, description| {
                                         this.child(
-                                            Label::new(description.clone())
+                                            Label::new(localization::text(description))
                                                 .size(LabelSize::Small)
                                                 .color(Color::Muted),
                                         )
@@ -1379,7 +1380,7 @@ impl SettingsPageItem {
                         .child(
                             Button::new(
                                 ("action-link".into(), action_link.title.clone()),
-                                action_link.button_text.clone(),
+                                localization::text(&action_link.button_text),
                             )
                             .tab_index(0_isize)
                             .end_icon(
@@ -1436,14 +1437,16 @@ fn render_settings_item_layout(
                     h_flex()
                         .w_full()
                         .gap_1()
-                        .child(Label::new(SharedString::new_static(title)))
+                        .child(Label::new(SharedString::new_static(
+                            localization::static_text(title),
+                        )))
                         .when_some(reset_fn, |this, reset_to_default| {
                             this.child(
                                 IconButton::new("reset-to-default-btn", IconName::Undo)
                                     .icon_color(Color::Muted)
                                     .icon_size(IconSize::Small)
-                                    .aria_label("Reset to Default")
-                                    .tooltip(Tooltip::text("Reset to Default"))
+                                    .aria_label("Восстановить по умолчанию")
+                                    .tooltip(Tooltip::text("Восстановить по умолчанию"))
                                     .on_click(move |_, window, cx| {
                                         reset_to_default(window, cx);
                                     }),
@@ -1451,14 +1454,14 @@ fn render_settings_item_layout(
                         })
                         .when_some(modified_in, |this, modified_in| {
                             this.child(
-                                Label::new(format!("\u{2014}  Modified in {modified_in}"))
+                                Label::new(format!("\u{2014}  Изменено в {modified_in}"))
                                     .color(Color::Muted)
                                     .size(LabelSize::Small),
                             )
                         }),
                 )
                 .child(
-                    Label::new(SharedString::new_static(description))
+                    Label::new(localization::text(description))
                         .size(LabelSize::Small)
                         .color(Color::Muted)
                         .render_code_spans(),
@@ -1515,9 +1518,9 @@ fn render_settings_item(
                     )
                     .tooltip(|_, cx| {
                         Tooltip::with_meta(
-                            "Overridden by Organization",
+                            "Задано организацией",
                             None,
-                            "Contact your organization admins to adjust this setting.",
+                            "Для изменения настройки обратитесь к администратору организации.",
                             cx,
                         )
                     }),
@@ -1574,8 +1577,8 @@ fn render_settings_item_link(
                 .icon_color(link_icon_color)
                 .icon_size(IconSize::Small)
                 .shape(IconButtonShape::Square)
-                .aria_label("Copy Link")
-                .tooltip(Tooltip::text("Copy Link"))
+                .aria_label("Копировать ссылку")
+                .tooltip(Tooltip::text("Копировать ссылку"))
                 .when_some(json_path, |this, path| {
                     this.on_click(cx.listener(move |this, _, _, cx| {
                         let link = format!("zed://settings/{}", path);
@@ -1684,11 +1687,21 @@ struct SubPageLink {
     /// See [`SettingField.json_path`]
     json_path: Option<&'static str>,
     /// Whether or not the settings in this sub page are configurable in settings.json
-    /// Removes the "Edit in settings.json" button from the page.
+    /// Removes the "Изменить в settings.json" button from the page.
     in_json: bool,
     files: FileMask,
     render:
         fn(&SettingsWindow, &ScrollHandle, &mut Window, &mut Context<SettingsWindow>) -> AnyElement,
+}
+
+impl SubPageLink {
+    fn display_title(&self) -> SharedString {
+        if self.r#type == SubPageType::Language {
+            self.title.clone()
+        } else {
+            localization::text(&self.title)
+        }
+    }
 }
 
 impl PartialEq for SubPageLink {
@@ -1798,7 +1811,7 @@ impl SettingsWindow {
         let current_file = SettingsUiFile::User;
         let search_bar = cx.new(|cx| {
             let mut editor = Editor::single_line(window, cx);
-            editor.set_placeholder_text("Search settings…", window, cx);
+            editor.set_placeholder_text("Поиск настроек…", window, cx);
             editor
         });
         cx.subscribe(&search_bar, |this, _, event: &EditorEvent, cx| {
@@ -2398,14 +2411,7 @@ impl SettingsWindow {
 
     fn build_search_index(&mut self) {
         fn split_into_words(parts: &[&str]) -> Vec<String> {
-            parts
-                .iter()
-                .flat_map(|s| {
-                    s.split(|c: char| !c.is_alphanumeric())
-                        .filter(|w| !w.is_empty())
-                        .map(|w| w.to_lowercase())
-                })
-                .collect()
+            localization::search_words(parts)
         }
 
         let mut key_lut: Vec<SearchKeyLUTEntry> = vec![];
@@ -2417,8 +2423,11 @@ impl SettingsWindow {
             key_index: usize,
             input: &str,
         ) {
-            for word in input.split_ascii_whitespace() {
-                fuzzy_match_candidates.push(StringMatchCandidate::new(key_index, word));
+            let translated = localization::text(input);
+            for value in [input, translated.as_ref()] {
+                for word in value.split_whitespace() {
+                    fuzzy_match_candidates.push(StringMatchCandidate::new(key_index, word));
+                }
             }
         }
 
@@ -2680,7 +2689,8 @@ impl SettingsWindow {
             .enumerate()
             .filter(|(_, (_, entry))| !entry.is_root)
             .map(|(logical_index, (index, entry))| {
-                let title_lower = entry.title.to_lowercase();
+                let title_lower =
+                    format!("{} {}", entry.title, localization::text(entry.title)).to_lowercase();
                 let matching_words = query_words
                     .iter()
                     .filter(|query_word| {
@@ -2707,7 +2717,8 @@ impl SettingsWindow {
             .enumerate()
             .find(|(_, (_, item))| match item {
                 SettingsPageItem::SectionHeader(title) => {
-                    let title_lower = title.to_lowercase();
+                    let title_lower =
+                        format!("{} {}", title, localization::text(title)).to_lowercase();
                     query_words.iter().all(|query_word| {
                         title_lower
                             .split_whitespace()
@@ -2875,7 +2886,7 @@ impl SettingsWindow {
         h_flex()
             .id("settings-ui-files-header")
             .role(Role::Group)
-            .aria_label("Settings File")
+            .aria_label("Файл настроек")
             .w_full()
             .gap_1()
             .justify_between()
@@ -2940,7 +2951,7 @@ impl SettingsWindow {
                                         }),
                                     )
                                     .style(DropdownStyle::Subtle)
-                                    .trigger_tooltip(Tooltip::text("View Other Projects"))
+                                    .trigger_tooltip(Tooltip::text("Другие проекты"))
                                     .trigger_icon(IconName::ChevronDown)
                                     .attach(gpui::Anchor::BottomLeft)
                                     .offset(gpui::Point {
@@ -2953,11 +2964,11 @@ impl SettingsWindow {
                     }),
             )
             .child(
-                Button::new(edit_in_json_id, "Edit in settings.json")
+                Button::new(edit_in_json_id, "Изменить в settings.json")
                     .tab_index(0_isize)
                     .style(ButtonStyle::OutlinedGhost)
                     .tooltip(Tooltip::for_action_title_in(
-                        "Edit in settings.json",
+                        "Изменить в settings.json",
                         &OpenCurrentFile,
                         &self.focus_handle,
                     ))
@@ -2969,7 +2980,7 @@ impl SettingsWindow {
 
     pub(crate) fn display_name(&self, file: &SettingsUiFile) -> Option<String> {
         match file {
-            SettingsUiFile::User => Some("User".to_string()),
+            SettingsUiFile::User => Some("Пользовательские".to_string()),
             SettingsUiFile::Project((worktree_id, path)) => self
                 .worktree_root_dirs
                 .get(&worktree_id)
@@ -3025,7 +3036,7 @@ impl SettingsWindow {
         h_flex()
             .id("settings-ui-search")
             .role(Role::SearchInput)
-            .aria_label("Search Settings")
+            .aria_label("Поиск настроек")
             .aria_value(a11y_value)
             .track_focus(&self.search_bar.focus_handle(cx))
             .a11y_synthetic_children(a11y_text_runs)
@@ -3046,7 +3057,7 @@ impl SettingsWindow {
                     IconButton::new("clear-btn", IconName::Close)
                         .icon_color(Color::Muted)
                         .icon_size(IconSize::Small)
-                        .tooltip(Tooltip::text("Clear"))
+                        .tooltip(Tooltip::text("Очистить"))
                         .on_click(cx.listener(|settings_window, _, window, cx| {
                             settings_window.clear_search(window, cx);
                         })),
@@ -3070,9 +3081,9 @@ impl SettingsWindow {
                 .visible_navbar_entries()
                 .any(|(_, entry)| entry.focus_handle.is_focused(window))
         {
-            "Focus Content"
+            "Перейти к настройкам"
         } else {
-            "Focus Navbar"
+            "Перейти к разделам"
         };
 
         let mut key_context = KeyContext::new_with_defaults(cx.platform_info().os);
@@ -3213,7 +3224,7 @@ impl SettingsWindow {
                 v_flex()
                     .id("settings-ui-nav")
                     .role(Role::Tree)
-                    .aria_label("Settings Navigation")
+                    .aria_label("Разделы настроек")
                     .flex_1()
                     .overflow_hidden()
                     .track_focus(&self.navbar_focus_handle.focus_handle(cx))
@@ -3230,7 +3241,7 @@ impl SettingsWindow {
                                     .map(|(entry_index, entry)| {
                                         TreeViewItem::new(
                                             ("settings-ui-navbar-entry", entry_index),
-                                            entry.title,
+                                            localization::text(entry.title),
                                         )
                                         .track_focus(&entry.focus_handle)
                                         .root_item(entry.is_root)
@@ -3493,7 +3504,7 @@ impl SettingsWindow {
                 "sub-page-scope-picker",
                 scope_name,
                 ContextMenu::build(window, cx, move |mut menu, _, _| {
-                    menu = menu.header("Scope");
+                    menu = menu.header("Область настроек");
 
                     for ix in allowed_file_indices {
                         let (file, focus_handle) = &self.files[ix];
@@ -3523,7 +3534,7 @@ impl SettingsWindow {
                 }),
             )
             .style(DropdownStyle::Subtle)
-            .trigger_tooltip(Tooltip::text("Change Scope"))
+            .trigger_tooltip(Tooltip::text("Изменить область"))
             .attach(gpui::Anchor::BottomLeft)
             .offset(gpui::Point {
                 x: px(0.0),
@@ -3545,15 +3556,15 @@ impl SettingsWindow {
             .child(Label::new("/").color(Color::Muted))
             .children(
                 itertools::intersperse(
-                    std::iter::once(self.current_page().title.into()).chain(
+                    std::iter::once(localization::text(self.current_page().title)).chain(
                         self.sub_page_stack
                             .iter()
                             .enumerate()
                             .flat_map(|(index, page)| {
                                 (index == 0)
-                                    .then(|| page.section_header.clone())
+                                    .then(|| localization::text(&page.section_header))
                                     .into_iter()
-                                    .chain(std::iter::once(page.link.title.clone()))
+                                    .chain(std::iter::once(page.link.display_title()))
                             }),
                     ),
                     "/".into(),
@@ -3570,9 +3581,9 @@ impl SettingsWindow {
             .items_center()
             .justify_center()
             .gap_1()
-            .child(Label::new("No Results"))
+            .child(Label::new("Ничего не найдено"))
             .child(
-                Label::new(format!("No settings match \"{}\"", search_query))
+                Label::new(format!("Нет настроек по запросу «{}»", search_query))
                     .size(LabelSize::Small)
                     .color(Color::Muted),
             )
@@ -3594,7 +3605,7 @@ impl SettingsWindow {
             }))
             .id("settings-ui-page")
             .role(Role::Group)
-            .aria_label("Settings Content")
+            .aria_label("Содержимое настроек")
             .size_full();
 
         let has_active_search = !self.search_bar.read(cx).is_empty(cx);
@@ -3622,8 +3633,14 @@ impl SettingsWindow {
                         .px_8()
                         .when(settings_window.sub_page_stack.is_empty(), |element| {
                             element.when_some(root_nav_label, |element, title| {
-                                element
-                                    .child(Label::new(title).size(LabelSize::Large).mt_2().mb_3())
+                                element.child(
+                                    Label::new(SharedString::new_static(
+                                        localization::static_text(title),
+                                    ))
+                                    .size(LabelSize::Large)
+                                    .mt_2()
+                                    .mb_3(),
+                                )
                             })
                         })
                         .into_any_element();
@@ -3779,7 +3796,12 @@ impl SettingsWindow {
             page_content
                 .when(self.sub_page_stack.is_empty(), |this| {
                     this.when_some(root_nav_label, |this, title| {
-                        this.child(Label::new(title).size(LabelSize::Large).mt_2().mb_3())
+                        this.child(
+                            Label::new(SharedString::new_static(localization::static_text(title)))
+                                .size(LabelSize::Large)
+                                .mt_2()
+                                .mb_3(),
+                        )
                     })
                 })
                 .children(items.clone().into_iter().enumerate().map(
@@ -3850,11 +3872,11 @@ impl SettingsWindow {
                         .flex_shrink_0()
                         .when(current_sub_page.link.in_json, |this| {
                             this.child(
-                                Button::new("open-in-settings-file", "Edit in settings.json")
+                                Button::new("open-in-settings-file", "Изменить в settings.json")
                                     .tab_index(0_isize)
                                     .style(ButtonStyle::OutlinedGhost)
                                     .tooltip(Tooltip::for_action_title_in(
-                                        "Edit in settings.json",
+                                        "Изменить в settings.json",
                                         &OpenCurrentFile,
                                         &self.focus_handle,
                                     ))
@@ -3868,7 +3890,7 @@ impl SettingsWindow {
                         })
                         .when(is_skills_page, |this| {
                             this.child(
-                                Button::new("open-skill-creator", "Create Skill")
+                                Button::new("open-skill-creator", "Создать навык")
                                     .tab_index(0_isize)
                                     .style(ButtonStyle::OutlinedGhost)
                                     .on_click(cx.listener(|this, _, window, cx| {
@@ -3926,7 +3948,7 @@ impl SettingsWindow {
                     )
                     .action_slot(
                         div().pr_1().pb_1().child(
-                            Button::new("fix-in-json", "Fix in settings.json")
+                            Button::new("fix-in-json", "Исправить в settings.json")
                                 .tab_index(0_isize)
                                 .style(ButtonStyle::Tinted(ui::TintColor::Warning))
                                 .on_click(cx.listener(|this, _, window, cx| {
@@ -3943,7 +3965,7 @@ impl SettingsWindow {
                 .gap_2()
                 .when_some(parse_error, |this, err| {
                     this.child(banner(
-                        "Failed to load your settings. Some values may be incorrect and changes may be lost.",
+                        "Не удалось загрузить настройки. Некоторые значения могут быть неверными, а изменения — потеряны.",
                         err,
                         &mut self.shown_errors,
                         cx,
@@ -3951,17 +3973,17 @@ impl SettingsWindow {
                 })
                 .map(|this| match &error.migration_status {
                     settings::MigrationStatus::Succeeded => this.child(banner(
-                        "Your settings are out of date, and need to be updated.",
+                        "Формат настроек устарел и требует обновления.",
                         match &self.current_file {
-                            SettingsUiFile::User => "They can be automatically migrated to the latest version.",
-                            SettingsUiFile::Server(_) | SettingsUiFile::Project(_)  => "They must be manually migrated to the latest version."
+                            SettingsUiFile::User => "Настройки можно автоматически перенести в новый формат.",
+                            SettingsUiFile::Server(_) | SettingsUiFile::Project(_)  => "Настройки необходимо вручную перенести в новый формат."
                         }.to_string(),
                         &mut self.shown_errors,
                         cx,
                     )),
                     settings::MigrationStatus::Failed { error: err } if !parse_failed => this
                         .child(banner(
-                            "Your settings file is out of date, automatic migration failed",
+                            "Файл настроек устарел; автоматическое обновление не удалось",
                             err.clone(),
                             &mut self.shown_errors,
                             cx,
@@ -3993,10 +4015,10 @@ impl SettingsWindow {
                         v_flex()
                             .my_0p5()
                             .gap_0p5()
-                            .child(Label::new("Restricted Mode"))
+                            .child(Label::new("Ограниченный режим"))
                             .child(
                                 Label::new(
-                                    "This project is in restricted mode. Some project settings may not apply.",
+                                    "Проект открыт в ограниченном режиме. Некоторые настройки проекта могут не применяться.",
                                 )
                                 .size(LabelSize::Small)
                                 .color(Color::Muted),
@@ -4004,7 +4026,7 @@ impl SettingsWindow {
                     )
                     .action_slot(
                         div().pr_2().pb_1().child(
-                            Button::new("manage-trust", "Manage Trust")
+                            Button::new("manage-trust", "Настроить доверие")
                                 .style(ButtonStyle::Tinted(ui::TintColor::Warning))
                                 .on_click(cx.listener(move |_this, _, window, cx| {
                                     if let Some(original_window) = original_window {
@@ -4499,7 +4521,7 @@ impl SettingsWindow {
                             .take(item_index)
                             .rev()
                             .find_map(|item| item.header_text().map(SharedString::new_static))
-                            .unwrap_or_else(|| "Settings".into());
+                            .unwrap_or_else(|| "Настройки".into());
 
                         self.push_sub_page(sub_page_link.clone(), section_header, window, cx);
                         return true;
@@ -5051,9 +5073,9 @@ fn render_text_field<T: From<String> + Into<String> + AsRef<str> + Clone>(
     // it a stable, collision-free element ID within the page.
     SettingsInputField::new(field.json_path.unwrap_or("settings-text-field"))
         .tab_index(0)
-        .aria_label(title)
+        .aria_label(localization::text(title))
         .when(!description.is_empty(), |editor| {
-            editor.aria_description(description)
+            editor.aria_description(localization::text(description))
         })
         .when_some(initial_text, |editor, text| editor.with_initial_text(text))
         .when_some(
@@ -5111,9 +5133,9 @@ fn render_toggle_button<B: Into<bool> + From<bool> + Copy>(
 
     Switch::new("toggle_button", toggle_state)
         .tab_index(0_isize)
-        .aria_label(title)
+        .aria_label(localization::text(title))
         .when(!description.is_empty(), |this| {
-            this.aria_description(description)
+            this.aria_description(localization::text(description))
         })
         .disabled(disabled)
         .on_click({
@@ -5150,9 +5172,9 @@ fn render_editable_number_field<T: NumberFieldType + Send + Sync>(
     NumberField::new(id, value, window, cx)
         .mode(NumberFieldMode::Edit, cx)
         .tab_index(0_isize)
-        .aria_label(title)
+        .aria_label(localization::text(title))
         .when(!description.is_empty(), |this| {
-            this.aria_description(description)
+            this.aria_description(localization::text(description))
         })
         .on_change({
             move |value, window, cx| {
@@ -5212,9 +5234,9 @@ where
             .log_err(); // todo(settings_ui) don't log err
         }
     })
-    .aria_label(title)
+    .aria_label(localization::text(title))
     .when(!description.is_empty(), |this| {
-        this.aria_description(description)
+        this.aria_description(localization::text(description))
     })
     .disabled(disabled)
     .tab_index(0)
@@ -5275,9 +5297,9 @@ fn render_font_picker(
                 "font_family_picker_trigger".into(),
                 current_value.clone(),
             )
-            .aria_label(title)
+            .aria_label(localization::text(title))
             .when(!description.is_empty(), |this| {
-                this.aria_description(description)
+                this.aria_description(localization::text(description))
             }),
             handle.clone(),
         ))
@@ -5333,9 +5355,9 @@ fn render_theme_picker(
     PopoverMenu::new("theme-picker")
         .trigger(wire_picker_trigger_a11y(
             render_picker_trigger_button("theme_picker_trigger".into(), current_value.clone())
-                .aria_label(title)
+                .aria_label(localization::text(title))
                 .when(!description.is_empty(), |this| {
-                    this.aria_description(description)
+                    this.aria_description(localization::text(description))
                 }),
             handle.clone(),
         ))
@@ -5394,9 +5416,9 @@ fn render_icon_theme_picker(
     PopoverMenu::new("icon-theme-picker")
         .trigger(wire_picker_trigger_a11y(
             render_picker_trigger_button("icon_theme_picker_trigger".into(), current_value.clone())
-                .aria_label(title)
+                .aria_label(localization::text(title))
                 .when(!description.is_empty(), |this| {
-                    this.aria_description(description)
+                    this.aria_description(localization::text(description))
                 }),
             handle.clone(),
         ))

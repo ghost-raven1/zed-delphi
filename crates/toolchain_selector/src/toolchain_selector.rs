@@ -175,22 +175,24 @@ impl AddToolchainState {
                                 .p_1()
                                 .justify_between()
                                 .gap_2()
-                                .child(Label::new("Select Toolchain Path").color(Color::Muted).map(
-                                    |this| {
-                                        if is_loading {
-                                            this.with_animation(
-                                                "select-toolchain-label",
-                                                Animation::new(Duration::from_secs(2))
-                                                    .repeat()
-                                                    .with_easing(pulsating_between(0.4, 0.8)),
-                                                |label, delta| label.alpha(delta),
-                                            )
-                                            .into_any()
-                                        } else {
-                                            this.into_any_element()
-                                        }
-                                    },
-                                ))
+                                .child(
+                                    Label::new("Выберите путь к инструментам")
+                                        .color(Color::Muted)
+                                        .map(|this| {
+                                            if is_loading {
+                                                this.with_animation(
+                                                    "select-toolchain-label",
+                                                    Animation::new(Duration::from_secs(2))
+                                                        .repeat()
+                                                        .with_easing(pulsating_between(0.4, 0.8)),
+                                                    |label, delta| label.alpha(delta),
+                                                )
+                                                .into_any()
+                                            } else {
+                                                this.into_any_element()
+                                            }
+                                        }),
+                                )
                                 .when_some(error, |this, error| {
                                     this.child(Label::new(error).color(Color::Error))
                                 }),
@@ -239,7 +241,7 @@ impl AddToolchainState {
                             this.focus_handle(cx).focus(window, cx);
                         }
                     });
-                    return Err(anyhow::anyhow!("Failed to resolve toolchain"));
+                    return Err(anyhow::anyhow!("Не удалось определить набор инструментов"));
                 };
                 let resolved_toolchain_path = project.read_with(cx, |this, cx| {
                     this.find_project_path(&toolchain.path.as_ref(), cx)
@@ -385,7 +387,7 @@ impl Render for AddToolchainState {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let theme = cx.theme().clone();
         let weak = self.weak.upgrade();
-        let label = SharedString::new_static("Add");
+        let label = SharedString::new_static("Добавить");
 
         v_flex()
             .size_full()
@@ -435,7 +437,7 @@ impl Render for AddToolchainState {
                             .child(
                                 v_flex()
                                     .child(
-                                        Label::new("Scope")
+                                        Label::new("Область действия")
                                             .size(LabelSize::Small)
                                             .color(Color::Muted)
                                             .mt_1()
@@ -793,7 +795,7 @@ impl ToolchainSelectorDelegate {
                 let relative_path = this
                     .update(cx, |this, cx| {
                         this.delegate.add_toolchain_text = format!(
-                            "Add {}",
+                            "Добавить: {}",
                             meta.term.as_ref().to_case(convert_case::Case::Title)
                         )
                         .into();
@@ -820,13 +822,16 @@ impl ToolchainSelectorDelegate {
                     .await?;
                 let pretty_path = {
                     if relative_path.is_empty() {
-                        Cow::Borrowed("worktree root")
+                        Cow::Borrowed("корень рабочей папки")
                     } else {
                         Cow::Owned(format!("`{}`", relative_path.display(path_style)))
                     }
                 };
-                let placeholder_text =
-                    format!("Select a {} for {pretty_path}…", meta.term.to_lowercase(),).into();
+                let placeholder_text = format!(
+                    "Выберите инструменты для {pretty_path} ({})…",
+                    meta.term.to_lowercase(),
+                )
+                .into();
                 let _ = this.update_in(cx, move |this, window, cx| {
                     this.delegate.relative_path = relative_path;
                     this.delegate.placeholder_text = placeholder_text;
@@ -864,7 +869,7 @@ impl ToolchainSelectorDelegate {
                 Some(())
             }
         });
-        let placeholder_text = Arc::from("Select a toolchain…");
+        let placeholder_text = Arc::from("Выберите набор инструментов…");
         Self {
             toolchain_selector,
             candidates: Default::default(),
@@ -878,7 +883,7 @@ impl ToolchainSelectorDelegate {
             _fetch_candidates_task,
             project,
             focus_handle: cx.focus_handle(),
-            add_toolchain_text: Arc::from("Add Toolchain"),
+            add_toolchain_text: Arc::from("Добавить набор инструментов"),
         }
     }
     fn relativize_path(
@@ -1147,7 +1152,7 @@ impl PickerDelegate for ToolchainSelectorDelegate {
                                 }),
                         )
                         .child(
-                            Button::new("select", "Select")
+                            Button::new("select", "Выбрать")
                                 .key_binding(KeyBinding::for_action_in(
                                     &menu::Confirm,
                                     &self.focus_handle,

@@ -520,7 +520,7 @@ impl Render for KeystrokeInput {
             .rounded_sm()
             .child(recording_pulse(Color::Accent))
             .child(
-                Label::new("SEARCH")
+                Label::new("ПОИСК")
                     .size(LabelSize::XSmall)
                     .weight(FontWeight::SEMIBOLD)
                     .color(Color::Accent),
@@ -610,9 +610,9 @@ impl Render for KeystrokeInput {
                                     .map(|this| {
                                         this.tooltip(Tooltip::for_action_title(
                                             if self.search {
-                                                "Stop Searching"
+                                                "Остановить поиск"
                                             } else {
-                                                "Stop Recording"
+                                                "Остановить запись"
                                             },
                                             &StopRecording,
                                         ))
@@ -629,9 +629,9 @@ impl Render for KeystrokeInput {
                                     .map(|this| {
                                         this.tooltip(Tooltip::for_action_title(
                                             if self.search {
-                                                "Start Searching"
+                                                "Начать поиск"
                                             } else {
-                                                "Start Recording"
+                                                "Начать запись"
                                             },
                                             &StartRecording,
                                         ))
@@ -650,9 +650,9 @@ impl Render for KeystrokeInput {
                                 .shape(IconButtonShape::Square)
                                 .tooltip(move |_, cx| {
                                     Tooltip::with_meta(
-                                        "Clear Keystrokes",
+                                        "Очистить клавиши",
                                         Some(&ClearKeystrokes),
-                                        "Hit it three times to execute",
+                                        "Нажмите три раза для выполнения",
                                         cx,
                                     )
                                 })

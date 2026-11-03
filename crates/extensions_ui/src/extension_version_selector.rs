@@ -97,7 +97,7 @@ impl PickerDelegate for ExtensionVersionSelectorDelegate {
     }
 
     fn placeholder_text(&self, _window: &mut Window, _cx: &mut App) -> Arc<str> {
-        "Select extension version...".into()
+        "Выберите версию расширения…".into()
     }
 
     fn match_count(&self) -> usize {

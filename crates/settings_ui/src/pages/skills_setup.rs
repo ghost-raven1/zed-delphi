@@ -196,9 +196,9 @@ pub(crate) fn render_skills_setup_page(
         .map(|this| {
             if skills.is_empty() {
                 let message = match &settings_window.current_file {
-                    SettingsUiFile::User => "No global skills installed.",
-                    SettingsUiFile::Project(_) => "No project skills found.",
-                    _ => "No skills available for this context.",
+                    SettingsUiFile::User => "Глобальные навыки не установлены.",
+                    SettingsUiFile::Project(_) => "Навыки проекта не найдены.",
+                    _ => "Для этого контекста нет доступных навыков.",
                 };
 
                 this.px_8().items_center().justify_center().child(
@@ -207,7 +207,7 @@ pub(crate) fn render_skills_setup_page(
                         .gap_2()
                         .child(Label::new(message).color(Color::Muted))
                         .child(
-                            Button::new("open-skill-creator-empty", "Create a Skill")
+                            Button::new("open-skill-creator-empty", "Создать навык")
                                 .tab_index(0_isize)
                                 .style(ButtonStyle::Outlined)
                                 .start_icon(
@@ -257,8 +257,8 @@ fn render_skill_row(
     let skill_name = skill.name.clone();
 
     let (skill_scope, shared_scope) = match &skill.source {
-        SkillSource::ProjectLocal { .. } => ("project", "used in this project"),
-        _ => ("global", "on this machine"),
+        SkillSource::ProjectLocal { .. } => ("проектный", "в этом проекте"),
+        _ => ("глобальный", "на этом компьютере"),
     };
 
     let delete_skill = skill.clone();
@@ -288,7 +288,7 @@ fn render_skill_row(
             .shape(ui::IconButtonShape::Square)
             .icon_size(IconSize::Small)
             .icon_color(share_icon_color)
-            .tooltip(Tooltip::text("Copy Share Link"))
+            .tooltip(Tooltip::text("Скопировать ссылку для обмена"))
             .visible_on_hover(&group)
             .on_click(cx.listener(move |settings_window, _event, _window, cx| {
                 copy_skill_share_link(&share_skill, settings_window, cx).detach();
@@ -333,62 +333,64 @@ fn render_skill_row(
                     )
                     .tab_index(0_isize)
                     .icon_size(IconSize::Small)
-                    .tooltip(Tooltip::text("Delete Skill"))
-                    .on_click(cx.listener(
-                        move |settings_window, _event, window, cx| {
-                            let directory_path = directory_path.clone();
-                            if settings_window
-                                .hidden_deleted_skill_directory_paths
-                                .contains(&directory_path)
-                            {
+                    .tooltip(Tooltip::text("Удалить навык"))
+                    .on_click(cx.listener(move |settings_window, _event, window, cx| {
+                        let directory_path = directory_path.clone();
+                        if settings_window
+                            .hidden_deleted_skill_directory_paths
+                            .contains(&directory_path)
+                        {
+                            return;
+                        }
+
+                        let prompt_message =
+                            format!("Удалить навык «{skill_name}» ({skill_scope})?");
+                        let prompt_detail = format!(
+                            "Каталог {} будет перемещён в корзину. Этот навык также используется \
+                                 другими инструментами агентов {shared_scope} и станет недоступен \
+                                 для них.",
+                            directory_path.compact().display(),
+                        );
+                        let answer = window.prompt(
+                            PromptLevel::Info,
+                            &prompt_message,
+                            Some(&prompt_detail),
+                            &["Удалить", "Отмена"],
+                            cx,
+                        );
+
+                        let delete_skill = delete_skill.clone();
+                        cx.spawn(async move |settings_window, cx| {
+                            if answer.await != Ok(0) {
                                 return;
                             }
-
-                            let prompt_message =
-                                format!("Delete the {skill_scope} skill \"{skill_name}\"?");
-                            let prompt_detail = format!(
-                                "This will move {} to the trash. This skill is shared with other \
-                                 agent tools {shared_scope}, so it will no longer be available to \
-                                 them either.",
-                                directory_path.compact().display(),
-                            );
-                            let answer = window.prompt(
-                                PromptLevel::Info,
-                                &prompt_message,
-                                Some(&prompt_detail),
-                                &["Delete", "Cancel"],
-                                cx,
-                            );
-
-                            let delete_skill = delete_skill.clone();
-                            cx.spawn(async move |settings_window, cx| {
-                                if answer.await != Ok(0) {
-                                    return;
-                                }
-                                let Ok(trash_task) =
-                                    settings_window.update(cx, |settings_window, cx| {
-                                        trash_skill(&delete_skill, settings_window, cx)
-                                    })
-                                else {
-                                    return;
-                                };
-                                trash_task.await;
-                            })
-                            .detach();
-                        },
-                    )),
+                            let Ok(trash_task) =
+                                settings_window.update(cx, |settings_window, cx| {
+                                    trash_skill(&delete_skill, settings_window, cx)
+                                })
+                            else {
+                                return;
+                            };
+                            trash_task.await;
+                        })
+                        .detach();
+                    })),
                 )
                 .child(
-                    Button::new(SharedString::from(format!("open-{}", skill.name)), "Open")
-                        .tab_index(0_isize)
-                        .style(ButtonStyle::OutlinedGhost)
-                        .size(ButtonSize::Medium)
-                        .end_icon(
-                            Icon::new(IconName::ArrowUpRight)
-                                .size(IconSize::Small)
-                                .color(Color::Muted),
-                        )
-                        .on_click(cx.listener(move |settings_window, _event, window, cx| {
+                    Button::new(
+                        SharedString::from(format!("open-{}", skill.name)),
+                        "Открыть",
+                    )
+                    .tab_index(0_isize)
+                    .style(ButtonStyle::OutlinedGhost)
+                    .size(ButtonSize::Medium)
+                    .end_icon(
+                        Icon::new(IconName::ArrowUpRight)
+                            .size(IconSize::Small)
+                            .color(Color::Muted),
+                    )
+                    .on_click(cx.listener(
+                        move |settings_window, _event, window, cx| {
                             let skill_file_path = skill_file_path.clone();
                             let Some(original_window) = settings_window.original_window else {
                                 return;
@@ -409,7 +411,8 @@ fn render_skill_row(
                                 })
                                 .log_err();
                             window.remove_window();
-                        })),
+                        },
+                    )),
                 ),
         )
         .into_any_element()

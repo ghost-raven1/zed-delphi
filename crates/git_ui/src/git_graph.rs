@@ -152,7 +152,7 @@ impl PickerDelegate for CommitTagPickerDelegate {
     }
 
     fn placeholder_text(&self, _window: &mut Window, _cx: &mut App) -> Arc<str> {
-        "Copy Tag".into()
+        "Копировать тег".into()
     }
 
     fn match_count(&self) -> usize {
@@ -309,7 +309,7 @@ impl ChangedFileEntry {
                 } else {
                     format!("{}/{}", dir_path, file_name).into()
                 };
-                move |_, cx| Tooltip::with_meta("View Changes", None, meta.clone(), cx)
+                move |_, cx| Tooltip::with_meta("Показать изменения", None, meta.clone(), cx)
             })
             .on_click({
                 let entry = self.clone();
@@ -390,7 +390,9 @@ impl ChangedFileDirectoryEntry {
             )
             .tooltip({
                 let name = self.name.clone();
-                move |_, cx| Tooltip::with_meta("Toggle Folder", None, name.clone(), cx)
+                move |_, cx| {
+                    Tooltip::with_meta("Развернуть или свернуть папку", None, name.clone(), cx)
+                }
             })
             .on_click(move |_, _, cx| {
                 git_graph
@@ -617,7 +619,7 @@ fn timestamp_format() -> &'static [BorrowedFormatItem<'static>] {
 
 fn format_timestamp(timestamp: i64) -> String {
     let Ok(datetime) = OffsetDateTime::from_unix_timestamp(timestamp) else {
-        return "Unknown".to_string();
+        return "Неизвестно".to_string();
     };
 
     let local_offset = UtcOffset::current_local_offset().unwrap_or(UtcOffset::UTC);
@@ -1387,16 +1389,20 @@ impl RefMenuEntry {
         window: &mut Window,
     ) -> ContextMenu {
         if let Some(ref_name) = self.ref_name {
-            menu = menu.entry("Copy Ref Name", None, move |_window, cx| {
-                cx.write_to_clipboard(ClipboardItem::new_string(ref_name.to_string()));
-            });
+            menu = menu.entry(
+                "Копировать имя ссылки",
+                None,
+                move |_window, cx| {
+                    cx.write_to_clipboard(ClipboardItem::new_string(ref_name.to_string()));
+                },
+            );
         }
 
-        menu = menu.separator().header("Custom Commands");
+        menu = menu.separator().header("Пользовательские команды");
 
         if self.git_tasks.is_empty() {
             return menu.item(
-                ContextMenuEntry::new("Learn More")
+                ContextMenuEntry::new("Подробнее")
                     .icon(IconName::ArrowUpRight)
                     .icon_color(Color::Muted)
                     .icon_position(IconPosition::End)
@@ -1627,7 +1633,7 @@ impl GitGraph {
 
         let search_editor = cx.new(|cx| {
             let mut editor = Editor::single_line(window, cx);
-            editor.set_placeholder_text("Search commits…", window, cx);
+            editor.set_placeholder_text("Поиск коммитов…", window, cx);
             editor
         });
 
@@ -2683,7 +2689,7 @@ impl GitGraph {
 
         let git_graph = cx.entity();
         let context_menu = ContextMenu::build(window, cx, move |mut menu, _window, _| {
-            menu = menu.header("Refs");
+            menu = menu.header("Ссылки");
             for (ref_entry, name) in ref_entries {
                 let git_graph = git_graph.clone();
                 menu = menu.submenu(name, move |submenu, window, _cx| {
@@ -2801,9 +2807,9 @@ impl GitGraph {
     ) {
         let is_path_history = matches!(self.log_source, LogSource::Path(_));
         let columns: &[&str] = if is_path_history {
-            &["Description", "Date", "Author", "Commit"]
+            &["Описание", "Дата", "Автор", "Коммит"]
         } else {
-            &["Refs", "Graph", "Description", "Date", "Author", "Commit"]
+            &["Ссылки", "Граф", "Описание", "Дата", "Автор", "Коммит"]
         };
 
         let filter = self.column_visibility.clone();
@@ -2816,7 +2822,7 @@ impl GitGraph {
         let focus_handle = self.focus_handle.clone();
         let git_graph = cx.entity();
         let context_menu = ContextMenu::build(window, cx, |mut context_menu, _window, _cx| {
-            context_menu = context_menu.context(focus_handle).header("Columns");
+            context_menu = context_menu.context(focus_handle).header("Столбцы");
             for (col_idx, label) in columns.iter().enumerate() {
                 let is_visible = !filter.get(col_idx).copied().unwrap_or(false);
                 // Disable hiding the last remaining visible column.
@@ -2891,7 +2897,7 @@ impl GitGraph {
                             })
                             .tooltip(move |_window, cx| {
                                 Tooltip::for_action_in(
-                                    "Match Case Sensitivity",
+                                    "Учитывать регистр",
                                     &ToggleCaseSensitive,
                                     &focus_handle,
                                     cx,
@@ -2910,7 +2916,7 @@ impl GitGraph {
                             .icon_size(IconSize::Small)
                             .tooltip(move |_, cx| {
                                 Tooltip::for_action_in(
-                                    "Select Previous Match",
+                                    "Предыдущее совпадение",
                                     &SelectPreviousMatch,
                                     &focus_handle,
                                     cx,
@@ -2933,7 +2939,7 @@ impl GitGraph {
                             .icon_size(IconSize::Small)
                             .tooltip(move |_, cx| {
                                 Tooltip::for_action_in(
-                                    "Select Next Match",
+                                    "Следующее совпадение",
                                     &SelectNextMatch,
                                     &focus_handle,
                                     cx,
@@ -3108,9 +3114,9 @@ impl GitGraph {
             .toggle_state(self.changed_files_view_mode.is_tree())
             .tooltip({
                 let tooltip = if is_tree_view {
-                    "Show Flat View"
+                    "Показать списком"
                 } else {
-                    "Show Tree View"
+                    "Показать деревом"
                 };
                 move |_, cx| Tooltip::for_action(tooltip, &ToggleChangedFilesView, cx)
             })
@@ -3141,7 +3147,7 @@ impl GitGraph {
                                     let focus_handle = self.focus_handle.clone();
                                     move |_window, cx: &mut App| {
                                         Tooltip::for_action_in(
-                                            "Close Details Panel",
+                                            "Закрыть подробности",
                                             &Cancel,
                                             &focus_handle,
                                             cx,
@@ -3169,9 +3175,9 @@ impl GitGraph {
                             )
                             .tooltip({
                                 let label = if self.commit_details_metadata_collapsed {
-                                    "Show Commit Details"
+                                    "Показать подробности коммита"
                                 } else {
-                                    "Hide Commit Details"
+                                    "Скрыть подробности коммита"
                                 };
                                 move |_window, cx: &mut App| Tooltip::simple(label, cx)
                             })
@@ -3243,9 +3249,9 @@ impl GitGraph {
                                     let is_copied = copied_state.read(cx).is_copied();
 
                                     let (icon, icon_color, tooltip_label) = if is_copied {
-                                        (IconName::Check, Color::Success, "Email Copied!")
+                                        (IconName::Check, Color::Success, "Адрес почты скопирован")
                                     } else {
-                                        (IconName::Envelope, Color::Muted, "Copy Email")
+                                        (IconName::Envelope, Color::Muted, "Копировать адрес почты")
                                     };
 
                                     let copy_email = author_email.clone();
@@ -3296,9 +3302,9 @@ impl GitGraph {
                                     let is_copied = copied_state.read(cx).is_copied();
 
                                     let (icon, icon_color, tooltip_label) = if is_copied {
-                                        (IconName::Check, Color::Success, "Commit SHA Copied!")
+                                        (IconName::Check, Color::Success, "SHA коммита скопирован")
                                     } else {
-                                        (IconName::Hash, Color::Muted, "Copy Commit SHA")
+                                        (IconName::Hash, Color::Muted, "Копировать SHA коммита")
                                     };
 
                                     Button::new("sha-button", &full_sha)
@@ -3357,11 +3363,11 @@ impl GitGraph {
                                     this.child(
                                         Button::new(
                                             "view-on-provider",
-                                            format!("View on {}", provider_name),
+                                            format!("Открыть на {}", provider_name),
                                         )
                                         .tooltip({
                                             move |_window, cx: &mut App| {
-                                                Tooltip::simple("Open In Browser", cx)
+                                                Tooltip::simple("Открыть в браузере", cx)
                                             }
                                         })
                                         .start_icon(
@@ -3406,9 +3412,9 @@ impl GitGraph {
                                             "{} Changed {}",
                                             changed_files_count,
                                             if changed_files_count == 1 {
-                                                "File"
+                                                "файл"
                                             } else {
-                                                "Files"
+                                                "файлов"
                                             }
                                         ))
                                         .size(LabelSize::Small)
@@ -3520,7 +3526,7 @@ impl GitGraph {
             .child(Divider::horizontal())
             .child(
                 h_flex().p_1p5().w_full().child(
-                    Button::new("view-commit", "View Commit")
+                    Button::new("view-commit", "Показать коммит")
                         .full_width()
                         .start_icon(
                             Icon::new(IconName::GitCommit)
@@ -4298,16 +4304,16 @@ impl GitGraph {
                             }))
                             .tooltip({
                                 let label = if !collapsed {
-                                    "Hide Commit Message"
+                                    "Скрыть сообщение коммита"
                                 } else {
-                                    "Show Commit Message"
+                                    "Показать сообщение коммита"
                                 };
 
                                 move |_window, cx: &mut App| Tooltip::simple(label, cx)
                             }),
                     )
                     .child(
-                        Label::new("Message")
+                        Label::new("Сообщение")
                             .size(LabelSize::Small)
                             .color(Color::Muted),
                     ),
@@ -4352,11 +4358,11 @@ impl Render for GitGraph {
 
         let content = if commit_count == 0 {
             let message = if let Some(error) = &error {
-                format!("Error loading: {}", error)
+                format!("Ошибка загрузки: {}", error)
             } else if is_loading {
-                "Loading".to_string()
+                "Загрузка".to_string()
             } else {
-                "No commits found".to_string()
+                "Коммиты не найдены".to_string()
             };
             let label = Label::new(message)
                 .color(Color::Muted)
@@ -4432,24 +4438,24 @@ impl Render for GitGraph {
                                     if !is_path_history {
                                         TableRow::from_vec(
                                             vec![
-                                                Label::new("Refs")
+                                                Label::new("Ссылки")
                                                     .color(Color::Muted)
                                                     .truncate()
                                                     .into_any_element(),
-                                                Label::new("Graph")
+                                                Label::new("Граф")
                                                     .color(Color::Muted)
                                                     .truncate()
                                                     .into_any_element(),
-                                                Label::new("Description")
+                                                Label::new("Описание")
                                                     .color(Color::Muted)
                                                     .into_any_element(),
-                                                Label::new("Date")
+                                                Label::new("Дата")
                                                     .color(Color::Muted)
                                                     .into_any_element(),
-                                                Label::new("Author")
+                                                Label::new("Автор")
                                                     .color(Color::Muted)
                                                     .into_any_element(),
-                                                Label::new("Commit")
+                                                Label::new("Коммит")
                                                     .color(Color::Muted)
                                                     .into_any_element(),
                                             ],
@@ -4458,16 +4464,16 @@ impl Render for GitGraph {
                                     } else {
                                         TableRow::from_vec(
                                             vec![
-                                                Label::new("Description")
+                                                Label::new("Описание")
                                                     .color(Color::Muted)
                                                     .into_any_element(),
-                                                Label::new("Date")
+                                                Label::new("Дата")
                                                     .color(Color::Muted)
                                                     .into_any_element(),
-                                                Label::new("Author")
+                                                Label::new("Автор")
                                                     .color(Color::Muted)
                                                     .into_any_element(),
-                                                Label::new("Commit")
+                                                Label::new("Коммит")
                                                     .color(Color::Muted)
                                                     .into_any_element(),
                                             ],
@@ -4769,9 +4775,9 @@ impl Item for GitGraph {
             move |_, _| {
                 v_flex()
                     .child(Label::new(if path_history_path.is_some() {
-                        "Path History"
+                        "История пути"
                     } else {
-                        "Git Graph"
+                        "Граф Git"
                     }))
                     .when_some(path_history_path.clone(), |this, path| {
                         this.child(Label::new(path).color(Color::Muted).size(LabelSize::Small))
@@ -4800,7 +4806,7 @@ impl Item for GitGraph {
                     .file_name()
                     .map(|name| name.to_string_lossy().to_string())
             })
-            .map_or_else(|| "Git Graph".into(), |name| SharedString::from(name))
+            .map_or_else(|| "Граф Git".into(), |name| SharedString::from(name))
     }
 
     fn show_toolbar(&self) -> bool {

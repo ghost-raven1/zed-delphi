@@ -9,58 +9,68 @@ use zed_actions::{Quit, assistant, debug_panel, dev, git_panel, project_panel};
 pub fn app_menus(cx: &mut App) -> Vec<Menu> {
     let mut view_items = vec![
         MenuItem::action(
-            "Zoom In",
+            "Увеличить масштаб",
             zed_actions::IncreaseBufferFontSize { persist: false },
         ),
         MenuItem::action(
-            "Zoom Out",
+            "Уменьшить масштаб",
             zed_actions::DecreaseBufferFontSize { persist: false },
         ),
         MenuItem::action(
-            "Reset Zoom",
+            "Сбросить масштаб",
             zed_actions::ResetBufferFontSize { persist: false },
         ),
         MenuItem::action(
-            "Reset All Zoom",
+            "Сбросить весь масштаб",
             zed_actions::ResetAllZoom { persist: false },
         ),
         MenuItem::separator(),
-        MenuItem::action("Toggle Left Dock", workspace::ToggleLeftDock),
-        MenuItem::action("Toggle Right Dock", workspace::ToggleRightDock),
-        MenuItem::action("Toggle Bottom Dock", workspace::ToggleBottomDock),
-        MenuItem::action("Toggle All Docks", workspace::ToggleAllDocks),
+        MenuItem::action(
+            "Показать или скрыть левую панель",
+            workspace::ToggleLeftDock,
+        ),
+        MenuItem::action(
+            "Показать или скрыть правую панель",
+            workspace::ToggleRightDock,
+        ),
+        MenuItem::action(
+            "Показать или скрыть нижнюю панель",
+            workspace::ToggleBottomDock,
+        ),
+        MenuItem::action("Показать или скрыть все панели", workspace::ToggleAllDocks),
         MenuItem::submenu(Menu {
             name: "Editor Layout".into(),
+            display_name: Some("Расположение редакторов".into()),
             disabled: false,
             items: vec![
-                MenuItem::action("Split Up", workspace::SplitUp::default()),
-                MenuItem::action("Split Down", workspace::SplitDown::default()),
-                MenuItem::action("Split Left", workspace::SplitLeft::default()),
-                MenuItem::action("Split Right", workspace::SplitRight::default()),
+                MenuItem::action("Разделить сверху", workspace::SplitUp::default()),
+                MenuItem::action("Разделить снизу", workspace::SplitDown::default()),
+                MenuItem::action("Разделить слева", workspace::SplitLeft::default()),
+                MenuItem::action("Разделить справа", workspace::SplitRight::default()),
             ],
         }),
         MenuItem::separator(),
-        MenuItem::action("Project Panel", project_panel::ToggleFocus),
-        MenuItem::action("Outline Panel", outline_panel::ToggleFocus),
-        MenuItem::action("Collab Panel", collab_panel::ToggleFocus),
-        MenuItem::action("Terminal Panel", terminal_panel::Toggle),
-        MenuItem::action("Debugger Panel", debug_panel::ToggleFocus),
+        MenuItem::action("Панель проекта", project_panel::ToggleFocus),
+        MenuItem::action("Структура кода", outline_panel::ToggleFocus),
+        MenuItem::action("Совместная работа", collab_panel::ToggleFocus),
+        MenuItem::action("Терминал", terminal_panel::Toggle),
+        MenuItem::action("Отладчик", debug_panel::ToggleFocus),
     ];
 
     if !DisableAiSettings::get_global(cx).disable_ai {
-        view_items.push(MenuItem::action("Agent Panel", assistant::ToggleFocus));
+        view_items.push(MenuItem::action("Панель агента", assistant::ToggleFocus));
     }
 
     view_items.extend([
-        MenuItem::action("Git Panel", git_panel::ToggleFocus),
+        MenuItem::action("Панель Git", git_panel::ToggleFocus),
         MenuItem::separator(),
-        MenuItem::action("Diagnostics", diagnostics::Deploy),
+        MenuItem::action("Диагностика", diagnostics::Deploy),
         MenuItem::separator(),
     ]);
 
     if ReleaseChannel::try_global(cx) == Some(ReleaseChannel::Dev) {
         view_items.push(MenuItem::action(
-            "Toggle GPUI Inspector",
+            "Показать или скрыть инспектор GPUI",
             dev::ToggleInspector,
         ));
         view_items.push(MenuItem::separator());
@@ -69,268 +79,319 @@ pub fn app_menus(cx: &mut App) -> Vec<Menu> {
     vec![
         Menu {
             name: "Zed".into(),
+            display_name: Some("Zed".into()),
             disabled: false,
             items: vec![
-                MenuItem::action("About Zed", zed_actions::About),
-                MenuItem::action("Check for Updates", auto_update::Check),
+                MenuItem::action("О Zed", zed_actions::About),
+                MenuItem::action("Проверить обновления", auto_update::Check),
                 MenuItem::separator(),
-                MenuItem::submenu(Menu::new("Settings").items([
-                    MenuItem::action("Open Settings", zed_actions::OpenSettings),
-                    MenuItem::action("Open Settings File", super::OpenSettingsFile),
-                    MenuItem::action("Open Project Settings", zed_actions::OpenProjectSettings),
-                    MenuItem::action("Open Project Settings File", super::OpenProjectSettingsFile),
-                    MenuItem::action("Open Default Settings", super::OpenDefaultSettings),
+                MenuItem::submenu(Menu::new("Settings").display_name("Настройки").items([
+                    MenuItem::action("Открыть настройки", zed_actions::OpenSettings),
+                    MenuItem::action("Открыть файл настроек", super::OpenSettingsFile),
+                    MenuItem::action(
+                        "Открыть настройки проекта",
+                        zed_actions::OpenProjectSettings,
+                    ),
+                    MenuItem::action(
+                        "Открыть файл настроек проекта",
+                        super::OpenProjectSettingsFile,
+                    ),
+                    MenuItem::action("Открыть стандартные настройки", super::OpenDefaultSettings),
                     MenuItem::separator(),
-                    MenuItem::action("Open Keymap", zed_actions::OpenKeymap),
-                    MenuItem::action("Open Keymap File", zed_actions::OpenKeymapFile),
-                    MenuItem::action("Open Default Key Bindings", zed_actions::OpenDefaultKeymap),
+                    MenuItem::action("Сочетания клавиш", zed_actions::OpenKeymap),
+                    MenuItem::action("Открыть файл сочетаний клавиш", zed_actions::OpenKeymapFile),
+                    MenuItem::action(
+                        "Стандартные сочетания клавиш",
+                        zed_actions::OpenDefaultKeymap,
+                    ),
                     MenuItem::separator(),
                     MenuItem::action(
-                        "Select Theme...",
+                        "Выбрать тему…",
                         zed_actions::theme_selector::Toggle::default(),
                     ),
                     MenuItem::action(
-                        "Select Icon Theme...",
+                        "Выбрать тему значков…",
                         zed_actions::icon_theme_selector::Toggle::default(),
                     ),
                 ])),
                 MenuItem::separator(),
                 #[cfg(target_os = "macos")]
-                MenuItem::os_submenu("Services", gpui::SystemMenuType::Services),
+                MenuItem::os_submenu("Службы", gpui::SystemMenuType::Services),
                 MenuItem::separator(),
-                MenuItem::action("Extensions", zed_actions::Extensions::default()),
+                MenuItem::action("Расширения", zed_actions::Extensions::default()),
                 #[cfg(not(target_os = "windows"))]
-                MenuItem::action("Install CLI", install_cli::InstallCliBinary),
+                MenuItem::action("Установить команду zed", install_cli::InstallCliBinary),
                 MenuItem::separator(),
                 #[cfg(target_os = "macos")]
-                MenuItem::action("Hide Zed", super::Hide),
+                MenuItem::action("Скрыть Zed", super::Hide),
                 #[cfg(target_os = "macos")]
-                MenuItem::action("Hide Others", super::HideOthers),
+                MenuItem::action("Скрыть остальные", super::HideOthers),
                 #[cfg(target_os = "macos")]
-                MenuItem::action("Show All", super::ShowAll),
+                MenuItem::action("Показать все", super::ShowAll),
                 MenuItem::separator(),
-                MenuItem::action("Quit Zed", Quit),
+                MenuItem::action("Выйти из Zed", Quit),
             ],
         },
         Menu {
             name: "File".into(),
+            display_name: Some("Файл".into()),
             disabled: false,
             items: vec![
-                MenuItem::action("New", workspace::NewFile),
-                MenuItem::action("New Window", workspace::NewWindow),
+                MenuItem::action("Новый файл", workspace::NewFile),
+                MenuItem::action("Новое окно", workspace::NewWindow),
                 MenuItem::separator(),
                 #[cfg(not(target_os = "macos"))]
-                MenuItem::action("Open File...", workspace::OpenFiles),
+                MenuItem::action("Открыть файл…", workspace::OpenFiles),
                 MenuItem::action(
                     if cfg!(not(target_os = "macos")) {
-                        "Open Folder..."
+                        "Открыть папку…"
                     } else {
-                        "Open…"
+                        "Открыть…"
                     },
                     workspace::Open::default(),
                 ),
-                MenuItem::action("Open Recent…", zed_actions::OpenRecent::default()),
-                MenuItem::action("Open Remote…", zed_actions::OpenRemote::default()),
+                MenuItem::action("Недавние проекты…", zed_actions::OpenRecent::default()),
+                MenuItem::action("Удалённый проект…", zed_actions::OpenRemote::default()),
                 MenuItem::separator(),
-                MenuItem::action("Add Folder to Project…", workspace::AddFolderToProject),
+                MenuItem::action("Добавить папку в проект…", workspace::AddFolderToProject),
                 MenuItem::separator(),
-                MenuItem::action("Save", workspace::Save { save_intent: None }),
-                MenuItem::action("Save As…", workspace::SaveAs),
-                MenuItem::action("Save All", workspace::SaveAll { save_intent: None }),
+                MenuItem::action("Сохранить", workspace::Save { save_intent: None }),
+                MenuItem::action("Сохранить как…", workspace::SaveAs),
+                MenuItem::action("Сохранить всё", workspace::SaveAll { save_intent: None }),
                 MenuItem::separator(),
                 MenuItem::action(
-                    "Close Editor",
+                    "Закрыть редактор",
                     workspace::CloseActiveItem {
                         save_intent: None,
                         close_pinned: true,
                     },
                 ),
-                MenuItem::action("Close Project", workspace::CloseProject),
-                MenuItem::action("Close Window", workspace::CloseWindow),
+                MenuItem::action("Закрыть проект", workspace::CloseProject),
+                MenuItem::action("Закрыть окно", workspace::CloseWindow),
             ],
         },
         Menu {
             name: "Edit".into(),
+            display_name: Some("Правка".into()),
             disabled: false,
             items: vec![
-                MenuItem::os_action("Undo", editor::actions::Undo, OsAction::Undo),
-                MenuItem::os_action("Redo", editor::actions::Redo, OsAction::Redo),
+                MenuItem::os_action("Отменить", editor::actions::Undo, OsAction::Undo),
+                MenuItem::os_action("Повторить", editor::actions::Redo, OsAction::Redo),
                 MenuItem::separator(),
-                MenuItem::os_action("Cut", editor::actions::Cut, OsAction::Cut),
-                MenuItem::os_action("Copy", editor::actions::Copy, OsAction::Copy),
-                MenuItem::action("Copy and Trim", editor::actions::CopyAndTrim),
-                MenuItem::os_action("Paste", editor::actions::Paste, OsAction::Paste),
+                MenuItem::os_action("Вырезать", editor::actions::Cut, OsAction::Cut),
+                MenuItem::os_action("Копировать", editor::actions::Copy, OsAction::Copy),
+                MenuItem::action(
+                    "Копировать без крайних пробелов",
+                    editor::actions::CopyAndTrim,
+                ),
+                MenuItem::os_action("Вставить", editor::actions::Paste, OsAction::Paste),
                 MenuItem::separator(),
-                MenuItem::action("Find", search::buffer_search::Deploy::find()),
-                MenuItem::action("Find in Project", workspace::DeploySearch::default()),
+                MenuItem::action("Найти", search::buffer_search::Deploy::find()),
+                MenuItem::action("Найти в проекте", workspace::DeploySearch::default()),
                 MenuItem::separator(),
                 MenuItem::action(
-                    "Toggle Line Comment",
+                    "Закомментировать или раскомментировать строку",
                     editor::actions::ToggleComments::default(),
                 ),
             ],
         },
         Menu {
             name: "Selection".into(),
+            display_name: Some("Выделение".into()),
             disabled: false,
             items: vec![
                 MenuItem::os_action(
-                    "Select All",
+                    "Выделить всё",
                     editor::actions::SelectAll,
                     OsAction::SelectAll,
                 ),
-                MenuItem::action("Expand Selection", editor::actions::SelectLargerSyntaxNode),
-                MenuItem::action("Shrink Selection", editor::actions::SelectSmallerSyntaxNode),
-                MenuItem::action("Select Next Sibling", editor::actions::SelectNextSyntaxNode),
                 MenuItem::action(
-                    "Select Previous Sibling",
+                    "Расширить выделение",
+                    editor::actions::SelectLargerSyntaxNode,
+                ),
+                MenuItem::action("Сузить выделение", editor::actions::SelectSmallerSyntaxNode),
+                MenuItem::action(
+                    "Выделить следующий элемент",
+                    editor::actions::SelectNextSyntaxNode,
+                ),
+                MenuItem::action(
+                    "Выделить предыдущий элемент",
                     editor::actions::SelectPreviousSyntaxNode,
                 ),
                 MenuItem::separator(),
                 MenuItem::action(
-                    "Add Cursor Above",
+                    "Добавить курсор выше",
                     editor::actions::AddSelectionAbove {
                         skip_soft_wrap: true,
                     },
                 ),
                 MenuItem::action(
-                    "Add Cursor Below",
+                    "Добавить курсор ниже",
                     editor::actions::AddSelectionBelow {
                         skip_soft_wrap: true,
                     },
                 ),
                 MenuItem::action(
-                    "Select Next Occurrence",
+                    "Выделить следующее совпадение",
                     editor::actions::SelectNext {
                         replace_newest: false,
                     },
                 ),
                 MenuItem::action(
-                    "Select Previous Occurrence",
+                    "Выделить предыдущее совпадение",
                     editor::actions::SelectPrevious {
                         replace_newest: false,
                     },
                 ),
-                MenuItem::action("Select All Occurrences", editor::actions::SelectAllMatches),
+                MenuItem::action("Выделить все совпадения", editor::actions::SelectAllMatches),
                 MenuItem::separator(),
-                MenuItem::action("Move Line Up", editor::actions::MoveLineUp),
-                MenuItem::action("Move Line Down", editor::actions::MoveLineDown),
-                MenuItem::action("Duplicate Selection", editor::actions::DuplicateLineDown),
+                MenuItem::action("Переместить строку вверх", editor::actions::MoveLineUp),
+                MenuItem::action("Переместить строку вниз", editor::actions::MoveLineDown),
+                MenuItem::action("Дублировать выделение", editor::actions::DuplicateLineDown),
             ],
         },
         Menu {
             name: "View".into(),
+            display_name: Some("Вид".into()),
             disabled: false,
             items: view_items,
         },
         Menu {
             name: "Go".into(),
+            display_name: Some("Переход".into()),
             disabled: false,
             items: vec![
-                MenuItem::action("Back", workspace::GoBack),
-                MenuItem::action("Forward", workspace::GoForward),
+                MenuItem::action("Назад", workspace::GoBack),
+                MenuItem::action("Вперёд", workspace::GoForward),
                 MenuItem::separator(),
-                MenuItem::action("Command Palette...", zed_actions::command_palette::Toggle),
+                MenuItem::action("Палитра команд…", zed_actions::command_palette::Toggle),
                 MenuItem::separator(),
-                MenuItem::action("Go to File...", workspace::ToggleFileFinder::default()),
-                // MenuItem::action("Go to Symbol in Project", project_symbols::Toggle),
+                MenuItem::action("Перейти к файлу…", workspace::ToggleFileFinder::default()),
+                // MenuItem::action("Перейти к символу в проекте", project_symbols::Toggle),
                 MenuItem::action(
-                    "Go to Symbol in Editor...",
+                    "Перейти к символу в редакторе…",
                     zed_actions::outline::ToggleOutline,
                 ),
-                MenuItem::action("Go to Line/Column...", editor::actions::ToggleGoToLine),
+                MenuItem::action(
+                    "Перейти к строке или столбцу…",
+                    editor::actions::ToggleGoToLine,
+                ),
                 MenuItem::separator(),
                 MenuItem::action(
-                    "Go to Definition",
+                    "Перейти к определению",
                     editor::actions::GoToDefinition::default(),
                 ),
                 MenuItem::action(
-                    "Go to Declaration",
+                    "Перейти к объявлению",
                     editor::actions::GoToDeclaration::default(),
                 ),
                 MenuItem::action(
-                    "Go to Type Definition",
+                    "Перейти к определению типа",
                     editor::actions::GoToTypeDefinition::default(),
                 ),
                 MenuItem::action(
-                    "Find All References",
+                    "Найти все ссылки",
                     editor::actions::FindAllReferences::default(),
                 ),
-                MenuItem::action("Show Incoming Calls", call_hierarchy::ShowIncomingCalls),
-                MenuItem::action("Show Outgoing Calls", call_hierarchy::ShowOutgoingCalls),
-                MenuItem::separator(),
-                MenuItem::action("Next Problem", editor::actions::GoToDiagnostic::default()),
                 MenuItem::action(
-                    "Previous Problem",
+                    "Показать входящие вызовы",
+                    call_hierarchy::ShowIncomingCalls,
+                ),
+                MenuItem::action(
+                    "Показать исходящие вызовы",
+                    call_hierarchy::ShowOutgoingCalls,
+                ),
+                MenuItem::separator(),
+                MenuItem::action(
+                    "Следующая проблема",
+                    editor::actions::GoToDiagnostic::default(),
+                ),
+                MenuItem::action(
+                    "Предыдущая проблема",
                     editor::actions::GoToPreviousDiagnostic::default(),
                 ),
             ],
         },
         Menu {
             name: "Run".into(),
+            display_name: Some("Запуск".into()),
             disabled: false,
             items: vec![
                 MenuItem::action(
-                    "Spawn Task",
+                    "Запустить задачу",
                     zed_actions::Spawn::ViaModal {
                         reveal_target: None,
                     },
                 ),
-                MenuItem::action("Start Debugger", debugger_ui::Start),
+                MenuItem::action("Начать отладку", debugger_ui::Start),
                 MenuItem::separator(),
-                MenuItem::action("Edit tasks.json…", zed_actions::OpenProjectTasks),
-                MenuItem::action("Edit debug.json…", zed_actions::OpenProjectDebugTasks),
+                MenuItem::action("Изменить tasks.json…", zed_actions::OpenProjectTasks),
+                MenuItem::action("Изменить debug.json…", zed_actions::OpenProjectDebugTasks),
                 MenuItem::separator(),
-                MenuItem::action("Continue", debugger_ui::Continue),
-                MenuItem::action("Step Over", debugger_ui::StepOver),
-                MenuItem::action("Step Into", debugger_ui::StepInto),
-                MenuItem::action("Step Out", debugger_ui::StepOut),
+                MenuItem::action("Продолжить", debugger_ui::Continue),
+                MenuItem::action("Шаг с обходом", debugger_ui::StepOver),
+                MenuItem::action("Шаг с заходом", debugger_ui::StepInto),
+                MenuItem::action("Выйти из функции", debugger_ui::StepOut),
                 MenuItem::separator(),
-                MenuItem::action("Toggle Breakpoint", editor::actions::ToggleBreakpoint),
-                MenuItem::action("Edit Breakpoint", editor::actions::EditLogBreakpoint),
-                MenuItem::action("Clear All Breakpoints", debugger_ui::ClearAllBreakpoints),
+                MenuItem::action(
+                    "Установить или убрать точку останова",
+                    editor::actions::ToggleBreakpoint,
+                ),
+                MenuItem::action(
+                    "Изменить точку останова",
+                    editor::actions::EditLogBreakpoint,
+                ),
+                MenuItem::action(
+                    "Удалить все точки останова",
+                    debugger_ui::ClearAllBreakpoints,
+                ),
             ],
         },
         Menu {
             name: "Window".into(),
+            display_name: Some("Окно".into()),
             disabled: false,
             items: vec![
-                MenuItem::action("Minimize", super::Minimize),
-                MenuItem::action("Zoom", super::Zoom),
+                MenuItem::action("Свернуть", super::Minimize),
+                MenuItem::action("Развернуть", super::Zoom),
                 MenuItem::separator(),
             ],
         },
         Menu {
             name: "Help".into(),
+            display_name: Some("Справка".into()),
             disabled: false,
             items: vec![
                 MenuItem::action(
-                    "View Release Notes Locally",
+                    "Открыть описание выпуска",
                     auto_update_ui::ViewReleaseNotesLocally,
                 ),
-                MenuItem::action("View Telemetry", zed_actions::OpenTelemetryLog),
-                MenuItem::action("View Dependency Licenses", zed_actions::OpenLicenses),
-                MenuItem::action("Show Welcome", onboarding::ShowWelcome),
+                MenuItem::action(
+                    "Просмотреть журнал телеметрии",
+                    zed_actions::OpenTelemetryLog,
+                ),
+                MenuItem::action("Лицензии зависимостей", zed_actions::OpenLicenses),
+                MenuItem::action("Открыть начальный экран", onboarding::ShowWelcome),
                 MenuItem::separator(),
-                MenuItem::action("File Bug Report...", zed_actions::feedback::FileBugReport),
-                MenuItem::action("Request Feature...", zed_actions::feedback::RequestFeature),
-                MenuItem::action("Email Us...", zed_actions::feedback::EmailZed),
+                MenuItem::action("Сообщить об ошибке…", zed_actions::feedback::FileBugReport),
+                MenuItem::action("Предложить функцию…", zed_actions::feedback::RequestFeature),
+                MenuItem::action("Написать разработчикам…", zed_actions::feedback::EmailZed),
                 MenuItem::separator(),
                 MenuItem::action(
-                    "Documentation",
+                    "Документация",
                     super::OpenBrowser {
                         url: "https://zed.dev/docs".into(),
                     },
                 ),
-                MenuItem::action("Zed Repository", feedback::OpenZedRepo),
+                MenuItem::action("Репозиторий Zed", feedback::OpenZedRepo),
                 MenuItem::action(
-                    "Zed Twitter",
+                    "Zed в Twitter",
                     super::OpenBrowser {
                         url: "https://twitter.com/zeddotdev".into(),
                     },
                 ),
                 MenuItem::action(
-                    "Join the Team",
+                    "Присоединиться к команде",
                     super::OpenBrowser {
                         url: "https://zed.dev/jobs".into(),
                     },

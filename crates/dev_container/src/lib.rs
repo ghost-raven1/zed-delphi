@@ -429,7 +429,7 @@ impl PickerDelegate for TemplatePickerDelegate {
                 .border_t_1()
                 .border_color(cx.theme().colors().border_variant)
                 .child(
-                    Button::new("run-action", "Continue")
+                    Button::new("run-action", "Продолжить")
                         .key_binding(
                             KeyBinding::for_action(&menu::Confirm, cx)
                                 .map(|kb| kb.size(rems_from_px(12_f32))),
@@ -626,7 +626,7 @@ impl PickerDelegate for FeaturePickerDelegate {
                 .border_t_1()
                 .border_color(cx.theme().colors().border_variant)
                 .child(
-                    Button::new("run-action", "Select Feature")
+                    Button::new("run-action", "Выбрать компонент")
                         .key_binding(
                             KeyBinding::for_action(&menu::Confirm, cx)
                                 .map(|kb| kb.size(rems_from_px(12_f32))),
@@ -636,7 +636,7 @@ impl PickerDelegate for FeaturePickerDelegate {
                         }),
                 )
                 .child(
-                    Button::new("run-action-secondary", "Confirm Selections")
+                    Button::new("run-action-secondary", "Подтвердить выбор")
                         .key_binding(
                             KeyBinding::for_action(&menu::SecondaryConfirm, cx)
                                 .map(|kb| kb.size(rems_from_px(12_f32))),
@@ -668,11 +668,14 @@ impl DevContainerModal {
             div()
                 .p_1()
                 .child(
-                    div().track_focus(&self.focus_handle).child(
-                        ModalHeader::new().child(
-                            Headline::new("Create Dev Container").size(HeadlineSize::XSmall),
+                    div()
+                        .track_focus(&self.focus_handle)
+                        .child(
+                            ModalHeader::new().child(
+                                Headline::new("Создать контейнер разработки")
+                                    .size(HeadlineSize::XSmall),
+                            ),
                         ),
-                    ),
                 )
                 .child(ListSeparator)
                 .child(
@@ -699,7 +702,7 @@ impl DevContainerModal {
                                     );
                                     cx.notify();
                                 }))
-                                .child(Label::new("Search for Dev Container Templates")),
+                                .child(Label::new("Поиск шаблонов контейнеров разработки")),
                         ),
                 )
                 .into_any_element(),
@@ -765,7 +768,7 @@ impl DevContainerModal {
                         .child(
                             ModalHeader::new()
                                 .child(
-                                    Headline::new("Template Option: ").size(HeadlineSize::XSmall),
+                                    Headline::new("Параметр шаблона: ").size(HeadlineSize::XSmall),
                                 )
                                 .child(
                                     Headline::new(&next_option_entries.option_name)
@@ -845,7 +848,7 @@ impl DevContainerModal {
                                     this.accept_message(DevContainerMessage::GoBack, window, cx);
                                     cx.notify();
                                 }))
-                                .child(Label::new("Go Back")),
+                                .child(Label::new("Назад")),
                         ),
                 )
                 .into_any_element(),
@@ -887,7 +890,7 @@ impl DevContainerModal {
                         ModalHeader::new()
                             .icon(Icon::new(IconName::Warning).color(Color::Warning))
                             .child(
-                                Headline::new("Overwrite Existing Configuration?")
+                                Headline::new("Перезаписать существующую конфигурацию?")
                                     .size(HeadlineSize::XSmall),
                             ),
                     ),
@@ -923,7 +926,7 @@ impl DevContainerModal {
                                     );
                                     cx.notify();
                                 }))
-                                .child(Label::new("Overwrite")),
+                                .child(Label::new("Перезаписать")),
                         ),
                 )
                 .child(
@@ -944,7 +947,7 @@ impl DevContainerModal {
                                     this.dismiss(&menu::Cancel, window, cx);
                                     cx.notify();
                                 }))
-                                .child(Label::new("Cancel")),
+                                .child(Label::new("Отмена")),
                         ),
                 )
                 .into_any_element(),
@@ -959,11 +962,14 @@ impl DevContainerModal {
         Navigable::new(
             div()
                 .child(
-                    div().track_focus(&self.focus_handle).child(
-                        ModalHeader::new().child(
-                            Headline::new("Create Dev Container").size(HeadlineSize::XSmall),
+                    div()
+                        .track_focus(&self.focus_handle)
+                        .child(
+                            ModalHeader::new().child(
+                                Headline::new("Создать контейнер разработки")
+                                    .size(HeadlineSize::XSmall),
+                            ),
                         ),
-                    ),
                 )
                 .child(ListSeparator)
                 .child(
@@ -976,7 +982,7 @@ impl DevContainerModal {
                                     .color(Color::Muted)
                                     .with_rotate_animation(2),
                             )
-                            .child(Label::new("Querying template registry...")),
+                            .child(Label::new("Запрос реестра шаблонов…")),
                     ),
                 )
                 .child(ListSeparator)
@@ -998,7 +1004,7 @@ impl DevContainerModal {
                                     this.accept_message(DevContainerMessage::GoBack, window, cx);
                                     cx.notify();
                                 }))
-                                .child(Label::new("Go Back")),
+                                .child(Label::new("Назад")),
                         ),
                 )
                 .into_any_element(),
@@ -1011,11 +1017,14 @@ impl DevContainerModal {
         Navigable::new(
             div()
                 .child(
-                    div().track_focus(&self.focus_handle).child(
-                        ModalHeader::new().child(
-                            Headline::new("Create Dev Container").size(HeadlineSize::XSmall),
+                    div()
+                        .track_focus(&self.focus_handle)
+                        .child(
+                            ModalHeader::new().child(
+                                Headline::new("Создать контейнер разработки")
+                                    .size(HeadlineSize::XSmall),
+                            ),
                         ),
-                    ),
                 )
                 .child(ListSeparator)
                 .child(
@@ -1028,7 +1037,7 @@ impl DevContainerModal {
                                     .color(Color::Muted)
                                     .with_rotate_animation(2),
                             )
-                            .child(Label::new("Querying features...")),
+                            .child(Label::new("Загрузка компонентов…")),
                     ),
                 )
                 .child(ListSeparator)
@@ -1050,7 +1059,7 @@ impl DevContainerModal {
                                     this.accept_message(DevContainerMessage::GoBack, window, cx);
                                     cx.notify();
                                 }))
-                                .child(Label::new("Go Back")),
+                                .child(Label::new("Назад")),
                         ),
                 )
                 .into_any_element(),
@@ -1092,13 +1101,13 @@ impl StatefulModal for DevContainerModal {
                 self.render_confirming_write_dev_container(template_entry, window, cx)
             }
             DevContainerState::TemplateWriteFailed(dev_container_error) => self.render_error(
-                "Error Creating Dev Container Definition".to_string(),
+                "Ошибка создания конфигурации контейнера разработки".to_string(),
                 dev_container_error,
                 window,
                 cx,
             ),
             DevContainerState::TemplateQueryReturned(Err(e)) => {
-                self.render_error("Error Retrieving Templates".to_string(), e, window, cx)
+                self.render_error("Ошибка получения шаблонов".to_string(), e, window, cx)
             }
         }
     }
@@ -1172,7 +1181,7 @@ impl StatefulModal for DevContainerModal {
                     .collect::<Vec<TemplateEntry>>();
                 if self.state == DevContainerState::QueryingTemplates {
                     let delegate = TemplatePickerDelegate::new(
-                        "Select a template".to_string(),
+                        "Выберите шаблон".to_string(),
                         cx.weak_entity(),
                         items.clone(),
                         Box::new(|entry, this, window, cx| {
@@ -1302,7 +1311,7 @@ impl StatefulModal for DevContainerModal {
                         })
                         .collect::<Vec<FeatureEntry>>();
                     let delegate = FeaturePickerDelegate::new(
-                        "Select features to add".to_string(),
+                        "Выберите компоненты для добавления".to_string(),
                         cx.weak_entity(),
                         features,
                         template_entry.clone(),

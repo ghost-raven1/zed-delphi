@@ -196,8 +196,8 @@ impl ApplicationMenu {
                         .style(ButtonStyle::Subtle)
                         .icon_size(IconSize::Small)
                         .tab_index(0isize)
-                        .aria_label("Application menu"),
-                        Tooltip::text("Open Application Menu"),
+                        .aria_label("Меню приложения"),
+                        Tooltip::text("Открыть меню приложения"),
                     )
                     .with_handle(handle),
             )
@@ -207,6 +207,7 @@ impl ApplicationMenu {
         let current_handle = entry.handle.clone();
 
         let menu_name = entry.menu.name.clone();
+        let menu_title = entry.menu.title().clone();
         let entry = entry.clone();
 
         let all_handles: Vec<_> = self
@@ -226,7 +227,7 @@ impl ApplicationMenu {
                     .trigger(
                         Button::new(
                             SharedString::from(format!("{}-menu-trigger", menu_name)),
-                            menu_name,
+                            menu_title,
                         )
                         .style(ButtonStyle::Subtle)
                         .label_size(LabelSize::Small)
@@ -393,6 +394,7 @@ mod tests {
     fn owned_menu(name: &str, item_name: &str) -> OwnedMenu {
         OwnedMenu {
             name: name.into(),
+            display_name: None,
             disabled: false,
             items: vec![OwnedMenuItem::Action {
                 name: item_name.to_string(),
@@ -435,6 +437,7 @@ mod tests {
 
         Menu {
             name: "View".into(),
+            display_name: None,
             items,
             disabled: false,
         }

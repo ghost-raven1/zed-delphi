@@ -134,7 +134,7 @@ impl GoToLine {
         let line_editor_change = cx.subscribe_in(&line_editor, window, Self::on_line_editor_event);
 
         let current_text = format!(
-            "Current Line: {} of {} (column {})",
+            "Текущая строка: {} из {} (столбец {})",
             line,
             last_line + 1,
             column
@@ -313,13 +313,13 @@ impl Render for GoToLine {
             } else {
                 self.current_line.saturating_sub(offset.unsigned_abs())
             };
-            format!("Go to line {target_line} ({offset:+} from current)").into()
+            format!("Перейти к строке {target_line} ({offset:+} от текущей)").into()
         } else {
             match self.line_and_char_from_query(cx) {
                 Some((line, Some(character))) => {
-                    format!("Go to line {line}, character {character}").into()
+                    format!("Перейти к строке {line}, символу {character}").into()
                 }
-                Some((line, None)) => format!("Go to line {line}").into(),
+                Some((line, None)) => format!("Перейти к строке {line}").into(),
                 None => self.current_text.clone(),
             }
         };

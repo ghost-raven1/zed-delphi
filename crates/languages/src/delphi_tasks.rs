@@ -5,7 +5,7 @@ use task::{SaveStrategy, TaskTemplate, TaskTemplates, VariableName};
 pub(super) fn task_context() -> ContextProviderWithTasks {
     ContextProviderWithTasks::new(TaskTemplates(vec![
         TaskTemplate {
-            label: "Delphi: compile current file with Free Pascal (Debug)".into(),
+            label: "Delphi: собрать текущий файл Free Pascal для отладки".into(),
             // Tasks and debugger build steps quote args differently; keep the shell command whole.
             command: format!(
                 "fpc -Mdelphi -g -gl -gw3 -O- {}",
@@ -16,7 +16,7 @@ pub(super) fn task_context() -> ContextProviderWithTasks {
             ..TaskTemplate::default()
         },
         TaskTemplate {
-            label: "Delphi: compile current file with Free Pascal (Release)".into(),
+            label: "Delphi: собрать текущий файл Free Pascal для выпуска".into(),
             command: format!(
                 "fpc -Mdelphi -O2 {}",
                 VariableName::File.template_value_with_whitespace()

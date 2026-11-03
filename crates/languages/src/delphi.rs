@@ -68,7 +68,7 @@ impl LspInstaller for DelphiLspAdapter {
         _: &mut AsyncApp,
     ) -> Result<()> {
         bail!(
-            "Install {} locally and set lsp.{}.binary.path; automatic downloads are not supported",
+            "Установите {} локально и задайте lsp.{}.binary.path; автоматическая загрузка не поддерживается",
             self.executable(),
             self.name().0.as_str()
         )
@@ -80,7 +80,9 @@ impl LspInstaller for DelphiLspAdapter {
         _: PathBuf,
         _: &Arc<dyn LspAdapterDelegate>,
     ) -> impl Send + Future<Output = Result<LanguageServerBinary>> + use<> {
-        async { bail!("Delphi language servers must be installed locally") }
+        async {
+            bail!("Языковые серверы Delphi необходимо установить локально")
+        }
     }
 
     async fn cached_server_binary(

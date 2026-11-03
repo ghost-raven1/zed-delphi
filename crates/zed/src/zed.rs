@@ -1609,14 +1609,14 @@ fn open_about_window(cx: &mut App) {
                             .child(Headline::new(self.message.clone()))
                             .when_some(self.commit.clone(), |this, commit| {
                                 this.child(
-                                    Label::new("Commit")
+                                    Label::new("Коммит")
                                         .color(Color::Muted)
                                         .size(LabelSize::XSmall),
                                 )
                                 .child(Label::new(commit).size(LabelSize::Small))
                             })
                             .child(
-                                Label::new("Version")
+                                Label::new("Версия")
                                     .color(Color::Muted)
                                     .size(LabelSize::XSmall),
                             )
@@ -1654,7 +1654,7 @@ fn open_about_window(cx: &mut App) {
                                         },
                                     ))
                                     .child(
-                                        Button::new("copy", "Copy")
+                                        Button::new("copy", "Копировать")
                                             .full_width()
                                             .style(ButtonStyle::Tinted(TintColor::Accent))
                                             .toggle_state(copy_is_focused)
@@ -3533,7 +3533,7 @@ mod tests {
             .unwrap();
         executor.run_until_parked();
 
-        cx.simulate_prompt_answer("Don't Save");
+        cx.simulate_prompt_answer("Не сохранять");
         close.await.unwrap();
 
         // Advance the clock to ensure that the item has been serialized and dropped from the queue
@@ -3599,7 +3599,7 @@ mod tests {
         assert_eq!(cx.update(|cx| cx.windows().len()), 1);
 
         // The window is successfully closed after the user dismisses the prompt.
-        cx.simulate_prompt_answer("Don't Save");
+        cx.simulate_prompt_answer("Не сохранять");
         executor.run_until_parked();
         assert_eq!(cx.update(|cx| cx.windows().len()), 0);
     }
@@ -4767,7 +4767,7 @@ mod tests {
             })
             .unwrap();
         cx.background_executor.run_until_parked();
-        cx.simulate_prompt_answer("Overwrite");
+        cx.simulate_prompt_answer("Перезаписать");
         save_task.await.unwrap();
         window
             .update(cx, |_, _, cx| {
@@ -5093,7 +5093,7 @@ mod tests {
             close_pinned: false,
         });
         cx.background_executor.run_until_parked();
-        cx.simulate_prompt_answer("Don't Save");
+        cx.simulate_prompt_answer("Не сохранять");
         cx.background_executor.run_until_parked();
 
         workspace.read_with(cx, |workspace, cx| {
@@ -7300,7 +7300,7 @@ mod tests {
             "Case 1: Should prompt to save dirty item in active workspace"
         );
 
-        cx.simulate_prompt_answer("Cancel");
+        cx.simulate_prompt_answer("Отмена");
         cx.run_until_parked();
 
         assert_eq!(
@@ -7320,7 +7320,7 @@ mod tests {
             })
             .unwrap();
         cx.run_until_parked();
-        cx.simulate_prompt_answer("Don't Save");
+        cx.simulate_prompt_answer("Не сохранять");
         close_task.await.ok();
         cx.run_until_parked();
 
@@ -7382,7 +7382,7 @@ mod tests {
             "Case 2: Should prompt to save dirty item in non-active workspace"
         );
 
-        cx.simulate_prompt_answer("Cancel");
+        cx.simulate_prompt_answer("Отмена");
         cx.run_until_parked();
 
         assert_eq!(
@@ -7402,7 +7402,7 @@ mod tests {
             })
             .unwrap();
         cx.run_until_parked();
-        cx.simulate_prompt_answer("Don't Save");
+        cx.simulate_prompt_answer("Не сохранять");
         close_task.await.ok();
         cx.run_until_parked();
 
@@ -7466,7 +7466,7 @@ mod tests {
             "Case 3: Should prompt to save dirty item in non-active window"
         );
 
-        cx.simulate_prompt_answer("Cancel");
+        cx.simulate_prompt_answer("Отмена");
         cx.run_until_parked();
 
         assert_eq!(
@@ -7588,7 +7588,7 @@ mod tests {
             "Reload should prompt to save the dirty item in the non-active workspace"
         );
 
-        cx.simulate_prompt_answer("Cancel");
+        cx.simulate_prompt_answer("Отмена");
         cx.run_until_parked();
 
         assert_eq!(
@@ -7613,7 +7613,7 @@ mod tests {
             cx.has_pending_prompt(),
             "Reload should prompt again for the dirty item"
         );
-        cx.simulate_prompt_answer("Don't Save");
+        cx.simulate_prompt_answer("Не сохранять");
         cx.run_until_parked();
 
         will_restart
@@ -8461,11 +8461,11 @@ mod tests {
         cx.update(|cx| reload_keymaps(cx, Vec::new()));
         cx.update(|cx| {
             assert!(
-                has_view_item(cx, "Agent Panel"),
+                has_view_item(cx, "Панель агента"),
                 "expected Agent Panel in the View menu when AI is enabled"
             );
             assert!(
-                has_view_item(cx, "Diagnostics"),
+                has_view_item(cx, "Диагностика"),
                 "expected Diagnostics to be in View menu"
             );
         });
@@ -8482,11 +8482,11 @@ mod tests {
         });
         cx.update(|cx| {
             assert!(
-                !has_view_item(cx, "Agent Panel"),
+                !has_view_item(cx, "Панель агента"),
                 "expected Agent Panel to be removed from the View menu after disabling AI"
             );
             assert!(
-                has_view_item(cx, "Diagnostics"),
+                has_view_item(cx, "Диагностика"),
                 "expected Diagnostics to remain in the View menu"
             );
         });
@@ -8501,11 +8501,11 @@ mod tests {
         cx.update(|cx| reload_keymaps(cx, Vec::new()));
         cx.update(|cx| {
             assert!(
-                has_view_item(cx, "Agent Panel"),
+                has_view_item(cx, "Панель агента"),
                 "expected Agent Panel back in the View menu after re-enabling AI"
             );
             assert!(
-                has_view_item(cx, "Diagnostics"),
+                has_view_item(cx, "Диагностика"),
                 "expected Diagnostics to remain in the View menu"
             );
         });
@@ -8518,11 +8518,11 @@ mod tests {
         cx.update(|cx| reload_keymaps(cx, Vec::new()));
         cx.update(|cx| {
             assert!(
-                has_view_item(cx, "Agent Panel"),
+                has_view_item(cx, "Панель агента"),
                 "expected Agent Panel before disabling AI"
             );
             assert!(
-                has_view_item(cx, "Diagnostics"),
+                has_view_item(cx, "Диагностика"),
                 "expected Diagnostics in the View menu"
             );
         });
@@ -8563,11 +8563,11 @@ mod tests {
 
         cx.update(|cx| {
             assert!(
-                !has_view_item(cx, "Agent Panel"),
+                !has_view_item(cx, "Панель агента"),
                 "expected Agent Panel removed even though the keymap file is malformed"
             );
             assert!(
-                has_view_item(cx, "Diagnostics"),
+                has_view_item(cx, "Диагностика"),
                 "expected Diagnostics to remain in the View menu"
             );
         });
@@ -8585,11 +8585,11 @@ mod tests {
 
         cx.update(|cx| {
             assert!(
-                has_view_item(cx, "Agent Panel"),
+                has_view_item(cx, "Панель агента"),
                 "expected Agent Panel added back even though the keymap file is malformed"
             );
             assert!(
-                has_view_item(cx, "Diagnostics"),
+                has_view_item(cx, "Диагностика"),
                 "expected Diagnostics to remain in the View menu"
             );
         });

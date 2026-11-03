@@ -305,16 +305,16 @@ pub async fn open_remote_project(
                         ui.update(cx, |modal, cx| modal.finished(cx))
                     }
                 });
-                log::error!("Failed to open project: {e:#}");
+                log::error!("Не удалось открыть проект: {e:#}");
                 let response = window
                     .update(cx, |_, window, cx| {
                         window.prompt(
                             PromptLevel::Critical,
                             match connection_options {
-                                RemoteConnectionOptions::Ssh(_) => "Failed to connect over SSH",
-                                RemoteConnectionOptions::Wsl(_) => "Failed to connect to WSL",
+                                RemoteConnectionOptions::Ssh(_) => "Не удалось подключиться по SSH",
+                                RemoteConnectionOptions::Wsl(_) => "Не удалось подключиться к WSL",
                                 RemoteConnectionOptions::Docker(_) => {
-                                    "Failed to connect to Dev Container"
+                                    "Не удалось подключиться к контейнеру разработки"
                                 }
                                 #[cfg(any(test, feature = "test-support"))]
                                 RemoteConnectionOptions::Mock(_) => {
@@ -366,16 +366,16 @@ pub async fn open_remote_project(
 
         match opened {
             Err(e) => {
-                log::error!("Failed to open project: {e:#}");
+                log::error!("Не удалось открыть проект: {e:#}");
                 let response = window
                     .update(cx, |_, window, cx| {
                         window.prompt(
                             PromptLevel::Critical,
                             match connection_options {
-                                RemoteConnectionOptions::Ssh(_) => "Failed to connect over SSH",
-                                RemoteConnectionOptions::Wsl(_) => "Failed to connect to WSL",
+                                RemoteConnectionOptions::Ssh(_) => "Не удалось подключиться по SSH",
+                                RemoteConnectionOptions::Wsl(_) => "Не удалось подключиться к WSL",
                                 RemoteConnectionOptions::Docker(_) => {
-                                    "Failed to connect to Dev Container"
+                                    "Не удалось подключиться к контейнеру разработки"
                                 }
                                 #[cfg(any(test, feature = "test-support"))]
                                 RemoteConnectionOptions::Mock(_) => {

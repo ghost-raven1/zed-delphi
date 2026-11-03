@@ -192,7 +192,7 @@ impl ExtensionCard {
     fn uninstall_button(extension_id: &Arc<str>, is_dev: bool) -> Button {
         Button::new(
             Self::button_id(extension_id, ExtensionOperation::Remove),
-            "Uninstall",
+            "Удалить",
         )
         .on_click({
             let extension_id = extension_id.clone();
@@ -215,7 +215,7 @@ impl ExtensionCard {
     ) -> Button {
         Button::new(
             SharedString::from(format!("configure-{extension_id}")),
-            "Configure",
+            "Настроить",
         )
         .on_click({
             let extension_id = extension_id.clone();
@@ -246,7 +246,7 @@ impl ExtensionCard {
         let rebuild = is_dev.then(|| {
             Button::new(
                 SharedString::from(format!("rebuild-{}", extension.id)),
-                "Rebuild",
+                "Пересобрать",
             )
             .color(Color::Accent)
             .disabled(Self::disables_actions(status))
@@ -286,7 +286,7 @@ impl ExtensionCard {
     fn install_button(extension_id: &Arc<str>) -> Button {
         Button::new(
             Self::button_id(extension_id, ExtensionOperation::Install),
-            "Install",
+            "Установить",
         )
         .style(ButtonStyle::Tinted(ui::TintColor::Accent))
         .start_icon(
@@ -339,7 +339,7 @@ impl ExtensionCard {
                 let upgrade = matches!(status, ExtensionStatus::Upgrading).then(|| {
                     Button::new(
                         Self::button_id(&extension.id, ExtensionOperation::Upgrade),
-                        "Upgrade",
+                        "Обновить",
                     )
                     .disabled(Self::disables_actions(status))
                 });
@@ -360,7 +360,7 @@ impl ExtensionCard {
                     );
                     Button::new(
                         Self::button_id(&extension.id, ExtensionOperation::Upgrade),
-                        "Upgrade",
+                        "Обновить",
                     )
                     .style(ButtonStyle::Tinted(ui::TintColor::Accent))
                     .when(!is_compatible, |button| {
@@ -368,9 +368,7 @@ impl ExtensionCard {
                             let version = extension.manifest.version.clone();
                             move |_, cx| {
                                 Tooltip::simple(
-                                    format!(
-                                        "v{version} is not compatible with this version of Zed."
-                                    ),
+                                    format!("Версия {version} несовместима с этой версией Zed."),
                                     cx,
                                 )
                             }
@@ -426,17 +424,17 @@ fn provided_feature_labels(
 
 pub(crate) fn extension_provides_label(provides: ExtensionProvides) -> &'static str {
     match provides {
-        ExtensionProvides::Themes => "Themes",
-        ExtensionProvides::IconThemes => "Icon Themes",
-        ExtensionProvides::Languages => "Languages",
-        ExtensionProvides::Grammars => "Grammars",
-        ExtensionProvides::LanguageServers => "Language Servers",
-        ExtensionProvides::ContextServers => "MCP Servers",
-        ExtensionProvides::AgentServers => "Agent Servers",
-        ExtensionProvides::SlashCommands => "Slash Commands",
-        ExtensionProvides::IndexedDocsProviders => "Indexed Docs Providers",
-        ExtensionProvides::Snippets => "Snippets",
-        ExtensionProvides::DebugAdapters => "Debug Adapters",
+        ExtensionProvides::Themes => "Темы",
+        ExtensionProvides::IconThemes => "Темы значков",
+        ExtensionProvides::Languages => "Языки",
+        ExtensionProvides::Grammars => "Грамматики",
+        ExtensionProvides::LanguageServers => "Языковые серверы",
+        ExtensionProvides::ContextServers => "Серверы MCP",
+        ExtensionProvides::AgentServers => "Серверы агентов",
+        ExtensionProvides::SlashCommands => "Слеш-команды",
+        ExtensionProvides::IndexedDocsProviders => "Источники индексируемой документации",
+        ExtensionProvides::Snippets => "Фрагменты кода",
+        ExtensionProvides::DebugAdapters => "Адаптеры отладки",
     }
 }
 
@@ -719,7 +717,7 @@ impl RenderOnce for ExtensionCard {
                                             .icon_size(IconSize::Small)
                                             .tooltip(move |_, cx| {
                                                 Tooltip::with_meta(
-                                                    "Visit Extension Repository",
+                                                    "Открыть репозиторий расширения",
                                                     None,
                                                     repository_url_for_tooltip.clone(),
                                                     cx,
@@ -768,7 +766,7 @@ impl RenderOnce for ExtensionCard {
                             .size_full()
                             .justify_center()
                             .bg(cx.theme().colors().elevated_surface_background.alpha(0.8))
-                            .child(Label::new("Overridden by dev extension.")),
+                            .child(Label::new("Заменено расширением для разработки.")),
                     )
                 }),
         )

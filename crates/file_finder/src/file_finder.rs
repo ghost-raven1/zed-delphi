@@ -1491,11 +1491,11 @@ impl FileFinderDelegate {
                 } => (
                     channel_name.to_string(),
                     string_match.positions.clone(),
-                    "Channel Notes".to_string(),
+                    "Заметки канала".to_string(),
                     vec![],
                 ),
                 Match::CreateNew(project_path) => (
-                    format!("Create File: {}", project_path.path.display(path_style)),
+                    format!("Создать файл: {}", project_path.path.display(path_style)),
                     vec![],
                     String::from(""),
                     vec![],
@@ -1946,7 +1946,7 @@ impl PickerDelegate for FileFinderDelegate {
     }
 
     fn placeholder_text(&self, _window: &mut Window, _cx: &mut App) -> Arc<str> {
-        "Search project files...".into()
+        "Поиск файлов проекта…".into()
     }
 
     fn searchbar_trailer(
@@ -1959,9 +1959,9 @@ impl PickerDelegate for FileFinderDelegate {
         // Clicking includes ignored files unless they're already included, in
         // which case it excludes them again (see `handle_toggle_ignored`).
         let tooltip_label = if including_ignored {
-            "Exclude Ignored Files"
+            "Исключить игнорируемые файлы"
         } else {
-            "Include Ignored Files"
+            "Включить игнорируемые файлы"
         };
 
         let filter_button = IconButton::new("filter-ignored", IconName::FileIgnored)
@@ -2219,7 +2219,7 @@ impl PickerDelegate for FileFinderDelegate {
                     ..Default::default()
                 };
                 let mut message = picker::HighlightedTextBuilder::default();
-                message.push_plain("Create file ");
+                message.push_plain("Создать файл ");
                 message.push_styled(project_path.path.display(path_style), path_highlight);
                 message.push_plain("?");
                 Some(picker::PreviewUpdate::message(message.build()))
@@ -2257,16 +2257,16 @@ impl PickerDelegate for FileFinderDelegate {
         _cx: &mut Context<Picker<Self>>,
     ) -> Vec<picker::PickerAction> {
         let open_label: SharedString = if self.selected_matches.len() > 1 {
-            "Open multiple".into()
+            "Открыть выбранные файлы".into()
         } else {
-            "Open File".into()
+            "Открыть файл".into()
         };
         vec![
-            picker::PickerAction::header("Split…"),
-            picker::PickerAction::button("Left", pane::SplitLeft::default().boxed_clone()),
-            picker::PickerAction::button("Right", pane::SplitRight::default().boxed_clone()),
-            picker::PickerAction::button("Up", pane::SplitUp::default().boxed_clone()),
-            picker::PickerAction::button("Down", pane::SplitDown::default().boxed_clone()),
+            picker::PickerAction::header("Разделить…"),
+            picker::PickerAction::button("Слева", pane::SplitLeft::default().boxed_clone()),
+            picker::PickerAction::button("Справа", pane::SplitRight::default().boxed_clone()),
+            picker::PickerAction::button("Сверху", pane::SplitUp::default().boxed_clone()),
+            picker::PickerAction::button("Снизу", pane::SplitDown::default().boxed_clone()),
             picker::PickerAction::separator(),
             picker::PickerAction::button(open_label, menu::Confirm.boxed_clone()),
         ]

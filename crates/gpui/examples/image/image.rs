@@ -173,6 +173,7 @@ fn run_example() {
         cx.bind_keys([KeyBinding::new("cmd-q", Quit, None)]);
         cx.set_menus(vec![Menu {
             name: "Image".into(),
+            display_name: None,
             items: vec![MenuItem::action("Quit", Quit)],
             disabled: false,
         }]);

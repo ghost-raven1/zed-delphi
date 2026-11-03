@@ -55,9 +55,9 @@ impl TasksModalDelegate {
             reveal_target: Some(RevealTarget::Center),
         }) = &task_overrides
         {
-            Arc::from("Find a task, or run a command in the central pane")
+            Arc::from("Найдите задачу или выполните команду в центральной панели")
         } else {
-            Arc::from("Find a task, or run a command")
+            Arc::from("Найдите задачу или выполните команду")
         };
         Self {
             task_store,
@@ -569,7 +569,7 @@ impl PickerDelegate for TasksModalDelegate {
                                         .checked_sub(1);
                                     picker.refresh(window, cx);
                                 }))
-                                .tooltip(|_, cx| Tooltip::simple("Delete from Recent Tasks", cx)),
+                                .tooltip(|_, cx| Tooltip::simple("Удалить из недавних задач", cx)),
                         );
                         item.end_slot_on_hover(delete_button)
                     } else {
@@ -646,7 +646,7 @@ impl PickerDelegate for TasksModalDelegate {
             .last_scheduled_task(None)
             .is_some()
         {
-            Some(("Rerun Last Task", Rerun::default().boxed_clone()))
+            Some(("Повторить последнюю задачу", Rerun::default().boxed_clone()))
         } else {
             None
         };
@@ -680,9 +680,9 @@ impl PickerDelegate for TasksModalDelegate {
                         .boxed_clone();
                         this.child({
                             let spawn_oneshot_label = if current_modifiers.secondary(cx) {
-                                "Spawn Oneshot Without History"
+                                "Выполнить команду без истории"
                             } else {
-                                "Spawn Oneshot"
+                                "Выполнить команду"
                             };
 
                             Button::new("spawn-onehshot", spawn_oneshot_label)
@@ -694,9 +694,9 @@ impl PickerDelegate for TasksModalDelegate {
                     } else if current_modifiers.secondary(cx) {
                         this.child({
                             let label = if is_recent_selected {
-                                "Rerun Without History"
+                                "Повторить без истории"
                             } else {
-                                "Spawn Without History"
+                                "Запустить без истории"
                             };
                             Button::new("spawn", label)
                                 .key_binding(KeyBinding::for_action(&menu::SecondaryConfirm, cx))
@@ -706,8 +706,11 @@ impl PickerDelegate for TasksModalDelegate {
                         })
                     } else {
                         this.child({
-                            let run_entry_label =
-                                if is_recent_selected { "Rerun" } else { "Spawn" };
+                            let run_entry_label = if is_recent_selected {
+                                "Перезапустить"
+                            } else {
+                                "Запустить"
+                            };
 
                             Button::new("spawn", run_entry_label)
                                 .key_binding(KeyBinding::for_action(&menu::Confirm, cx))

@@ -168,7 +168,7 @@ impl SkillCreatorPage {
 
         let name_editor = cx.new(|cx| {
             InputField::new(window, cx, "my-new-skill")
-                .label("Name")
+                .label("Имя")
                 .tab_index(NAME_FIELD_TAB_INDEX)
                 .tab_stop(true)
         });
@@ -179,9 +179,9 @@ impl SkillCreatorPage {
             InputField::new(
                 window,
                 cx,
-                "e.g., Fill the PR description following this template.",
+                "Например: заполнить описание PR по этому шаблону.",
             )
-            .label("Description")
+            .label("Описание")
             .tab_index(DESCRIPTION_FIELD_TAB_INDEX)
             .tab_stop(true)
         });
@@ -193,7 +193,7 @@ impl SkillCreatorPage {
                 buffer
             });
             let mut editor = Editor::for_buffer(buffer, None, window, cx);
-            editor.set_placeholder_text("Add skill content…", window, cx);
+            editor.set_placeholder_text("Добавьте содержимое навыка…", window, cx);
             editor.set_soft_wrap_mode(SoftWrap::EditorWidth, cx);
             editor.set_show_gutter(false, cx);
             editor.set_show_wrap_guides(false, cx);
@@ -397,7 +397,7 @@ impl SkillCreatorPage {
     fn recompute_body_error(&mut self, cx: &App) {
         let body = self.current_body(cx);
         self.body_error = if body.trim().is_empty() {
-            Some("Body is required.")
+            Some("Укажите содержимое.")
         } else {
             None
         };
@@ -443,7 +443,7 @@ impl SkillCreatorPage {
             Ok(imported) => self.apply_imported_skill(imported, window, cx),
             Err(err) => {
                 self.save_error = Some(SharedString::from(format!(
-                    "Couldn't read shared skill: {err}"
+                    "Не удалось прочитать опубликованный навык: {err}"
                 )));
                 cx.notify();
             }
@@ -704,20 +704,20 @@ impl SkillCreatorPage {
             .child(
                 h_flex()
                     .gap_1()
-                    .child(Label::new("Import from URL"))
-                    .child(Label::new("(optional)").color(Color::Muted)),
+                    .child(Label::new("Импортировать по URL"))
+                    .child(Label::new("(необязательно)").color(Color::Muted)),
             )
             .child(self.url_editor.clone())
             .child(match &self.url_import_status {
                 UrlImportStatus::Idle => Label::new(
-                    "Paste a GitHub .md URL to fetch it and fill out the form. \
-                     For private files, Zed retries using GITHUB_TOKEN, if set.",
+                    "Вставьте URL файла .md на GitHub, чтобы загрузить его и заполнить форму. \
+                     Для закрытых файлов Zed повторит запрос с GITHUB_TOKEN, если он задан.",
                 )
                 .size(LabelSize::Small)
                 .color(Color::Muted)
                 .into_any_element(),
                 UrlImportStatus::Fetching => {
-                    LoadingLabel::new("Fetching and parsing…").into_any_element()
+                    LoadingLabel::new("Загрузка и обработка…").into_any_element()
                 }
                 UrlImportStatus::Error(error) => h_flex()
                     .gap_1()
@@ -744,7 +744,7 @@ impl SkillCreatorPage {
             .child(
                 v_flex()
                     .gap_2()
-                    .child(Label::new("Front-matter"))
+                    .child(Label::new("Метаданные"))
                     .child(self.name_editor.clone())
                     .child(self.description_editor.clone()),
             )
@@ -755,7 +755,7 @@ impl SkillCreatorPage {
                     .flex_grow_1()
                     .flex_shrink_0()
                     .gap_2()
-                    .child(Label::new("Skill Content"))
+                    .child(Label::new("Содержимое навыка"))
                     .child(self.render_body_field(window, cx))
                     .when_some(self.body_error, |this, error| {
                         this.child(Label::new(error).size(LabelSize::Small).color(Color::Error))
@@ -768,9 +768,9 @@ impl SkillCreatorPage {
 
         SwitchField::new(
             "disable-model-invocation",
-            Some("Disable model invocation"),
+            Some("Запретить вызов моделью"),
             Some(
-                "Hide this skill from the model's catalog. It can still be invoked via slash command."
+                "Скрыть навык из каталога модели. Его по-прежнему можно вызвать командой с косой чертой."
                     .into(),
             ),
             toggle_state,
@@ -836,7 +836,11 @@ impl SkillCreatorPage {
 
     fn render_footer(&self, _window: &Window, cx: &mut Context<Self>) -> impl IntoElement {
         let saving = self.saving;
-        let main_action = if saving { "Saving…" } else { "Save Skill" };
+        let main_action = if saving {
+            "Сохранение…"
+        } else {
+            "Сохранить навык"
+        };
 
         v_flex()
             .w_full()
@@ -1068,17 +1072,17 @@ pub(crate) fn is_supported_skill_url(input: &str) -> bool {
 }
 
 fn github_raw_url(input: &str) -> Result<String> {
-    let url = Url::parse(input.trim()).context("Enter a valid GitHub URL")?;
+    let url = Url::parse(input.trim()).context("Введите корректный URL GitHub")?;
     if url.scheme() != "https" {
-        anyhow::bail!("GitHub skill URLs must use https://");
+        anyhow::bail!("URL навыков GitHub должны использовать https://");
     }
 
     let host = url
         .host_str()
-        .ok_or_else(|| anyhow!("Enter a valid GitHub URL"))?;
+        .ok_or_else(|| anyhow!("Введите корректный URL GitHub"))?;
     let path_segments = url
         .path_segments()
-        .ok_or_else(|| anyhow!("Enter a valid GitHub URL"))?
+        .ok_or_else(|| anyhow!("Введите корректный URL GitHub"))?
         .collect::<Vec<_>>();
 
     match host {
@@ -1087,17 +1091,17 @@ fn github_raw_url(input: &str) -> Result<String> {
             ensure_markdown_path(&path_segments)?;
             Ok(url.into())
         }
-        _ => anyhow::bail!("Paste a GitHub .md URL"),
+        _ => anyhow::bail!("Вставьте URL файла .md на GitHub"),
     }
 }
 
 fn github_blob_raw_url(path_segments: &[&str]) -> Result<String> {
     let [owner, repo, kind, reference, file_path @ ..] = path_segments else {
-        anyhow::bail!("Paste a GitHub blob URL that points to a .md file");
+        anyhow::bail!("Вставьте URL GitHub blob, указывающий на файл .md");
     };
 
     if *kind != "blob" {
-        anyhow::bail!("Paste a GitHub blob URL that points to a .md file");
+        anyhow::bail!("Вставьте URL GitHub blob, указывающий на файл .md");
     }
 
     ensure_markdown_path(file_path)?;
@@ -1109,11 +1113,11 @@ fn github_blob_raw_url(path_segments: &[&str]) -> Result<String> {
 
 fn ensure_markdown_path(path_segments: &[&str]) -> Result<()> {
     let Some(file_name) = path_segments.last() else {
-        anyhow::bail!("Paste a GitHub .md URL");
+        anyhow::bail!("Вставьте URL файла .md на GitHub");
     };
 
     if !file_name.to_ascii_lowercase().ends_with(".md") {
-        anyhow::bail!("Paste a GitHub URL that points to a .md file");
+        anyhow::bail!("Вставьте URL GitHub, указывающий на файл .md");
     }
 
     Ok(())
@@ -1243,7 +1247,9 @@ async fn write_skill_to_worktree(
     let Some(host_check) = project.read_with(cx, |project, cx| {
         project.host_path_is_dir(&skill_dir_abs_path, cx)
     }) else {
-        anyhow::bail!("You can't create skills in a project someone shared with you.");
+        anyhow::bail!(
+            "Нельзя создавать навыки в проекте, доступ к которому предоставил другой пользователь."
+        );
     };
     let existing_is_dir = host_check.await.with_context(|| {
         format!(

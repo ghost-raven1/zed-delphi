@@ -10,9 +10,9 @@ use util::ResultExt as _;
 use crate::SettingsWindow;
 use crate::components::{SettingsInputField, SettingsSectionHeader};
 
-const DOMAINS_DESCRIPTION: &str = "Each entry is an exact domain (github.com) or a leading-*. subdomain wildcard (*.npmjs.org). IP addresses and local domains are not allowed.";
+const DOMAINS_DESCRIPTION: &str = "Каждая запись — точный домен (github.com) или маска поддоменов с *. в начале (*.npmjs.org). IP-адреса и локальные домены недопустимы.";
 
-const WRITE_PATHS_DESCRIPTION: &str = "Each entry must be an absolute path and grants write access to the whole subtree, except protected Git metadata.";
+const WRITE_PATHS_DESCRIPTION: &str = "Каждая запись должна быть абсолютным путём и разрешает запись во всё поддерево, кроме защищённых метаданных Git.";
 
 pub(crate) fn render_sandbox_settings_page(
     settings_window: &SettingsWindow,
@@ -61,9 +61,9 @@ pub(crate) fn render_sandbox_settings_page(
         .child(
             SwitchField::new(
                 "sandbox-enabled",
-                Some("Enable Sandbox"),
+                Some("Включить песочницу"),
                 Some(
-                    "Wrap agent-run terminal commands in an OS-level sandbox. When off, commands run with Zed's own permissions."
+                    "Выполнять команды агента в терминале внутри песочницы ОС. Когда выключено, команды выполняются с правами Zed."
                         .into(),
                 ),
                 sandbox_enabled,
@@ -76,11 +76,11 @@ pub(crate) fn render_sandbox_settings_page(
         .child({
             let docs_url =
                 client::zed_urls::sandboxing_docs(Some("persistent-sandbox-permissions"), cx);
-            let tooltip = format!("Opens {docs_url}");
+            let tooltip = format!("Открывает {docs_url}");
             // Wrap in a row so the button shrinks to its content width instead
             // of stretching across the settings page.
             h_flex().child(
-                Button::new("sandbox-docs-link", "Learn more about sandboxing")
+                Button::new("sandbox-docs-link", "Подробнее о песочнице")
                     .label_size(LabelSize::Small)
                     .color(Color::Muted)
                     .end_icon(
@@ -99,7 +99,7 @@ pub(crate) fn render_sandbox_settings_page(
                     .severity(Severity::Warning)
                     .child(Label::new(error).size(LabelSize::Small))
                     .action_slot(
-                        Button::new("dismiss-sandbox-host-error", "Dismiss")
+                        Button::new("dismiss-sandbox-host-error", "Закрыть")
                             .style(ButtonStyle::Tinted(ui::TintColor::Warning))
                             .on_click(cx.listener(|this, _, _, cx| {
                                 this.sandbox_host_validation_error = None;
@@ -111,13 +111,13 @@ pub(crate) fn render_sandbox_settings_page(
         .child(
             v_flex()
                 .gap_4()
-                .child(SettingsSectionHeader::new("Network").no_padding(true))
+                .child(SettingsSectionHeader::new("Сеть").no_padding(true))
                 .child(
                     SwitchField::new(
                         "sandbox-allow-all-hosts",
-                        Some("Allow All Domains"),
+                        Some("Разрешить все домены"),
                         Some(
-                            "Let sandboxed commands reach any domain over the network without prompting."
+                            "Разрешить командам в песочнице обращаться к любым доменам без подтверждения."
                                 .into(),
                         ),
                         permissions.allow_all_hosts,
@@ -128,7 +128,7 @@ pub(crate) fn render_sandbox_settings_page(
                     .tab_index(0),
                 )
                 .child(render_list_section(
-                    "Allowed Domains",
+                    "Разрешённые домены",
                     DOMAINS_DESCRIPTION,
                     host_rows,
                     add_host_input,
@@ -140,13 +140,13 @@ pub(crate) fn render_sandbox_settings_page(
         .child(
             v_flex()
                 .gap_4()
-                .child(SettingsSectionHeader::new("File System").no_padding(true))
+                .child(SettingsSectionHeader::new("Файловая система").no_padding(true))
                 .child(
                     SwitchField::new(
                         "sandbox-allow-fs-write-all",
-                        Some("Allow All File System Writes"),
+                        Some("Разрешить запись во всю файловую систему"),
                         Some(
-                            "Let sandboxed commands write anywhere except protected Git metadata without prompting."
+                            "Разрешить командам в песочнице запись в любые места, кроме защищённых метаданных Git, без подтверждения."
                                 .into(),
                         ),
                         permissions.allow_fs_write_all,
@@ -157,7 +157,7 @@ pub(crate) fn render_sandbox_settings_page(
                     .tab_index(0),
                 )
                 .child(render_list_section(
-                    "Writable Paths",
+                    "Пути с разрешением на запись",
                     WRITE_PATHS_DESCRIPTION,
                     path_rows,
                     add_path_input,
@@ -168,13 +168,13 @@ pub(crate) fn render_sandbox_settings_page(
         .child(
             v_flex()
                 .gap_4()
-                .child(SettingsSectionHeader::new("Escalation Prompts").no_padding(true))
+                .child(SettingsSectionHeader::new("Запросы расширения прав").no_padding(true))
                 .child(
                     SwitchField::new(
                         "sandbox-warn-confusable-unicode",
-                        Some("Warn About Confusable Unicode"),
+                        Some("Предупреждать о похожих символах Unicode"),
                         Some(
-                            "Warn when an approval prompt requests a domain or write path that contains potentially confusable Unicode characters, such as homoglyphs (i.e. two symbols that look similar, such as a Cyrillic `а`)"
+                            "Предупреждать, если запрос разрешения содержит домен или путь записи с похожими символами Unicode, например омоглифами (визуально сходными символами, такими как кириллическая `а`)"
                                 .into(),
                         ),
                         permissions.warn_confusable_unicode,
@@ -187,9 +187,9 @@ pub(crate) fn render_sandbox_settings_page(
                 .child(
                     SwitchField::new(
                         "sandbox-warn-ntfs-grants",
-                        Some("Warn About Windows-Drive Grants"),
+                        Some("Предупреждать о доступе к дискам Windows"),
                         Some(
-                            "Windows only: warn when a sandbox grant targets a file on a Windows drive (accessed inside WSL via DrvFs). Such grants are enforced through a translated path and their sandbox-integrity guarantees are weaker than files on the Linux distro's own filesystem."
+                            "Только Windows: предупреждать, когда разрешение песочницы относится к файлу на диске Windows (доступном из WSL через DrvFs). Такие разрешения используют преобразованный путь и обеспечивают более слабую изоляцию, чем для файлов в собственной файловой системе Linux."
                                 .into(),
                         ),
                         permissions.warn_ntfs_grants,
@@ -244,7 +244,7 @@ fn render_empty_state(border_color: gpui::Hsla) -> AnyElement {
         .border_dashed()
         .border_color(border_color)
         .child(
-            Label::new("Nothing configured")
+            Label::new("Ничего не настроено")
                 .size(LabelSize::Small)
                 .color(Color::Disabled),
         )
@@ -265,7 +265,7 @@ fn render_host_row(index: usize, host: String, cx: &mut Context<SettingsWindow>)
             IconButton::new(format!("sandbox-host-delete-{}", index), IconName::Trash)
                 .icon_size(IconSize::Small)
                 .icon_color(Color::Muted)
-                .tooltip(Tooltip::text("Remove Domain"))
+                .tooltip(Tooltip::text("Удалить домен"))
                 .on_click(cx.listener(move |_, _, _, cx| {
                     remove_network_host(host_for_delete.clone(), cx);
                 })),
@@ -301,7 +301,7 @@ fn render_add_host_input(cx: &mut Context<SettingsWindow>) -> AnyElement {
     let settings_window = cx.entity().downgrade();
 
     SettingsInputField::new("sandbox-host-new")
-        .with_placeholder("Add domain (e.g. github.com or *.npmjs.org)…")
+        .with_placeholder("Добавить домен (например, github.com или *.npmjs.org)…")
         .tab_index(0)
         .with_buffer_font()
         .display_clear_button()
@@ -348,7 +348,7 @@ fn render_path_row(index: usize, path: PathBuf, cx: &mut Context<SettingsWindow>
             IconButton::new(format!("sandbox-path-delete-{}", index), IconName::Trash)
                 .icon_size(IconSize::Small)
                 .icon_color(Color::Muted)
-                .tooltip(Tooltip::text("Remove Path"))
+                .tooltip(Tooltip::text("Удалить путь"))
                 .on_click(cx.listener(move |_, _, _, cx| {
                     remove_write_path(path_for_delete.clone(), cx);
                 })),
@@ -375,7 +375,7 @@ fn render_add_path_input(cx: &mut Context<SettingsWindow>) -> AnyElement {
     let settings_window = cx.entity().downgrade();
 
     SettingsInputField::new("sandbox-path-new")
-        .with_placeholder("Add an absolute path (e.g. /path/to/directory)…")
+        .with_placeholder("Добавить абсолютный путь (например, /path/to/directory)…")
         .tab_index(0)
         .with_buffer_font()
         .display_clear_button()
@@ -433,16 +433,16 @@ fn canonicalize_host(host: &str) -> Result<String, String> {
     HostPattern::parse(host)
         .map(|pattern| pattern.to_string())
         .map_err(|error| match error {
-            HostPatternError::Empty => "Domain cannot be empty.".to_string(),
+            HostPatternError::Empty => "Домен не может быть пустым.".to_string(),
             HostPatternError::IpLiteral(_) => {
-                "IP addresses and local domains aren't allowed; enter a domain like github.com."
+                "IP-адреса и локальные домены недопустимы; укажите домен, например github.com."
                     .to_string()
             }
             HostPatternError::InvalidWildcard(_) => {
-                "Wildcards are only allowed as a leading label, e.g. *.github.com.".to_string()
+                "Подстановочный знак разрешён только в начале, например *.github.com.".to_string()
             }
             HostPatternError::Invalid { .. } => {
-                "Not a valid domain. Use a domain like github.com or *.npmjs.org.".to_string()
+                "Недопустимый домен. Укажите домен вида github.com или *.npmjs.org.".to_string()
             }
         })
 }

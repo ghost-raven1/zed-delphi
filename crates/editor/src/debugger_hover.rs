@@ -120,8 +120,8 @@ impl DebuggerHoverView {
                             .shape(IconButtonShape::Square)
                             .icon_size(IconSize::Small)
                             .icon_color(Color::Muted)
-                            .aria_label("Copy Value")
-                            .tooltip(Tooltip::text("Copy Value"))
+                            .aria_label("Скопировать значение")
+                            .tooltip(Tooltip::text("Скопировать значение"))
                             .on_click(move |_, _, cx| {
                                 cx.write_to_clipboard(gpui::ClipboardItem::new_string(
                                     value.clone(),
@@ -134,8 +134,8 @@ impl DebuggerHoverView {
                                 .shape(IconButtonShape::Square)
                                 .icon_size(IconSize::Small)
                                 .icon_color(Color::Muted)
-                                .aria_label("Add to Watch")
-                                .tooltip(Tooltip::text("Add to Watch"))
+                                .aria_label("Добавить в наблюдение")
+                                .tooltip(Tooltip::text("Добавить в наблюдение"))
                                 .on_click(cx.listener(move |view, _, _, cx| {
                                     view.add_watch(expression.clone(), cx);
                                 })),
@@ -146,8 +146,8 @@ impl DebuggerHoverView {
                             .shape(IconButtonShape::Square)
                             .icon_size(IconSize::Small)
                             .icon_color(Color::Muted)
-                            .aria_label("Value Actions")
-                            .tooltip(Tooltip::text("Value Actions"))
+                            .aria_label("Действия со значением")
+                            .tooltip(Tooltip::text("Действия со значением"))
                             .on_click(cx.listener(move |view, _, window, cx| {
                                 view.variable_menu(variable.clone(), window, cx);
                             })),
@@ -292,18 +292,36 @@ impl DebuggerHoverView {
         let view = cx.entity().downgrade();
         let menu = ContextMenu::build(window, cx, |menu, _, _| {
             menu.key_context("menu DebuggerHoverMenu")
-                .entry("Copy Value", None, move |_, cx| {
-                    cx.write_to_clipboard(gpui::ClipboardItem::new_string(variable.value.clone()));
-                })
+                .entry(
+                    "Скопировать значение",
+                    None,
+                    move |_, cx| {
+                        cx.write_to_clipboard(gpui::ClipboardItem::new_string(
+                            variable.value.clone(),
+                        ));
+                    },
+                )
                 .when_some(variable.evaluate_name, |menu, expression| {
                     let watch_expression = expression.clone();
-                    menu.entry("Copy as Expression", None, move |_, cx| {
-                        cx.write_to_clipboard(gpui::ClipboardItem::new_string(expression.clone()));
-                    })
-                    .entry("Add to Watch", None, move |_, cx| {
-                        view.update(cx, |view, cx| view.add_watch(watch_expression.clone(), cx))
+                    menu.entry(
+                        "Скопировать как выражение",
+                        None,
+                        move |_, cx| {
+                            cx.write_to_clipboard(gpui::ClipboardItem::new_string(
+                                expression.clone(),
+                            ));
+                        },
+                    )
+                    .entry(
+                        "Добавить в наблюдение",
+                        None,
+                        move |_, cx| {
+                            view.update(cx, |view, cx| {
+                                view.add_watch(watch_expression.clone(), cx)
+                            })
                             .log_err();
-                    })
+                        },
+                    )
                 })
         });
         menu.update(cx, |menu, cx| menu.select_toggled_or_first(window, cx));
@@ -348,7 +366,7 @@ impl DebuggerHoverView {
                 .flatten()
         });
         let Some(task) = task else {
-            self.operation_error = Some("The debug session is no longer paused here".into());
+            self.operation_error = Some("Сеанс отладки больше не приостановлен здесь".into());
             cx.notify();
             return;
         };
@@ -473,7 +491,7 @@ impl DebuggerHoverView {
                     }
                 }
                 DebuggerHoverChildren::Loading => {
-                    entries.push(self.render_status_row("Loading…", depth + 1, cx));
+                    entries.push(self.render_status_row("Загрузка…", depth + 1, cx));
                 }
                 DebuggerHoverChildren::Failed(error) => {
                     entries.push(self.render_status_row(error, depth + 1, cx));

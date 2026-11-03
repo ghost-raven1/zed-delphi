@@ -69,9 +69,9 @@ impl DiffHunkRenderer for UnstagedDiffHunkRenderer {
             .block_mouse_except_scroll()
             .shadow_md()
             .child(
-                Button::new(("stage", row as u64), "Stage")
+                Button::new(("stage", row as u64), "В индекс")
                     .alpha(if status.is_pending() { 0.66 } else { 1.0 })
-                    .tooltip(Tooltip::text("Stage Hunk"))
+                    .tooltip(Tooltip::text("Добавить фрагмент в индекс"))
                     .on_click({
                         let editor = editor.clone();
                         move |_event, window, cx| {
@@ -87,8 +87,8 @@ impl DiffHunkRenderer for UnstagedDiffHunkRenderer {
                     }),
             )
             .child(
-                Button::new(("restore", row as u64), "Restore")
-                    .tooltip(Tooltip::text("Restore Hunk"))
+                Button::new(("restore", row as u64), "Восстановить")
+                    .tooltip(Tooltip::text("Отменить изменения фрагмента"))
                     .on_click({
                         let editor = editor.clone();
                         let hunk_range = hunk_range_for_restore;
@@ -209,7 +209,7 @@ impl UnstagedDiff {
             DiffMultibuffer::new(
                 branch_diff,
                 Capability::ReadWrite,
-                "No unstaged changes",
+                "Нет изменений вне индекса",
                 move |editor, cx| {
                     editor.set_diff_hunk_renderer(Some(Arc::new(UnstagedDiffHunkRenderer)), cx);
                     editor.rhs_editor().update(cx, |rhs_editor, _cx| {
@@ -347,11 +347,11 @@ impl Item for UnstagedDiff {
     }
 
     fn tab_tooltip_text(&self, _: &App) -> Option<SharedString> {
-        Some("Unstaged Changes".into())
+        Some("Изменения вне индекса".into())
     }
 
     fn tab_content_text(&self, _detail: usize, _cx: &App) -> SharedString {
-        "Unstaged Changes".into()
+        "Изменения вне индекса".into()
     }
 
     fn telemetry_event_text(&self) -> Option<&'static str> {
@@ -687,7 +687,7 @@ impl Render for UnstagedDiffToolbar {
                             .icon_size(IconSize::Small)
                             .disabled(!button_states.prev_next)
                             .tooltip(Tooltip::for_action_title_in(
-                                "Go to Previous Hunk",
+                                "Предыдущий фрагмент",
                                 &GoToPreviousHunk,
                                 &focus_handle,
                             ))
@@ -700,7 +700,7 @@ impl Render for UnstagedDiffToolbar {
                             .icon_size(IconSize::Small)
                             .disabled(!button_states.prev_next)
                             .tooltip(Tooltip::for_action_title_in(
-                                "Go to Next Hunk",
+                                "Следующий фрагмент",
                                 &GoToHunk,
                                 &focus_handle,
                             ))
@@ -714,9 +714,9 @@ impl Render for UnstagedDiffToolbar {
                 h_group_sm()
                     .when(button_states.selection, |this| {
                         this.child(
-                            Button::new("stage", "Stage")
+                            Button::new("stage", "В индекс")
                                 .disabled(!button_states.stage)
-                                .tooltip(Tooltip::text("Stage Selected Hunks"))
+                                .tooltip(Tooltip::text("Добавить выбранные фрагменты в индекс"))
                                 .on_click(cx.listener(|this, _, window, cx| {
                                     this.stage_selected_unstaged_hunks(false, window, cx)
                                 })),
@@ -724,10 +724,10 @@ impl Render for UnstagedDiffToolbar {
                     })
                     .when(!button_states.selection, |this| {
                         this.child(
-                            Button::new("stage", "Stage")
+                            Button::new("stage", "В индекс")
                                 .disabled(!button_states.stage)
                                 .tooltip(Tooltip::for_action_title_in(
-                                    "Stage and Go to Next Hunk",
+                                    "Добавить в индекс и перейти к следующему фрагменту",
                                     &StageAndNext,
                                     &focus_handle,
                                 ))
@@ -737,9 +737,9 @@ impl Render for UnstagedDiffToolbar {
                         )
                     })
                     .child(
-                        Button::new("restore", "Restore")
+                        Button::new("restore", "Восстановить")
                             .disabled(!button_states.restore)
-                            .tooltip(Tooltip::text("Restore Selected Hunks"))
+                            .tooltip(Tooltip::text("Отменить изменения выбранных фрагментов"))
                             .on_click(cx.listener(|this, _, window, cx| {
                                 this.restore_selected_unstaged_hunks(false, window, cx)
                             })),
@@ -747,11 +747,11 @@ impl Render for UnstagedDiffToolbar {
             )
             .child(Divider::vertical())
             .child(
-                Button::new("stage-all", "Stage All")
+                Button::new("stage-all", "Добавить всё в индекс")
                     .width(rems_from_px(80_f32))
                     .disabled(!button_states.stage_all)
                     .tooltip(Tooltip::for_action_title_in(
-                        "Stage All Changes",
+                        "Добавить все изменения в индекс",
                         &StageAll,
                         &focus_handle,
                     ))
@@ -759,10 +759,10 @@ impl Render for UnstagedDiffToolbar {
             )
             .child(Divider::vertical())
             .child(
-                Button::new("restore-all", "Restore All")
+                Button::new("restore-all", "Отменить все изменения")
                     .width(rems_from_px(80_f32))
                     .disabled(!button_states.restore_all)
-                    .tooltip(Tooltip::text("Restore All Changes"))
+                    .tooltip(Tooltip::text("Отменить все изменения"))
                     .on_click(cx.listener(|this, _, window, cx| this.restore_all(window, cx))),
             )
     }

@@ -338,7 +338,7 @@ impl BranchList {
         // Fetch default branch asynchronously since it requires a git operation
         cx.spawn_in(window, async move |this, cx| {
             let default_branch = default_branch_request
-                .context("No active repository")?
+                .context("Нет активного репозитория")?
                 .await
                 .map(Result::ok)
                 .ok()
@@ -357,7 +357,7 @@ impl BranchList {
 
         cx.spawn(async move |this, cx| {
             let remote_urls = remote_urls_request
-                .context("No active repository")?
+                .context("Нет активного репозитория")?
                 .await??;
             let remote_provider_icons = cx.update(|cx| remote_provider_icons(&remote_urls, cx));
             this.update(cx, |this, cx| {
@@ -612,9 +612,9 @@ impl BranchFilter {
 
     fn label(self) -> &'static str {
         match self {
-            Self::All => "All Branches",
-            Self::Local => "Local Branches",
-            Self::Remote => "Remote Branches",
+            Self::All => "Все ветки",
+            Self::Local => "Локальные ветки",
+            Self::Remote => "Удалённые ветки",
         }
     }
 }
@@ -821,7 +821,7 @@ const BRANCH_DELETE_FORCE_DELETE_PROMPTS: &[BranchDeleteForceDeletePrompt] =
     }];
 
 fn unmerged_branch_force_delete_prompt(branch_name: &str) -> String {
-    format!("Branch \"{branch_name}\" is not fully merged. Force delete it?")
+    format!("Branch \"{branch_name}\" содержит неслитые изменения. Удалить принудительно?")
 }
 
 // Git only reports these cases via localized stderr, so this best-effort check
@@ -870,9 +870,9 @@ impl Render for DeleteBranchTooltip {
         // merged check), so there is no separate force delete to offer for them.
         if self.is_remote {
             return Tooltip::with_meta_in(
-                "Delete Local Tracking Branch",
+                "Удалить локальную отслеживающую ветку",
                 Some(&branch_picker::DeleteBranch),
-                "Does not delete the branch on the remote",
+                "Не удаляет ветку в удалённом репозитории",
                 &self.focus_handle,
                 cx,
             )
@@ -889,7 +889,7 @@ impl Render for DeleteBranchTooltip {
             .unwrap_or(false);
         if force_delete {
             Tooltip::for_action_in(
-                "Force Delete Branch",
+                "Принудительно удалить ветку",
                 &branch_picker::ForceDeleteBranch,
                 &self.focus_handle,
                 cx,
@@ -897,9 +897,9 @@ impl Render for DeleteBranchTooltip {
             .into_any_element()
         } else {
             Tooltip::with_meta_in(
-                "Delete Branch",
+                "Удалить ветку",
                 Some(&branch_picker::DeleteBranch),
-                concat!("Hold ", ui::alt_key_name!(), " to force delete"),
+                concat!("Hold ", ui::alt_key_name!(), " — удалить принудительно"),
                 &self.focus_handle,
                 cx,
             )
@@ -1050,7 +1050,7 @@ impl BranchListDelegate {
         let focus_handle = self.focus_handle.clone();
         move |_, cx| {
             Tooltip::for_action_in(
-                "Filter Branches",
+                "Фильтр веток",
                 &branch_picker::ToggleFilterMenu,
                 &focus_handle,
                 cx,
@@ -1082,9 +1082,12 @@ impl BranchListDelegate {
 
             Ok(())
         })
-        .detach_and_prompt_err("Failed to create branch", window, cx, |e, _, _| {
-            Some(e.to_string())
-        });
+        .detach_and_prompt_err(
+            "Не удалось создать ветку",
+            window,
+            cx,
+            |e, _, _| Some(e.to_string()),
+        );
         cx.emit(DismissEvent);
     }
 
@@ -1102,9 +1105,12 @@ impl BranchListDelegate {
         let receiver = repo.update(cx, |repo, _| repo.create_remote(remote_name, remote_url));
 
         cx.background_spawn(async move { receiver.await? })
-            .detach_and_prompt_err("Failed to create remote", window, cx, |e, _, _cx| {
-                Some(e.to_string())
-            });
+            .detach_and_prompt_err(
+                "Не удалось добавить удалённый репозиторий",
+                window,
+                cx,
+                |e, _, _cx| Some(e.to_string()),
+            );
         cx.emit(DismissEvent);
     }
 
@@ -1146,9 +1152,9 @@ impl BranchListDelegate {
                 Ok(()) => (Ok(()), force),
                 Err(error) => {
                     if is_remote {
-                        log::error!("Failed to delete remote branch: {error}");
+                        log::error!("Не удалось удалить удалённую ветку: {error}");
                     } else {
-                        log::error!("Failed to delete branch: {error}");
+                        log::error!("Не удалось удалить ветку: {error}");
                     }
 
                     let force_delete_prompt = (!force)
@@ -1161,7 +1167,7 @@ impl BranchListDelegate {
                                 PromptLevel::Warning,
                                 &prompt_message,
                                 None,
-                                &["Force Delete", "Cancel"],
+                                &["Удалить принудительно", "Отмена"],
                                 cx,
                             )
                         })?;
@@ -1177,7 +1183,7 @@ impl BranchListDelegate {
                             .await?;
 
                         if let Err(error) = &retry {
-                            log::error!("Failed to force delete branch: {error}");
+                            log::error!("Не удалось принудительно удалить ветку: {error}");
                         }
                         (retry, true)
                     } else {
@@ -1258,18 +1264,18 @@ impl PickerDelegate for BranchListDelegate {
     fn placeholder_text(&self, _window: &mut Window, _cx: &mut App) -> Arc<str> {
         match self.state {
             PickerState::List | PickerState::NewRemote | PickerState::NewBranch => {
-                "Switch or type to create a branch…"
+                "Выберите ветку или введите имя новой…"
             }
-            PickerState::CreateRemote(_) => "Enter a name for this remote…",
+            PickerState::CreateRemote(_) => "Введите имя удалённого репозитория…",
         }
         .into()
     }
 
     fn no_matches_text(&self, _window: &mut Window, _cx: &mut App) -> Option<SharedString> {
         match self.state {
-            PickerState::CreateRemote(_) => {
-                Some(SharedString::new_static("Remote name can't be empty"))
-            }
+            PickerState::CreateRemote(_) => Some(SharedString::new_static(
+                "Имя удалённого репозитория не может быть пустым",
+            )),
             _ => None,
         }
     }
@@ -1286,7 +1292,7 @@ impl PickerDelegate for BranchListDelegate {
 
         let warning_banner = || {
             self.branch_list_error.as_deref().map(|error| {
-                let message = format!("Some branches could not be loaded: {error}");
+                let message = format!("Не удалось загрузить некоторые ветки: {error}");
                 div().p_1p5().child(
                     Banner::new()
                         .severity(Severity::Warning)
@@ -1589,7 +1595,7 @@ impl PickerDelegate for BranchListDelegate {
                     anyhow::Ok(())
                 })
                 .detach_and_prompt_err(
-                    "Failed to change branch",
+                    "Не удалось переключить ветку",
                     window,
                     cx,
                     |_, _, _| None,
@@ -1703,18 +1709,20 @@ impl PickerDelegate for BranchListDelegate {
         };
 
         let entry_title = match entry {
-            Entry::NewUrl { .. } => Label::new("Create Remote Repository")
+            Entry::NewUrl { .. } => Label::new("Добавить удалённый репозиторий")
                 .single_line()
                 .truncate()
                 .into_any_element(),
-            Entry::NewBranch { name } => Label::new(format!("Create Branch: \"{name}\"…"))
+            Entry::NewBranch { name } => Label::new(format!("Создать ветку: «{name}»…"))
                 .single_line()
                 .truncate()
                 .into_any_element(),
-            Entry::NewRemoteName { name, .. } => Label::new(format!("Create Remote: \"{name}\""))
-                .single_line()
-                .truncate()
-                .into_any_element(),
+            Entry::NewRemoteName { name, .. } => {
+                Label::new(format!("Добавить удалённый репозиторий: «{name}»"))
+                    .single_line()
+                    .truncate()
+                    .into_any_element()
+            }
             Entry::Branch { branch, positions } => {
                 HighlightedLabel::new(branch.name().to_string(), positions.clone())
                     .single_line()
@@ -1773,7 +1781,7 @@ impl PickerDelegate for BranchListDelegate {
         };
 
         let create_from_default_button = self.default_branch.as_ref().map(|default_branch| {
-            let tooltip_label: SharedString = format!("Create New From: {default_branch}").into();
+            let tooltip_label: SharedString = format!("Создать на основе: {default_branch}").into();
             let focus_handle = self.focus_handle.clone();
 
             IconButton::new("create_from_default", IconName::GitBranchPlus)
@@ -1819,9 +1827,9 @@ impl PickerDelegate for BranchListDelegate {
                             .child(entry_title)
                             .child({
                                 let message = match entry {
-                                    Entry::NewUrl { url } => format!("Based off {url}"),
+                                    Entry::NewUrl { url } => format!("На основе {url}"),
                                     Entry::NewRemoteName { url, .. } => {
-                                        format!("Based off {url}")
+                                        format!("На основе {url}")
                                     }
                                     Entry::NewBranch { .. } => {
                                         if let Some(current_branch) =
@@ -1829,9 +1837,9 @@ impl PickerDelegate for BranchListDelegate {
                                                 repo.read(cx).branch.as_ref().map(|b| b.name())
                                             })
                                         {
-                                            format!("Based off {}", current_branch)
+                                            format!("На основе {}", current_branch)
                                         } else {
-                                            "Based off the current branch".to_string()
+                                            "На основе текущей ветки".to_string()
                                         }
                                     }
                                     Entry::Branch { .. } => String::new(),
@@ -1883,7 +1891,7 @@ impl PickerDelegate for BranchListDelegate {
                                         })
                                         .when(!has_commit, |this| {
                                             this.child(
-                                                Label::new("No commits found")
+                                                Label::new("Коммиты не найдены")
                                                     .color(Color::Muted)
                                                     .size(LabelSize::Small),
                                             )
@@ -1910,14 +1918,14 @@ impl PickerDelegate for BranchListDelegate {
                                                 .child(Label::new(branch_name.clone()))
                                                 .when(is_select_only && is_checked, |this| {
                                                     this.child(
-                                                        Label::new("Selected Branch")
+                                                        Label::new("Выбранная ветка")
                                                             .size(LabelSize::Small)
                                                             .color(Color::Muted),
                                                     )
                                                 })
                                                 .when(is_head, |this| {
                                                     this.child(
-                                                        Label::new("Current Branch")
+                                                        Label::new("Текущая ветка")
                                                             .size(LabelSize::Small)
                                                             .color(Color::Muted),
                                                     )
@@ -1968,9 +1976,9 @@ impl PickerDelegate for BranchListDelegate {
                         });
                 starts_section.then(|| {
                     if branch.is_remote() {
-                        ("Remote Branches", ix != 0)
+                        ("Удалённые ветки", ix != 0)
                     } else {
-                        ("Local Branches", false)
+                        ("Локальные ветки", false)
                     }
                 })
             });
@@ -2018,7 +2026,7 @@ impl PickerDelegate for BranchListDelegate {
                     .as_ref()
                     .filter(|_| matches!(selected_entry, Some(Entry::NewBranch { .. })))
                     .map(|default_branch| {
-                        let button_label = format!("Create New From: {default_branch}");
+                        let button_label = format!("Создать на основе: {default_branch}");
 
                         Button::new("branch-from-default", button_label)
                             .key_binding(
@@ -2036,9 +2044,9 @@ impl PickerDelegate for BranchListDelegate {
 
                 let selected_branch = selected_entry.and_then(|entry| entry.as_branch());
                 let delete_label = if selected_branch.is_some_and(|branch| branch.is_remote()) {
-                    "Delete Local Tracking Branch"
+                    "Удалить локальную отслеживающую ветку"
                 } else {
-                    "Delete"
+                    "Удалить"
                 };
 
                 let delete_and_select_btns = h_flex()
@@ -2066,7 +2074,7 @@ impl PickerDelegate for BranchListDelegate {
                         },
                     )
                     .child(
-                        Button::new("switch_branch", "Switch")
+                        Button::new("switch_branch", "Переключить")
                             .key_binding(
                                 KeyBinding::for_action_in(&menu::Confirm, &focus_handle, cx)
                                     .map(|kb| kb.size(rems_from_px(12_f32))),
@@ -2081,7 +2089,7 @@ impl PickerDelegate for BranchListDelegate {
                         .justify_end()
                         .map(|this| match branch_from_default_button {
                             Some(button) => this.child(button).child(
-                                Button::new("create", "Create")
+                                Button::new("create", "Создать")
                                     .key_binding(
                                         KeyBinding::for_action_in(
                                             &menu::Confirm,
@@ -2102,7 +2110,7 @@ impl PickerDelegate for BranchListDelegate {
             PickerState::NewBranch => {
                 let branch_from_default_button =
                     self.default_branch.as_ref().map(|default_branch| {
-                        let button_label = format!("Create New From: {default_branch}");
+                        let button_label = format!("Создать на основе: {default_branch}");
 
                         Button::new("branch-from-default", button_label)
                             .key_binding(
@@ -2126,7 +2134,7 @@ impl PickerDelegate for BranchListDelegate {
                             this.child(button)
                         })
                         .child(
-                            Button::new("create-new-branch", "Create")
+                            Button::new("create-new-branch", "Создать")
                                 .key_binding(
                                     KeyBinding::for_action_in(&menu::Confirm, &focus_handle, cx)
                                         .map(|kb| kb.size(rems_from_px(12_f32))),
@@ -2142,7 +2150,7 @@ impl PickerDelegate for BranchListDelegate {
                 footer_container()
                     .justify_end()
                     .child(
-                        Button::new("confirm-create-remote", "Confirm")
+                        Button::new("confirm-create-remote", "Подтвердить")
                             .key_binding(
                                 KeyBinding::for_action_in(&menu::Confirm, &focus_handle, cx)
                                     .map(|kb| kb.size(rems_from_px(12_f32))),
@@ -2654,7 +2662,7 @@ mod tests {
         cx.run_until_parked();
         assert!(cx.has_pending_prompt());
 
-        cx.simulate_prompt_answer("Force Delete");
+        cx.simulate_prompt_answer("Удалить принудительно");
         cx.run_until_parked();
 
         let repo_branches = branch_list
@@ -2733,7 +2741,7 @@ mod tests {
         cx.run_until_parked();
         assert!(cx.has_pending_prompt());
 
-        cx.simulate_prompt_answer("Cancel");
+        cx.simulate_prompt_answer("Отмена");
         cx.run_until_parked();
         assert!(!cx.has_pending_prompt());
 

@@ -727,7 +727,7 @@ impl PickerDelegate for Delegate {
     }
 
     fn placeholder_text(&self, _window: &mut Window, _cx: &mut App) -> Arc<str> {
-        "Search all files…".into()
+        "Поиск по всем файлам…".into()
     }
 
     fn searchbar_trailer(
@@ -788,30 +788,36 @@ impl PickerDelegate for Delegate {
     ) -> Vec<picker::PickerAction> {
         use gpui::Action as _;
         vec![
-            picker::PickerAction::header("Split…"),
+            picker::PickerAction::header("Разделить…"),
             picker::PickerAction::button(
-                "Left",
+                "Слева",
                 workspace::pane::SplitLeft::default().boxed_clone(),
             ),
             picker::PickerAction::button(
-                "Right",
+                "Справа",
                 workspace::pane::SplitRight::default().boxed_clone(),
             ),
-            picker::PickerAction::button("Up", workspace::pane::SplitUp::default().boxed_clone()),
             picker::PickerAction::button(
-                "Down",
+                "Сверху",
+                workspace::pane::SplitUp::default().boxed_clone(),
+            ),
+            picker::PickerAction::button(
+                "Снизу",
                 workspace::pane::SplitDown::default().boxed_clone(),
             ),
             picker::PickerAction::separator(),
             picker::PickerAction::button(
                 if self.selected_matches.len() > 1 {
-                    "Open Multiple"
+                    "Открыть выбранные файлы"
                 } else {
-                    "Open File"
+                    "Открыть файл"
                 },
                 menu::Confirm.boxed_clone(),
             ),
-            picker::PickerAction::button("Open as Tab", super::ToProjectSearch.boxed_clone()),
+            picker::PickerAction::button(
+                "Открыть во вкладке",
+                super::ToProjectSearch.boxed_clone(),
+            ),
         ]
     }
 
@@ -1131,7 +1137,7 @@ impl Delegate {
                                                     label,
                                                     Some(action),
                                                     format!(
-                                                        "{} to toggle all",
+                                                        "{} — выбрать или снять выделение со всех",
                                                         text_for_keystroke(
                                                             &Modifiers::alt(),
                                                             "click",

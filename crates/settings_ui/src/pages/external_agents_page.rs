@@ -48,9 +48,9 @@ pub(crate) fn render_external_agents_page(
         .pb_16()
         .track_scroll(scroll_handle)
         .overflow_y_scroll()
-        .child(Label::new("External Agents"))
+        .child(Label::new("Внешние агенты"))
         .child(
-            Label::new("Agents connected through the Agent Client Protocol.")
+            Label::new("Агенты, подключённые через Agent Client Protocol.")
                 .size(LabelSize::Small)
                 .color(Color::Muted),
         )
@@ -117,7 +117,7 @@ fn render_empty_state(cx: &App) -> AnyElement {
         .border_color(cx.theme().colors().border.opacity(0.6))
         .rounded_sm()
         .child(
-            Label::new("No external agents added yet. Click \"Add Agent\" to get started.")
+            Label::new("Внешние агенты ещё не добавлены. Нажмите «Добавить агента», чтобы начать.")
                 .color(Color::Muted)
                 .size(LabelSize::Small),
         )
@@ -133,7 +133,7 @@ fn render_no_project_state(cx: &App) -> AnyElement {
         .border_color(cx.theme().colors().border.opacity(0.6))
         .rounded_sm()
         .child(
-            Label::new("No active project found. Open a workspace to manage external agents.")
+            Label::new("Активный проект не найден. Откройте рабочее пространство для управления внешними агентами.")
                 .color(Color::Muted)
                 .size(LabelSize::Small),
         )
@@ -182,7 +182,7 @@ fn render_agent(
             .icon_size(IconSize::Small)
             .size(ButtonSize::Medium)
             .tab_index(0isize)
-            .tooltip(Tooltip::text("Configure Agent"))
+            .tooltip(Tooltip::text("Настроить агента"))
             .on_click(cx.listener({
                 let id = id.clone();
                 move |this, _event, window, cx| {
@@ -194,8 +194,8 @@ fn render_agent(
     });
 
     let remove_tooltip = match source {
-        ExternalAgentSource::Registry => "Remove Registry Agent",
-        ExternalAgentSource::Custom => "Remove Custom Agent",
+        ExternalAgentSource::Registry => "Удалить агента из реестра",
+        ExternalAgentSource::Custom => "Удалить пользовательского агента",
     };
 
     let remove_button = IconButton::new(format!("uninstall-{}", id_string), IconName::Trash)
@@ -267,7 +267,7 @@ pub(crate) fn render_add_agent_popover(
 
     let popover = PopoverMenu::new("add-agent-server-popover")
         .trigger(
-            Button::new("add-agent", "Add Agent")
+            Button::new("add-agent", "Добавить агента")
                 .style(ButtonStyle::Outlined)
                 .track_focus(&focus_handle)
                 .start_icon(
@@ -281,28 +281,36 @@ pub(crate) fn render_add_agent_popover(
         .menu(move |window, cx| {
             let settings_window = settings_window.clone();
             Some(ContextMenu::build(window, cx, move |menu, _window, _cx| {
-                menu.entry("Install from Registry", None, move |_window, cx| {
-                    if let Some(original_window) = original_window {
-                        cx.activate(true);
-                        original_window
-                            .update(cx, |_, window, cx| {
-                                window.activate_window();
-                                window.dispatch_action(Box::new(zed_actions::AcpRegistry), cx);
+                menu.entry(
+                    "Установить из реестра",
+                    None,
+                    move |_window, cx| {
+                        if let Some(original_window) = original_window {
+                            cx.activate(true);
+                            original_window
+                                .update(cx, |_, window, cx| {
+                                    window.activate_window();
+                                    window.dispatch_action(Box::new(zed_actions::AcpRegistry), cx);
+                                })
+                                .log_err();
+                        }
+                    },
+                )
+                .entry(
+                    "Добавить пользовательского агента",
+                    None,
+                    move |window, cx| {
+                        settings_window
+                            .update(cx, |this, cx| {
+                                open_custom_agent_form(this, None, window, cx);
                             })
                             .log_err();
-                    }
-                })
-                .entry("Add Custom Agent", None, move |window, cx| {
-                    settings_window
-                        .update(cx, |this, cx| {
-                            open_custom_agent_form(this, None, window, cx);
-                        })
-                        .log_err();
-                })
+                    },
+                )
                 .separator()
-                .header("Learn More")
+                .header("Подробнее")
                 .item(
-                    ContextMenuEntry::new("ACP Docs")
+                    ContextMenuEntry::new("Документация ACP")
                         .icon(IconName::ArrowUpRight)
                         .icon_color(Color::Muted)
                         .icon_position(IconPosition::End)
@@ -451,8 +459,8 @@ fn new_kv_row(
     cx: &mut Context<SettingsWindow>,
 ) -> KeyValueRow {
     KeyValueRow {
-        key: new_input("Key", key, window, cx),
-        value: new_input("Value", value, window, cx),
+        key: new_input("Ключ", key, window, cx),
+        value: new_input("Значение", value, window, cx),
     }
 }
 
@@ -467,14 +475,14 @@ pub(crate) fn open_custom_agent_form(
     settings_window.custom_agent_form = Some(CustomAgentForm::new(existing, window, cx));
 
     let title = if is_edit {
-        "Configure External Agent"
+        "Настроить внешнего агента"
     } else {
-        "Add Custom Agent"
+        "Добавить пользовательского агента"
     };
 
     settings_window.push_dynamic_sub_page(
         title,
-        "Agent Configuration",
+        "Настройка агента",
         Some("agent_servers"),
         false,
         render_custom_agent_form_page,
@@ -500,8 +508,8 @@ fn render_custom_agent_form_page(
         .child(
             crate::render_settings_item_layout(
                 settings_window,
-                "Agent Name",
-                "Required. A unique name used to identify this agent.",
+                "Имя агента",
+                "Обязательно. Уникальное имя для идентификации агента.",
                 input_box(&form.name, cx).into_any_element(),
                 None,
                 None,
@@ -514,8 +522,8 @@ fn render_custom_agent_form_page(
         .child(
             crate::render_settings_item_layout(
                 settings_window,
-                "Command",
-                "Required. Path to the executable that launches the agent.",
+                "Команда",
+                "Обязательно. Путь к исполняемому файлу агента.",
                 input_box(&form.command, cx).into_any_element(),
                 None,
                 None,
@@ -528,8 +536,8 @@ fn render_custom_agent_form_page(
         .child(
             crate::render_settings_item_layout(
                 settings_window,
-                "Arguments",
-                "Space-separated arguments passed to the command.",
+                "Аргументы",
+                "Аргументы команды, разделённые пробелами.",
                 input_box(&form.args, cx).into_any_element(),
                 None,
                 None,
@@ -597,7 +605,7 @@ fn render_env_section(
                             .icon_size(IconSize::Small)
                             .icon_color(Color::Muted)
                             .tab_index(0isize)
-                            .tooltip(Tooltip::text("Remove"))
+                            .tooltip(Tooltip::text("Удалить"))
                             .on_click(cx.listener(move |this, _, _window, cx| {
                                 if let Some(form) = this.custom_agent_form.as_mut()
                                     && ix < form.env.len()
@@ -610,7 +618,7 @@ fn render_env_section(
             )
         }))
         .child(
-            Button::new("custom-agent-env-add", "Add")
+            Button::new("custom-agent-env-add", "Добавить")
                 .style(ButtonStyle::Outlined)
                 .label_size(LabelSize::Small)
                 .tab_index(0isize)
@@ -635,8 +643,8 @@ fn render_env_section(
 
     crate::render_settings_item_layout(
         settings_window,
-        "Environment Variables",
-        "Environment variables provided to the agent process.",
+        "Переменные окружения",
+        "Переменные окружения, передаваемые процессу агента.",
         control,
         None,
         None,
@@ -681,7 +689,7 @@ fn render_form_actions(
                 .border_1()
                 .border_color(cancel_border)
                 .child(
-                    Button::new("custom-agent-form-cancel", "Cancel")
+                    Button::new("custom-agent-form-cancel", "Отмена")
                         .style(ButtonStyle::Subtle)
                         .track_focus(&cancel_handle)
                         .on_click(cx.listener(|this, _, window, cx| {
@@ -696,7 +704,7 @@ fn render_form_actions(
                 .border_1()
                 .border_color(save_border)
                 .child(
-                    Button::new("custom-agent-form-save", "Save")
+                    Button::new("custom-agent-form-save", "Сохранить")
                         .style(ButtonStyle::Filled)
                         .track_focus(&save_handle)
                         .on_click(cx.listener(|this, _, window, cx| {
@@ -752,7 +760,7 @@ fn save_custom_agent_form(
         });
     if collides_with_other_agent {
         if let Some(form) = settings_window.custom_agent_form.as_mut() {
-            form.error = Some(format!("An agent named \"{}\" already exists.", id.0).into());
+            form.error = Some(format!("Агент с именем «{}» уже существует.", id.0).into());
         }
         cx.notify();
         return;
@@ -814,12 +822,12 @@ fn build_settings_from_values(
 ) -> Result<(AgentId, Option<AgentId>, CustomAgentServerSettings), SharedString> {
     let name = values.name.trim().to_string();
     if name.is_empty() {
-        return Err("Agent name is required.".into());
+        return Err("Укажите имя агента.".into());
     }
 
     let command = values.command.trim().to_string();
     if command.is_empty() {
-        return Err("Command is required.".into());
+        return Err("Укажите команду.".into());
     }
 
     let args = values
@@ -827,7 +835,7 @@ fn build_settings_from_values(
         .split_whitespace()
         .map(|arg| arg.to_string())
         .collect::<Vec<_>>();
-    let env = collect_kv(&values.env, "environment variable")?;
+    let env = collect_kv(&values.env, "переменная окружения")?;
 
     let content = CustomAgentServerSettings::Custom {
         path: command.into(),
@@ -863,7 +871,7 @@ fn collect_kv(
             continue;
         }
         if map.contains_key(&key) {
-            return Err(format!("Duplicate {label} \"{key}\".").into());
+            return Err(format!("Повторяется {label} «{key}».").into());
         }
         map.insert(key, value.clone());
     }
@@ -872,7 +880,7 @@ fn collect_kv(
 
 // === Open settings.json at the agent's position ===
 //
-// Retained for an upcoming "Edit in settings.json" affordance that jumps the
+// Retained for an upcoming "Изменить в settings.json" affordance that jumps the
 // user to the relevant `agent_servers` entry. Not currently wired to any UI.
 
 /// Opens the user's `settings.json` in the original (editor) window, inserts a
@@ -1058,7 +1066,7 @@ mod tests {
         values.name = "   ".into();
         assert_eq!(
             build_settings_from_values(values).unwrap_err().as_ref(),
-            "Agent name is required."
+            "Укажите имя агента."
         );
     }
 
@@ -1068,7 +1076,7 @@ mod tests {
         values.command = "   ".into();
         assert_eq!(
             build_settings_from_values(values).unwrap_err().as_ref(),
-            "Command is required."
+            "Укажите команду."
         );
     }
 
@@ -1078,7 +1086,7 @@ mod tests {
         values.env = vec![("FOO".into(), "1".into()), ("FOO".into(), "2".into())];
         assert_eq!(
             build_settings_from_values(values).unwrap_err().as_ref(),
-            "Duplicate environment variable \"FOO\"."
+            "Повторяется переменная окружения «FOO»."
         );
     }
 

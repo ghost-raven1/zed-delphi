@@ -171,26 +171,21 @@ impl CursorPosition {
         } = self.selected_count;
         let format = LineIndicatorFormat::get(None, cx);
         let is_short_format = format == &LineIndicatorFormat::Short;
-        let lines = (lines > 1).then_some((lines, "line"));
-        let selections = (selections > 1).then_some((selections, "selection"));
-        let characters = (characters > 0).then_some((characters, "character"));
+        let lines = (lines > 1).then_some((lines, "строк", "стр."));
+        let selections = (selections > 1).then_some((selections, "выделений", "выд."));
+        let characters = (characters > 0).then_some((characters, "символов", "симв."));
         if (None, None, None) == (characters, selections, lines) {
             // Nothing to display.
             return;
         }
         write!(text, " (").unwrap();
         let mut wrote_once = false;
-        for (count, name) in [selections, lines, characters].into_iter().flatten() {
+        for (count, name, short_name) in [selections, lines, characters].into_iter().flatten() {
             if wrote_once {
                 write!(text, ", ").unwrap();
             }
-            let name = if is_short_format { &name[..1] } else { name };
-            let plural_suffix = if count > 1 && !is_short_format {
-                "s"
-            } else {
-                ""
-            };
-            write!(text, "{count} {name}{plural_suffix}").unwrap();
+            let name = if is_short_format { short_name } else { name };
+            write!(text, "{name}: {count}").unwrap();
             wrote_once = true;
         }
         text.push(')');
@@ -227,7 +222,7 @@ impl Render for CursorPosition {
                     .label_size(LabelSize::Small)
                     .tab_index(0isize)
                     .aria_label(format!(
-                        "Line {}, column {}",
+                        "Строка {}, столбец {}",
                         position.line, position.character
                     ))
                     .on_click(cx.listener(|this, _, window, cx| {
@@ -247,13 +242,13 @@ impl Render for CursorPosition {
                     }))
                     .tooltip(move |_window, cx| match context.as_ref() {
                         Some(context) => Tooltip::for_action_in(
-                            "Go to Line/Column",
+                            "Перейти к строке/столбцу",
                             &editor::actions::ToggleGoToLine,
                             context,
                             cx,
                         ),
                         None => Tooltip::for_action(
-                            "Go to Line/Column",
+                            "Перейти к строке/столбцу",
                             &editor::actions::ToggleGoToLine,
                             cx,
                         ),

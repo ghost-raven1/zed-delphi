@@ -23,12 +23,14 @@ def main():
     parser.add_argument('--zed', type=Path, required=True)
     parser.add_argument('--codelldb', type=Path, required=True)
     parser.add_argument('--pasls', type=Path, help='Also verify definition lookup through this real LSP')
+    parser.add_argument('--ui-language', choices=('ru', 'en'), default='ru')
     parser.add_argument('--fixture', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     options = parser.parse_args()
     output = options.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
-    project = output / 'Delphi Space Project'
+    russian = options.ui_language == 'ru'
+    project = output / ('Проект Delphi с пробелами' if russian else 'Delphi Space Project')
     shutil.copytree(options.fixture, project)
     (project / '.zed/settings.json').write_text(json.dumps({
         'languages': {'Delphi': {'language_servers': ['pasls'] if options.pasls else []}},
@@ -51,19 +53,26 @@ def main():
                        XDG_RUNTIME_DIR=str(runtime), ZED_ALLOW_EMULATED_GPU='1')
     result = {'status': 'running', 'platform': os.uname().machine,
               'binary': str(options.zed.resolve()),
-              'pasls': str(options.pasls.resolve()) if options.pasls else None, 'checks': []}
+              'pasls': str(options.pasls.resolve()) if options.pasls else None,
+              'ui_language': options.ui_language, 'checks': []}
+    ocr_language = 'rus+eng' if russian else 'eng'
 
     def key(value):
         run('xdotool', 'key', '--clearmodifiers', value)
         time.sleep(0.5)
 
     def type_text(value):
-        run('xdotool', 'type', '--clearmodifiers', '--delay', '40', value)
+        if value.isascii():
+            run('xdotool', 'type', '--clearmodifiers', '--delay', '40', value)
+        else:
+            subprocess.run(['xclip', '-selection', 'clipboard'], input=value.encode(),
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+            key('ctrl+v')
 
     def capture(stage):
         picture = output / f'{stage}.png'
         run('import', '-window', 'root', str(picture))
-        text = run('tesseract', str(picture), 'stdout', '--psm', '11').stdout
+        text = run('tesseract', str(picture), 'stdout', '-l', ocr_language, '--psm', '11').stdout
         (output / f'{stage}.txt').write_text(text)
         return text
 
@@ -81,7 +90,7 @@ def main():
         raise RuntimeError(f'UI assertion timed out: {stage}; see {stage}.png and {stage}.txt')
 
     def click_label(label, stage):
-        data = run('tesseract', str(output / f'{stage}.png'), 'stdout', '--psm', '11', 'tsv').stdout
+        data = run('tesseract', str(output / f'{stage}.png'), 'stdout', '-l', ocr_language, '--psm', '11', 'tsv').stdout
         words = csv.DictReader(io.StringIO(data), delimiter='\t', quoting=csv.QUOTE_NONE)
         for word in words:
             if word['text'].casefold() == label.casefold():
@@ -121,7 +130,8 @@ def main():
                                     '--foreground', str(project)], env=environment,
                                    stdout=log, stderr=subprocess.STDOUT)
         try:
-            wait_text('trust-project', ['Unrecognized Project', 'Trust and Continue'])
+            wait_text('trust-project', ['Неизвестный проект', 'Доверять и продолжить'] if russian
+                      else ['Unrecognized Project', 'Trust and Continue'])
             windows = run('xdotool', 'search', '--onlyvisible', '--class', 'zed').stdout.splitlines()
             run('xdotool', 'windowfocus', windows[0])
             key('Return')
@@ -130,6 +140,15 @@ def main():
             type_text('Arithmetic.pas')
             key('Return')
             wait_text('native-delphi', ['Arithmetic.pas', 'Delphi', 'AddValues'])
+            if russian:
+                key('ctrl+shift+p')
+                type_text('перейти к определению')
+                wait_text('russian-command-search', ['перейти к определению'])
+                key('Escape')
+                key('ctrl+shift+p')
+                type_text('go to definition')
+                wait_text('english-command-alias', ['перейти к определению'])
+                key('Escape')
             if options.pasls:
                 key('ctrl+g')
                 type_text('25:18')
@@ -142,23 +161,37 @@ def main():
             key('Return')
             key('F9')
             key('F4')
-            wait_text('debug-picker', [r'debug multi.unit', 'Spawn'])
+            wait_text('debug-picker', [r'debug multi.unit', 'Запустить' if russian else 'Spawn'])
             key('Return')
-            wait_text('breakpoint', ['Frames', 'Breakpoints', 'AddValues', 'Calculate', 'Variables'])
-            click_label('Variables', 'breakpoint')
+            wait_text('breakpoint', ['Стек вызовов', 'Точки останова', 'AddValues', 'Calculate', 'Переменные'] if russian
+                      else ['Frames', 'Breakpoints', 'AddValues', 'Calculate', 'Variables'])
+            click_label('Переменные' if russian else 'Variables', 'breakpoint')
             wait_text('variables', [r'LeftValue\s*=\s*20', r'RightValue\s*=\s*22'])
             key('F10')
             wait_text('step-result', [r'RESULT\s*=\s*42'])
             key('F5')
             time.sleep(1)
             capture('after-continue')
-            click_label('Console', 'after-continue')
+            click_label('Консоль' if russian else 'Console', 'after-continue')
             wait_text('exit-zero', [r'Process exited with code\s*0'])
             executable = project / 'MultiUnit'
             executed = run(str(executable))
             if executed.stdout.strip() != '42':
                 raise RuntimeError(f'Unexpected output from UI-built program: {executed.stdout!r}')
             (output / 'program-output.txt').write_text(executed.stdout)
+            if russian:
+                key('ctrl+comma')
+                wait_text('russian-settings', ['Поиск настроек'])
+                settings_windows = run('xdotool', 'search', '--onlyvisible', '--name',
+                                       'Zed.*Настройки').stdout.splitlines()
+                run('xdotool', 'windowfocus', settings_windows[-1])
+                key('ctrl+f')
+                type_text('шрифта')
+                wait_text('russian-settings-search', ['Размер шрифта'])
+                key('ctrl+a')
+                type_text('font size')
+                wait_text('english-settings-alias', ['Размер шрифта'])
+                key('ctrl+w')
             result['status'] = 'passed'
             result['checks'].append('ui-built-program-output-42')
         except Exception as error:

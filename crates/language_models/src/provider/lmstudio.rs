@@ -343,7 +343,7 @@ impl LanguageModelProvider for LmStudioLanguageModelProvider {
                     .into()
             })
             .description(InlineDescription::Text(
-                "Run local LLMs like Llama, Phi, and Qwen with LM Studio.".into(),
+                "Запускайте локальные модели Llama, Phi, Qwen и другие с LM Studio.".into(),
             )),
         ))
     }
@@ -612,10 +612,10 @@ struct ConfigurationView {
 
 impl ConfigurationView {
     pub fn new(state: Entity<State>, _window: &mut Window, cx: &mut Context<Self>) -> Self {
-        let api_key_editor = cx.new(|cx| InputField::new(_window, cx, "sk-...").label("API key"));
+        let api_key_editor = cx.new(|cx| InputField::new(_window, cx, "sk-...").label("Ключ API"));
 
         let api_url_editor = cx.new(|cx| {
-            let input = InputField::new(_window, cx, LMSTUDIO_API_URL).label("API URL");
+            let input = InputField::new(_window, cx, LMSTUDIO_API_URL).label("Адрес API");
             input.set_text(&LmStudioLanguageModelProvider::api_url(cx), _window, cx);
             input
         });
@@ -747,9 +747,9 @@ impl ConfigurationView {
         let state = self.state.read(cx);
         let env_var_set = state.api_key_state.is_from_env_var();
         let configured_card_label = if env_var_set {
-            format!("API key set in {API_KEY_ENV_VAR_NAME} environment variable.")
+            format!("Ключ API задан в переменной окружения {API_KEY_ENV_VAR_NAME}.")
         } else {
-            "API key configured".to_string()
+            "Ключ API настроен".to_string()
         };
 
         let api_key_control = if !state.api_key_state.has_key() {
@@ -760,7 +760,7 @@ impl ConfigurationView {
                 .on_click(cx.listener(|this, _, _window, cx| this.reset_api_key(_window, cx)))
                 .when(env_var_set, |this| {
                     this.tooltip_label(format!(
-                        "To reset your API key, unset the {API_KEY_ENV_VAR_NAME} environment variable."
+                        "Чтобы сбросить ключ API, удалите переменную окружения {API_KEY_ENV_VAR_NAME}."
                     ))
                 })
                 .into_any_element()
@@ -773,7 +773,7 @@ impl ConfigurationView {
             .mb_2()
             .child(
                 Label::new(format!(
-                    "You can also set the {API_KEY_ENV_VAR_NAME} environment variable and restart Zed."
+                    "Также можно задать переменную окружения {API_KEY_ENV_VAR_NAME} и перезапустить Zed."
                 ))
                 .size(LabelSize::Small)
                 .color(Color::Muted),
@@ -792,22 +792,21 @@ impl Render for ConfigurationView {
                     .gap_1()
                     .child(Headline::new("LM Studio").size(HeadlineSize::Small))
                     .child(
-                        Label::new("Run local LLMs like Llama, Phi, and Qwen.").color(Color::Muted),
+                        Label::new("Запускайте локальные модели Llama, Phi, Qwen и другие.").color(Color::Muted),
                     )
                     .child(
                         List::new()
                             .child(ListBulletItem::new(
-                                "LM Studio needs to be running with at least one model downloaded.",
+                                "Запустите LM Studio и загрузите хотя бы одну модель.",
                             ).label_color(Color::Muted))
                             .child(
                                 ListBulletItem::new("")
-                                    .child(Label::new("To get your first model, try running").color(Color::Muted))
+                                    .child(Label::new("Чтобы загрузить первую модель, выполните").color(Color::Muted))
                                     .child(Label::new("lms get qwen2.5-coder-7b").inline_code(cx).color(Color::Muted).ml_1()),
                             ),
                     )
                     .child(Label::new(
-                        "Alternatively, you can connect to an LM Studio server by specifying its \
-                        URL and API key (may not be required):",
+                        "Также можно подключиться к серверу LM Studio, указав URL и ключ API (может не требоваться):",
                     ).color(Color::Muted)),
             )
             .child(self.render_api_url_editor(cx))
@@ -843,7 +842,7 @@ impl Render for ConfigurationView {
                                     this.child(
                                         Button::new(
                                             "download_lmstudio_button",
-                                            "Download LM Studio",
+                                            "Скачать LM Studio",
                                         )
                                         .style(ButtonStyle::OutlinedGhost)
                                         .size(ButtonSize::Medium)
@@ -860,7 +859,7 @@ impl Render for ConfigurationView {
                                 }
                             })
                             .child(
-                                Button::new("view-models", "Model Catalog")
+                                Button::new("view-models", "Каталог моделей")
                                     .style(ButtonStyle::OutlinedGhost)
                                     .size(ButtonSize::Medium)
                                     .end_icon(
@@ -882,11 +881,11 @@ impl Render for ConfigurationView {
                                         h_flex()
                                             .gap_1()
                                             .child(Icon::new(IconName::Check).color(Color::Success))
-                                            .child(Label::new("Connected"))
+                                            .child(Label::new("Подключено"))
                                     )
                                     .child(
                                         IconButton::new("refresh-models", IconName::RotateCcw)
-                                            .tooltip(Tooltip::text("Refresh Models"))
+                                            .tooltip(Tooltip::text("Обновить модели"))
                                             .icon_size(IconSize::Small)
                                             .on_click(cx.listener(|this, _, _window, cx| {
                                                 this.state.update(cx, |state, _| {
@@ -898,7 +897,7 @@ impl Render for ConfigurationView {
                             )
                         } else {
                             this.child(
-                                Button::new("retry_lmstudio_models", "Connect")
+                                Button::new("retry_lmstudio_models", "Подключиться")
                                     .style(ButtonStyle::Outlined)
                                     .size(ButtonSize::Medium)
                                     .start_icon(

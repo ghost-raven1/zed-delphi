@@ -1,0 +1,400 @@
+action::Sequence	Действия: Выполнить последовательность действий
+activity_indicator::ShowErrorMessage	Фоновые задачи: Показать сообщение об ошибке
+agent::AddSelectionToThread	Агент: Добавить выделение в диалог
+agent::AllowAlways	Агент: Разрешать всегда
+agent::AllowOnce	Агент: Разрешить один раз
+agent::ArchiveSelectedThread	Агент: Архивировать выбранный диалог
+agent::AuthorizeToolCall	Агент: Разрешить вызов инструмента
+agent::Chat	Агент: Открыть чат
+agent::ChatWithFollow	Агент: Открыть чат и следовать за участником
+agent::ClearMessageQueue	Агент: Очистить очередь сообщений
+agent::CopyThreadToClipboard	Агент: Копировать диалог
+agent::CreateSkillFromUrl	Агент: Создать навык по URL
+agent::CycleFavoriteModels	Агент: Переключить избранную модель
+agent::CycleModeSelector	Агент: Переключить выбор режима
+agent::CycleNextInlineAssist	Агент: Перейти к следующей встроенной подсказке агента
+agent::CyclePreviousInlineAssist	Агент: Перейти к предыдущей встроенной подсказке агента
+agent::CycleThinkingEffort	Агент: Переключить глубину рассуждений
+agent::DismissThreadSearch	Агент: Закрыть поиск по диалогу
+agent::EditFirstQueuedMessage	Агент: Изменить первое сообщение в очереди
+agent::ExpandMessageEditor	Агент: Развернуть редактор сообщения
+agent::FocusAgent	Агент: Перейти к агенту
+agent::FocusDown	Агент: Переместить фокус вниз
+agent::FocusLeft	Агент: Переместить фокус влево
+agent::FocusRight	Агент: Переместить фокус вправо
+agent::FocusUp	Агент: Переместить фокус вверх
+agent::Follow	Агент: Следовать за участником
+agent::ImportThreadsFromOtherChannels	Агент: Импортировать диалоги из других каналов
+agent::Keep	Агент: Сохранить изменение
+agent::KeepAll	Агент: Сохранить все изменения
+agent::LoadThreadFromClipboard	Агент: Загрузить диалог из буфера обмена
+agent::LogoutAgent	Агент: Выйти из аккаунта агента
+agent::ManageProfiles	Агент: Управлять профилями
+agent::ManageSkills	Агент: Управлять навыками
+agent::NewExternalAgentThread	Агент: Создать диалог внешнего агента
+agent::NewNativeAgentThreadFromSummary	Агент: Создать диалог встроенного агента из краткого содержания
+agent::NewTerminalThread	Агент: Создать диалог в терминале
+agent::NewThread	Агент: Создать диалог
+agent::OpenActiveThreadAsMarkdown	Агент: Открыть текущий диалог как Markdown
+agent::OpenAddContextMenu	Агент: Открыть меню добавления контекста
+agent::OpenAgentDiff	Агент: Открыть изменения агента
+agent::OpenGlobalAGENTS.mdRules	Агент: Открыть глобальные правила AGENTS.md
+agent::OpenOnboardingModal	Агент: Открыть окно первоначальной настройки
+agent::OpenPermissionDropdown	Агент: Открыть выбор разрешений
+agent::OpenProjectAGENTS.mdRules	Агент: Открыть правила проекта AGENTS.md
+agent::OpenSettings	Агент: открыть настройки
+agent::OpenSkillCreator	Агент: Открыть создание навыка
+agent::PasteRaw	Агент: Вставить без обработки
+agent::ReauthenticateAgent	Агент: Повторно войти в аккаунт агента
+agent::Reject	Агент: Отклонить
+agent::RejectAll	Агент: Отклонить всё
+agent::RejectOnce	Агент: Отклонить один раз
+agent::RemoveFirstQueuedMessage	Агент: Удалить первое сообщение из очереди
+agent::RemoveSelectedThread	Агент: Удалить выбранный диалог
+agent::RenameSelectedThread	Агент: Переименовать выбранный диалог
+agent::RerunRulesToSkillsMigration	Агент: Повторить перенос правил в навыки
+agent::ResetAgentZoom	Агент: Сбросить масштаб агента
+agent::ResetFastModeWarnings	Агент: Сбросить предупреждения быстрого режима
+agent::ResetOnboarding	Агент: Сбросить первоначальную настройку
+agent::ResetTrialEndUpsell	Агент: Сбросить предложение подписки после пробного периода
+agent::ResetTrialUpsell	Агент: Сбросить предложение пробного периода
+agent::ResolveConflictedFilesWithAgent	Агент: Разрешить конфликты файлов с помощью агента
+agent::ResolveConflictsWithAgent	Агент: Разрешить конфликты с помощью агента
+agent::ReviewBranchDiff	Агент: Проверить изменения ветки
+agent::ScrollOutputLineDown	Агент: Прокрутить вывод на строку вниз
+agent::ScrollOutputLineUp	Агент: Прокрутить вывод на строку вверх
+agent::ScrollOutputPageDown	Агент: Прокрутить вывод на страницу вниз
+agent::ScrollOutputPageUp	Агент: Прокрутить вывод на страницу вверх
+agent::ScrollOutputToBottom	Агент: Прокрутить вывод в конец
+agent::ScrollOutputToNextMessage	Агент: Перейти к следующему сообщению в выводе
+agent::ScrollOutputToPreviousMessage	Агент: Перейти к предыдущему сообщению в выводе
+agent::ScrollOutputToTop	Агент: Прокрутить вывод в начало
+agent::SelectAgent	Агент: Выбрать агента
+agent::SelectNextThreadMatch	Агент: Выбрать следующее совпадение в диалоге
+agent::SelectPermissionGranularity	Агент: Выбрать детализацию разрешения
+agent::SelectPreviousThreadMatch	Агент: Выбрать предыдущее совпадение в диалоге
+agent::SendImmediately	Агент: Отправить немедленно
+agent::SendNextQueuedMessage	Агент: Отправить следующее сообщение из очереди
+agent::Toggle	Агент: показать или скрыть
+agent::ToggleCommandPattern	Агент: Переключить шаблон команды
+agent::ToggleFastMode	Агент: Включить или отключить быстрый режим
+agent::ToggleFocus	Агент: переключить фокус
+agent::ToggleModelSelector	Агент: Показать или скрыть выбор модели
+agent::ToggleNewThreadMenu	Агент: Показать или скрыть меню нового диалога
+agent::ToggleOptionsMenu	Агент: Показать или скрыть меню параметров
+agent::ToggleProfileSelector	Агент: Показать или скрыть выбор профиля
+agent::ToggleSearch	Агент: Показать или скрыть поиск
+agent::ToggleSteerFirstQueuedMessage	Агент: Переключить направление первого сообщения очереди
+agent::ToggleThinkingEffortMenu	Агент: Показать или скрыть выбор глубины рассуждений
+agent::ToggleThinkingMode	Агент: Включить или отключить режим рассуждений
+agent::UndoLastReject	Агент: Отменить последнее отклонение
+agents_sidebar::FocusSidebarFilter	Диалоги агента: Перейти к фильтру боковой панели
+agents_sidebar::NewThreadInGroup	Диалоги агента: Создать диалог в группе
+agents_sidebar::ToggleThreadHistory	Диалоги агента: Показать или скрыть историю диалогов
+agents_sidebar::ToggleThreadSwitcher	Диалоги агента: Показать или скрыть переключатель диалогов
+app_menu::ActivateMenuLeft	Меню приложения: Перейти к меню слева
+app_menu::ActivateMenuRight	Меню приложения: Перейти к меню справа
+app_menu::OpenApplicationMenu	Меню приложения: Открыть меню приложения
+assistant::InlineAssist	Агент: Вызвать встроенного помощника
+auto_update::Check	Обновления: Проверить
+auto_update::DismissMessage	Обновления: Закрыть сообщение
+auto_update::ViewReleaseNotes	Обновления: Просмотреть описание выпуска
+auto_update::ViewReleaseNotesLocally	Обновления: Просмотреть локальное описание выпуска
+bedrock::Tab	Amazon Bedrock: Перейти по Tab
+bedrock::TabPrev	Amazon Bedrock: Перейти по Tab назад
+branch_picker::CycleBranchFilter	Ветки: Переключить фильтр веток
+branch_picker::DeleteBranch	Ветки: Удалить ветку
+branch_picker::ForceDeleteBranch	Ветки: Принудительно удалить ветку
+branch_picker::ShowAllBranches	Ветки: Показать все ветки
+branch_picker::ShowLocalBranches	Ветки: Показать локальные ветки
+branch_picker::ShowRemoteBranches	Ветки: Показать удалённые ветки
+branch_picker::ToggleFilterMenu	Ветки: Показать или скрыть меню фильтров
+buffer_search::Deploy	Поиск в файле: открыть
+buffer_search::DeployReplace	Поиск в файле: Открыть замену
+buffer_search::Dismiss	Поиск в файле: закрыть
+buffer_search::FocusEditor	Поиск в файле: Перейти в редактор
+buffer_search::UseSelectionForFind	Поиск в файле: Искать выделенный текст
+call_hierarchy::ShowIncomingCalls	Иерархия вызовов: показать входящие вызовы
+call_hierarchy::ShowOutgoingCalls	Иерархия вызовов: показать исходящие вызовы
+call_hierarchy::ToggleDirection	Иерархия вызовов: Переключить направление
+channel_modal::RemoveMember	Каналы: Удалить участника
+channel_modal::SelectNextControl	Каналы: Выбрать следующий элемент управления
+channel_modal::ToggleMemberAdmin	Каналы: Назначить или снять права администратора участника
+channel_modal::ToggleMode	Каналы: Переключить режим
+cli::InstallCliBinary	Командная строка: Установить команду zed
+cli::RegisterZedScheme	Командная строка: Зарегистрировать протокол zed
+client::Reconnect	Подключение: Переподключиться
+client::SignIn	Подключение: Войти в аккаунт
+client::SignOut	Подключение: Выйти из аккаунта
+collab::CopyLink	Совместная работа: Копировать ссылку
+collab::CopyRoomId	Совместная работа: Копировать идентификатор комнаты
+collab::Deafen	Совместная работа: Отключить звук участников
+collab::LeaveCall	Совместная работа: Покинуть звонок
+collab::Mute	Совместная работа: Отключить микрофон
+collab::OpenChannelNotes	Совместная работа: Открыть заметки канала
+collab::OpenChannelNotesById	Совместная работа: Открыть заметки канала по идентификатору
+collab::ScreenShare	Совместная работа: Демонстрировать экран
+collab::ShareProject	Совместная работа: Предоставить доступ к проекту
+collab::ShowCallStats	Совместная работа: Показать статистику звонка
+collab::SimulateUpdateAvailable	Совместная работа: Имитировать доступное обновление
+collab::SwitchBranch	Совместная работа: Переключить ветку
+collab::ToggleProjectMenu	Совместная работа: Показать или скрыть меню проекта
+collab::ToggleUserMenu	Совместная работа: Показать или скрыть меню пользователя
+collab_panel::CollapseSelectedChannel	Панель совместной работы: Свернуть выбранный канал
+collab_panel::ExpandSelectedChannel	Панель совместной работы: Развернуть выбранный канал
+collab_panel::InsertSpace	Панель совместной работы: Вставить пробел
+collab_panel::MoveChannelDown	Панель совместной работы: Переместить канал вниз
+collab_panel::MoveChannelUp	Панель совместной работы: Переместить канал вверх
+collab_panel::MoveSelected	Панель совместной работы: Переместить выбранное
+collab_panel::OpenSelectedChannelNotes	Панель совместной работы: Открыть заметки выбранного канала
+collab_panel::Remove	Панель совместной работы: Удалить
+collab_panel::Secondary	Панель совместной работы: Открыть контекстное меню выбранного элемента
+collab_panel::StartMoveChannel	Панель совместной работы: Начать перемещение канала
+collab_panel::Toggle	Панель совместной работы: показать или скрыть
+collab_panel::ToggleFocus	Панель совместной работы: переключить фокус
+collab_panel::ToggleSelectedChannelFavorite	Панель совместной работы: Добавить выбранный канал в избранное или убрать из него
+command_palette::RemoveSelected	Палитра команд: удалить выбранное
+command_palette::Toggle	Палитра команд: открыть
+console::WatchExpression	Консоль: Наблюдать за выражением
+context_server::Restart	Сервер контекста: перезапустить
+copilot_edit_predictions::Reinstall	Предлагаемые изменения Copilot: Переустановить
+debug_panel::Toggle	Панель отладчика: показать или скрыть
+debug_panel::ToggleFocus	Панель отладчика: переключить фокус
+debugger::ClearAllBreakpoints	Отладчик: удалить все точки останова
+debugger::Continue	Отладчик: продолжить
+debugger::ContinueThread	Отладчик: продолжить поток
+debugger::Detach	Отладчик: отсоединить отладчик
+debugger::EvaluateSelectedText	Отладчик: Вычислить выделенный текст
+debugger::FocusBreakpointList	Отладчик: Перейти к списку точек останова
+debugger::FocusConsole	Отладчик: Перейти к консоли
+debugger::FocusFrames	Отладчик: Перейти к стеку вызовов
+debugger::FocusLoadedSources	Отладчик: Перейти к загруженным исходникам
+debugger::FocusModules	Отладчик: Перейти к модулям
+debugger::FocusTerminal	Отладчик: Перейти в терминал
+debugger::FocusVariables	Отладчик: Перейти к переменным
+debugger::GoToSelectedAddress	Отладчик: Перейти к выбранному адресу
+debugger::NextBreakpointProperty	Отладчик: Перейти к следующему свойству точки останова
+debugger::OpenProjectDebugTasks	Отладчик: открыть настройки отладки проекта
+debugger::Pause	Отладчик: приостановить
+debugger::PreviousBreakpointProperty	Отладчик: Перейти к предыдущему свойству точки останова
+debugger::Rerun	Отладчик: повторить запуск
+debugger::RerunSession	Отладчик: Перезапустить сеанс
+debugger::Restart	Отладчик: перезапустить
+debugger::RunToCursor	Отладчик: Выполнить до курсора
+debugger::Start	Отладчик: начать отладку
+debugger::StepBack	Отладчик: Сделать шаг назад
+debugger::StepInto	Отладчик: шаг с заходом
+debugger::StepOut	Отладчик: выйти из функции
+debugger::StepOver	Отладчик: шаг с обходом
+debugger::Stop	Отладчик: остановить
+debugger::ToggleDataBreakpoint	Отладчик: Установить или убрать точку останова по данным
+debugger::ToggleEnableBreakpoint	Отладчик: Включить или отключить точку останова
+debugger::ToggleExpandItem	Отладчик: Развернуть или свернуть элемент
+debugger::ToggleIgnoreBreakpoints	Отладчик: Включить или отключить игнорирование точек останова
+debugger::ToggleSessionPicker	Отладчик: Показать или скрыть выбор сеанса
+debugger::ToggleThreadPicker	Отладчик: Показать или скрыть выбор диалога
+debugger::ToggleUserFrames	Отладчик: Показать или скрыть пользовательские кадры стека
+debugger::UnsetBreakpoint	Отладчик: Удалить точку останова
+dev::CopyAccessibilityTree	Разработка Zed: Копировать дерево доступности
+dev::CopyDebugAdapterArguments	Разработка Zed: Копировать аргументы адаптера отладки
+dev::DebugFilesystemWatching	Разработка Zed: Отладить наблюдение за файловой системой
+dev::DumpAccessibilityTree	Разработка Zed: Выгрузить дерево доступности
+dev::DumpInputLatencyHistogram	Разработка Zed: Выгрузить гистограмму задержки ввода
+dev::DumpWorkspaceInfo	Разработка Zed: Выгрузить сведения о рабочей области
+dev::EditPredictionContextGoBack	Разработка Zed: Перейти назад в контексте предложенного изменения
+dev::EditPredictionContextGoForward	Разработка Zed: Перейти вперёд в контексте предложенного изменения
+dev::HangAction	Разработка Zed: Вызвать зависание действия
+dev::HangBackground	Разработка Zed: Вызвать зависание фонового потока
+dev::HangForeground	Разработка Zed: Вызвать зависание основного потока
+dev::OpenAcpLogs	Разработка Zed: Открыть журналы ACP
+dev::OpenDebugAdapterLogs	Разработка Zed: Открыть журналы адаптера отладки
+dev::OpenEditPredictionContextView	Разработка Zed: Открыть контекст предложенных изменений
+dev::OpenHighlightsTreeView	Разработка Zed: Открыть дерево подсветки
+dev::OpenKeyContextView	Разработка Zed: Открыть контекст сочетаний клавиш
+dev::OpenLanguageServerLogs	Разработка Zed: Открыть журналы языкового сервера
+dev::OpenSyntaxTreeView	Разработка Zed: Открыть синтаксическое дерево
+dev::OpenThemePreview	Разработка Zed: Открыть предварительный просмотр темы
+dev::OpenUrlPrompt	Разработка Zed: Открыть ввод URL
+dev::ResetFrameOverlayStats	Разработка Zed: Сбросить статистику наложения кадров
+dev::ShowAllSidebarThreadMetadata	Разработка Zed: Показать метаданные всех диалогов боковой панели
+dev::ShowGitJobQueue	Разработка Zed: Показать очередь заданий Git
+dev::ShowThreadMetadata	Разработка Zed: Показать метаданные диалога
+dev::ToggleFpsOverlay	Разработка Zed: Показать или скрыть счётчик FPS
+dev::ToggleInspector	Разработка Zed: Показать или скрыть инспектор
+diagnostics::Deploy	Диагностика: открыть
+diagnostics::DeployCurrentFile	Диагностика: Открыть текущий файл
+diagnostics::ToggleDiagnosticsRefresh	Диагностика: Включить или отключить обновление диагностики
+diagnostics::ToggleWarnings	Диагностика: Показать или скрыть предупреждения
+edit_prediction::ClearHistory	Предлагаемые изменения: Очистить историю
+edit_prediction::RatePredictions	Предлагаемые изменения: Оценить предлагаемые изменения
+edit_prediction::ResetOnboarding	Предлагаемые изменения: Сбросить первоначальную настройку
+edit_prediction::ToggleMenu	Предлагаемые изменения: Показать или скрыть меню
+editor::AcceptEditPrediction	Редактор: Принять предложенное изменение
+editor::AcceptInlayHint	Редактор: Принять встроенную подсказку
+editor::AcceptNextLineEditPrediction	Редактор: Принять следующую строку предложенного изменения
+editor::AcceptNextWordEditPrediction	Редактор: Принять следующее слово предложенного изменения
+editor::AddSelectionAbove	Редактор: добавить курсор выше
+editor::AddSelectionBelow	Редактор: добавить курсор ниже
+editor::AlignSelections	Редактор: Выровнять выделения
+editor::ApplyAllDiffHunks	Редактор: Применить все блоки изменений
+editor::ApplyDiffHunk	Редактор: Применить блок изменений
+editor::AutoIndent	Редактор: Автоматически расставить отступы
+editor::Backspace	Редактор: удалить слева
+editor::Backtab	Редактор: Уменьшить отступ
+editor::BlameHover	Редактор: Показать автора строки в подсказке
+editor::BlamePreviousRevision	Редактор: Показать авторов строк предыдущей версии
+editor::BlameRevision	Редактор: Показать авторов строк выбранной версии
+editor::Cancel	Редактор: отменить
+editor::CancelEditReviewComment	Редактор: Отменить редактирование комментария к изменению
+editor::CancelFlycheck	Редактор: Отменить проверку кода
+editor::CancelLanguageServerWork	Редактор: Отменить работу языкового сервера
+editor::ClearFlycheck	Редактор: Очистить результаты проверки кода
+editor::CollapseAllDiffHunks	Редактор: Свернуть все блоки изменений
+editor::ComposeCompletion	Редактор: Составить вариант завершения
+editor::ConfirmCodeAction	Редактор: Применить действие с кодом
+editor::ConfirmCompletion	Редактор: Принять вариант завершения
+editor::ConfirmCompletionInsert	Редактор: Вставить вариант завершения
+editor::ConfirmCompletionReplace	Редактор: Заменить текст вариантом завершения
+editor::ConfirmEditReviewComment	Редактор: Сохранить комментарий к изменению
+editor::ConfirmRename	Редактор: Подтвердить переименование
+editor::ContextMenuFirst	Редактор: Выбрать первый пункт контекстного меню
+editor::ContextMenuLast	Редактор: Выбрать последний пункт контекстного меню
+editor::ContextMenuNext	Редактор: Выбрать следующий пункт контекстного меню
+editor::ContextMenuPrevious	Редактор: Выбрать предыдущий пункт контекстного меню
+editor::ConvertFromBase64	Редактор: Декодировать Base64
+editor::ConvertIndentationToSpaces	Редактор: Заменить табуляцию в отступах пробелами
+editor::ConvertIndentationToTabs	Редактор: Заменить пробелы в отступах табуляцией
+editor::ConvertToBase64	Редактор: Кодировать в Base64
+editor::ConvertToKebabCase	Редактор: Преобразовать в kebab-case
+editor::ConvertToLowerCamelCase	Редактор: Преобразовать в lowerCamelCase
+editor::ConvertToLowerCase	Редактор: Преобразовать в нижний регистр
+editor::ConvertToOppositeCase	Редактор: Инвертировать регистр
+editor::ConvertToRot13	Редактор: Преобразовать по ROT13
+editor::ConvertToRot47	Редактор: Преобразовать по ROT47
+editor::ConvertToSentenceCase	Редактор: Использовать регистр предложения
+editor::ConvertToSnakeCase	Редактор: Преобразовать в snake_case
+editor::ConvertToTitleCase	Редактор: Начать каждое слово с прописной буквы
+editor::ConvertToUpperCamelCase	Редактор: Преобразовать в UpperCamelCase
+editor::ConvertToUpperCase	Редактор: Преобразовать в верхний регистр
+editor::Copy	Редактор: копировать
+editor::CopyAndTrim	Редактор: копировать без крайних пробелов
+editor::CopyFileLocation	Редактор: Копировать расположение файла
+editor::CopyFileName	Редактор: Копировать имя файла
+editor::CopyFileNameWithoutExtension	Редактор: Копировать имя файла без расширения
+editor::CopyHighlightJson	Редактор: Копировать описание подсветки в JSON
+editor::CopyPermalinkToLine	Редактор: копировать постоянную ссылку на строку
+editor::Cut	Редактор: вырезать
+editor::CutToEndOfLine	Редактор: Вырезать до конца строки
+editor::DebuggerHoverCollapseSelected	Редактор: Свернуть выбранный элемент в подсказке отладчика
+editor::DebuggerHoverExpandSelected	Редактор: Развернуть выбранный элемент в подсказке отладчика
+editor::DebuggerHoverSelectNext	Редактор: Выбрать следующий элемент в подсказке отладчика
+editor::DebuggerHoverSelectPrevious	Редактор: Выбрать предыдущий элемент в подсказке отладчика
+editor::Delete	Редактор: удалить
+editor::DeleteLine	Редактор: удалить строку
+editor::DeleteReviewComment	Редактор: Удалить комментарий к изменению
+editor::DeleteToBeginningOfLine	Редактор: Удалить до начала строки
+editor::DeleteToEndOfLine	Редактор: Удалить до конца строки
+editor::DeleteToNextSubwordEnd	Редактор: Удалить до конца следующей части слова
+editor::DeleteToNextWordEnd	Редактор: Удалить до конца следующего слова
+editor::DeleteToPreviousSubwordStart	Редактор: Удалить до начала предыдущей части слова
+editor::DeleteToPreviousWordStart	Редактор: Удалить до начала предыдущего слова
+editor::DiffClipboardWithSelection	Редактор: Сравнить буфер обмена с выделением
+editor::DisableBreakpoint	Редактор: Отключить точку останова
+editor::DisplayCursorNames	Редактор: Показать имена у курсоров
+editor::DuplicateLineDown	Редактор: Дублировать строку ниже
+editor::DuplicateLineUp	Редактор: Дублировать строку выше
+editor::DuplicateSelection	Редактор: Дублировать выделение
+editor::EditBookmark	Редактор: Изменить закладку
+editor::EditLogBreakpoint	Редактор: изменить точку останова
+editor::EditReviewComment	Редактор: Изменить комментарий к изменению
+editor::EnableBreakpoint	Редактор: Включить точку останова
+editor::ExpandAllDiffHunks	Редактор: Развернуть все блоки изменений
+editor::ExpandExcerpts	Редактор: Расширить фрагменты
+editor::ExpandExcerptsDown	Редактор: Расширить фрагменты вниз
+editor::ExpandExcerptsUp	Редактор: Расширить фрагменты вверх
+editor::ExpandMacroRecursively	Редактор: Рекурсивно раскрыть макрос
+editor::FindAllReferences	Редактор: найти все ссылки
+editor::FindNextMatch	Редактор: Найти следующее совпадение
+editor::FindPreviousMatch	Редактор: Найти предыдущее совпадение
+editor::Fold	Редактор: свернуть блок
+editor::FoldAll	Редактор: свернуть всё
+editor::FoldAtLevel	Редактор: Свернуть до уровня
+editor::FoldAtLevel_1	Редактор: Свернуть до первого уровня
+editor::FoldAtLevel_2	Редактор: Свернуть до второго уровня
+editor::FoldAtLevel_3	Редактор: Свернуть до третьего уровня
+editor::FoldAtLevel_4	Редактор: Свернуть до четвёртого уровня
+editor::FoldAtLevel_5	Редактор: Свернуть до пятого уровня
+editor::FoldAtLevel_6	Редактор: Свернуть до шестого уровня
+editor::FoldAtLevel_7	Редактор: Свернуть до седьмого уровня
+editor::FoldAtLevel_8	Редактор: Свернуть до восьмого уровня
+editor::FoldAtLevel_9	Редактор: Свернуть до девятого уровня
+editor::FoldFunctionBodies	Редактор: Свернуть тела функций
+editor::FoldRecursive	Редактор: Свернуть рекурсивно
+editor::FoldSelectedRanges	Редактор: Свернуть выделенные диапазоны
+editor::Format	Редактор: форматировать
+editor::FormatSelections	Редактор: форматировать выделение
+editor::GoToDeclaration	Редактор: перейти к объявлению
+editor::GoToDeclarationSplit	Редактор: Открыть объявление в соседнем редакторе
+editor::GoToDefinition	Редактор: перейти к определению
+editor::GoToDefinitionSplit	Редактор: Открыть определение в соседнем редакторе
+editor::GoToDiagnostic	Редактор: перейти к следующей проблеме
+editor::GoToHunk	Редактор: Перейти к блоку изменений
+editor::GoToImplementation	Редактор: Перейти к реализации
+editor::GoToImplementationSplit	Редактор: Открыть реализацию в соседнем редакторе
+editor::GoToNextBookmark	Редактор: Перейти к следующей закладке
+editor::GoToNextChange	Редактор: Перейти к следующему изменению
+editor::GoToNextDocumentHighlight	Редактор: Перейти к следующей подсветке в документе
+editor::GoToNextReference	Редактор: Перейти к следующей ссылке
+editor::GoToNextSymbol	Редактор: Перейти к следующему символу
+editor::GoToParentModule	Редактор: Перейти к родительскому модулю
+editor::GoToPreviousBookmark	Редактор: Перейти к предыдущей закладке
+editor::GoToPreviousChange	Редактор: Перейти к предыдущему изменению
+editor::GoToPreviousDiagnostic	Редактор: перейти к предыдущей проблеме
+editor::GoToPreviousDocumentHighlight	Редактор: Перейти к предыдущей подсветке в документе
+editor::GoToPreviousHunk	Редактор: Перейти к предыдущему блоку изменений
+editor::GoToPreviousReference	Редактор: Перейти к предыдущей ссылке
+editor::GoToPreviousSymbol	Редактор: Перейти к предыдущему символу
+editor::GoToTypeDefinition	Редактор: перейти к определению типа
+editor::GoToTypeDefinitionSplit	Редактор: Открыть определение типа в соседнем редакторе
+editor::HalfPageDown	Редактор: Прокрутить на полстраницы вниз
+editor::HalfPageUp	Редактор: Прокрутить на полстраницы вверх
+editor::HandleInput	Редактор: Обработать ввод
+editor::Hover	Редактор: показать информацию о символе
+editor::Indent	Редактор: Увеличить отступ
+editor::InsertSnippet	Редактор: Вставить фрагмент кода
+editor::InsertUuidV4	Редактор: Вставить UUID v4
+editor::InsertUuidV7	Редактор: Вставить UUID v7
+editor::JoinLines	Редактор: объединить строки
+editor::KillRingCut	Редактор: Вырезать в кольцевой буфер
+editor::KillRingYank	Редактор: Вставить из кольцевого буфера
+editor::LineDown	Редактор: На строку вниз
+editor::LineUp	Редактор: На строку вверх
+editor::MoveDown	Редактор: Переместить вниз
+editor::MoveDownByLines	Редактор: Переместить вниз по строкам
+editor::MoveLeft	Редактор: Переместить влево
+editor::MoveLineDown	Редактор: переместить строку вниз
+editor::MoveLineUp	Редактор: переместить строку вверх
+editor::MovePageDown	Редактор: Переместить на страницу вниз
+editor::MovePageUp	Редактор: Переместить на страницу вверх
+editor::MoveRight	Редактор: Переместить вправо
+editor::MoveToBeginning	Редактор: Перейти в начало
+editor::MoveToBeginningOfLine	Редактор: Перейти в начало строки
+editor::MoveToEnclosingBracket	Редактор: Перейти к обрамляющей скобке
+editor::MoveToEnd	Редактор: Перейти в конец
+editor::MoveToEndOfExcerpt	Редактор: Перейти в конец фрагмента
+editor::MoveToEndOfLargerSyntaxNode	Редактор: Перейти в конец внешнего синтаксического узла
+editor::MoveToEndOfLine	Редактор: Перейти в конец строки
+editor::MoveToEndOfParagraph	Редактор: Перейти в конец абзаца
+editor::MoveToEndOfPreviousExcerpt	Редактор: Перейти в конец предыдущего фрагмента
+editor::MoveToNextCommentParagraph	Редактор: Перейти к следующему абзацу комментария
+editor::MoveToNextSubwordEnd	Редактор: Перейти к концу следующей части слова
+editor::MoveToNextWordEnd	Редактор: Перейти к концу следующего слова
+editor::MoveToPreviousCommentParagraph	Редактор: Перейти к предыдущему абзацу комментария
+editor::MoveToPreviousSubwordStart	Редактор: Перейти к началу предыдущей части слова
+editor::MoveToPreviousWordStart	Редактор: Перейти к началу предыдущего слова
+editor::MoveToStartOfExcerpt	Редактор: Перейти в начало фрагмента
+editor::MoveToStartOfLargerSyntaxNode	Редактор: Перейти в начало внешнего синтаксического узла
+editor::MoveToStartOfNextExcerpt	Редактор: Перейти в начало следующего фрагмента
+editor::MoveToStartOfParagraph	Редактор: Перейти в начало абзаца
+editor::MoveUp	Редактор: Переместить вверх
+editor::MoveUpByLines	Редактор: Переместить вверх по строкам

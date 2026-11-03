@@ -563,15 +563,15 @@ impl PickerDelegate for CallHierarchyDelegate {
     fn no_matches_text(&self, _window: &mut Window, _cx: &mut App) -> Option<SharedString> {
         Some(SharedString::new_static(match self.state {
             FetchState::Loading => "Fetching call hierarchy…",
-            FetchState::NoSymbol => "No callable symbol under the cursor",
+            FetchState::NoSymbol => "Под курсором нет вызываемого символа",
             FetchState::Loaded => {
                 if self.calls.is_empty() {
                     match self.mode {
-                        CallHierarchyMode::Incoming => "No incoming calls found",
-                        CallHierarchyMode::Outgoing => "No outgoing calls found",
+                        CallHierarchyMode::Incoming => "Входящие вызовы не найдены",
+                        CallHierarchyMode::Outgoing => "Исходящие вызовы не найдены",
                     }
                 } else {
-                    "No matches"
+                    "Нет совпадений"
                 }
             }
         }))
@@ -697,8 +697,8 @@ impl PickerDelegate for CallHierarchyDelegate {
         }
         let focus_handle = self.focus_handle.clone();
         let expand_label = match self.mode {
-            CallHierarchyMode::Incoming => "Show Callers",
-            CallHierarchyMode::Outgoing => "Show Callees",
+            CallHierarchyMode::Incoming => "Показать вызывающие функции",
+            CallHierarchyMode::Outgoing => "Показать вызываемые функции",
         };
         Some(
             h_flex()
@@ -711,7 +711,7 @@ impl PickerDelegate for CallHierarchyDelegate {
                 .border_color(cx.theme().colors().border_variant)
                 .when(!self.root_stack.is_empty(), |this| {
                     this.child(
-                        Button::new("collapse-call", "Back")
+                        Button::new("collapse-call", "Назад")
                             .key_binding(
                                 KeyBinding::for_action_in(&menu::SelectParent, &focus_handle, cx)
                                     .map(|key_binding| key_binding.size(rems_from_px(12_f32))),
@@ -734,7 +734,7 @@ impl PickerDelegate for CallHierarchyDelegate {
                     )
                 })
                 .child(
-                    Button::new("toggle-direction", "Switch Direction")
+                    Button::new("toggle-direction", "Сменить направление")
                         .key_binding(
                             KeyBinding::for_action_in(&ToggleDirection, &focus_handle, cx)
                                 .map(|key_binding| key_binding.size(rems_from_px(12_f32))),

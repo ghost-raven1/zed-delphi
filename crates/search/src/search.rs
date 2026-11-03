@@ -81,9 +81,9 @@ pub enum SearchOption {
     Backwards,
 }
 
-const REPLACE_PLACEHOLDER: &str = "Replace in project…";
-const INCLUDE_PLACEHOLDER: &str = "Include: e.g. src/**/*.rs";
-const EXCLUDE_PLACEHOLDER: &str = "Exclude: e.g. vendor/*, *.lock";
+const REPLACE_PLACEHOLDER: &str = "Заменить в проекте…";
+const INCLUDE_PLACEHOLDER: &str = "Включить: например, src/**/*.rs";
+const EXCLUDE_PLACEHOLDER: &str = "Исключить: например, vendor/*, *.lock";
 
 pub enum SearchSource<'a, 'b> {
     /// Dispatches the toggle action from the button's focus handle. Only use this when the
@@ -111,12 +111,12 @@ impl SearchOption {
 
     pub fn label(&self) -> &'static str {
         match self {
-            SearchOption::WholeWord => "Match Whole Words",
-            SearchOption::CaseSensitive => "Match Case Sensitivity",
-            SearchOption::IncludeIgnored => "Also search files ignored by configuration",
-            SearchOption::Regex => "Use Regular Expressions",
-            SearchOption::OneMatchPerLine => "One Match Per Line",
-            SearchOption::Backwards => "Search Backwards",
+            SearchOption::WholeWord => "Слова целиком",
+            SearchOption::CaseSensitive => "Учитывать регистр",
+            SearchOption::IncludeIgnored => "Искать также в файлах, исключённых настройками",
+            SearchOption::Regex => "Регулярные выражения",
+            SearchOption::OneMatchPerLine => "Одно совпадение на строку",
+            SearchOption::Backwards => "Искать в обратном направлении",
         }
     }
 
@@ -254,7 +254,7 @@ pub(crate) fn show_no_more_matches(window: &mut Window, cx: &mut App) {
         };
         workspace.update(cx, |workspace, cx| {
             workspace.show_toast(
-                Toast::new(notification_id.clone(), "No more matches").autohide(),
+                Toast::new(notification_id.clone(), "Больше совпадений нет").autohide(),
                 cx,
             );
         })

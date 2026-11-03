@@ -121,7 +121,7 @@ impl DebugPanel {
                 active_session.label(cx).unwrap_or("(child)".into())
             })
         } else {
-            SharedString::new_static("Unknown Session")
+            SharedString::new_static("Неизвестный сеанс")
         };
         let running_state = running_state.read(cx);
 
@@ -212,7 +212,7 @@ impl DebugPanel {
         )
         .attach(Anchor::BottomLeft)
         .handle(self.session_picker_menu_handle.clone())
-        .trigger_tooltip(Tooltip::text("Select a Debug Session"));
+        .trigger_tooltip(Tooltip::text("Выберите сеанс отладки"));
 
         Some(menu)
     }
@@ -292,7 +292,7 @@ impl DebugPanel {
                 thread
                     .name
                     .is_empty()
-                    .then(|| format!("Tid: {}", thread.id))
+                    .then(|| format!("Поток: {}", thread.id))
                     .unwrap_or_else(|| thread.name.clone())
             });
 
@@ -309,7 +309,7 @@ impl DebugPanel {
                             let entry_name = thread
                                 .name
                                 .is_empty()
-                                .then(|| format!("Tid: {}", thread.id))
+                                .then(|| format!("Поток: {}", thread.id))
                                 .unwrap_or_else(|| thread.name);
                             let entry_name = truncate_and_trailoff(&entry_name, MAX_LABEL_CHARS);
 

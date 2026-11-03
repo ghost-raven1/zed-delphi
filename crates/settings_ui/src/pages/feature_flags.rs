@@ -59,7 +59,7 @@ fn render_flag_row(
                     ))
                     .when(forced_on, |this| {
                         this.child(
-                            Label::new("enabled for all")
+                            Label::new("Включено для всех")
                                 .size(LabelSize::Small)
                                 .color(Color::Muted),
                         )
@@ -68,7 +68,7 @@ fn render_flag_row(
             .when(has_override && !forced_on, |this| {
                 let name = descriptor.name;
                 this.child(
-                    Button::new(SharedString::from(format!("reset-{}", name)), "Reset")
+                    Button::new(SharedString::from(format!("reset-{}", name)), "Сбросить")
                         .label_size(LabelSize::Small)
                         .on_click(cx.listener(move |_, _, _, cx| {
                             FeatureFlagStore::clear_override(name, <dyn Fs>::global(cx), cx);
@@ -106,7 +106,7 @@ fn render_flag_variants(
             let checkbox_id = SharedString::from(format!("{}-{}", name, key));
             let disabled = forced_on;
             let mut checkbox = Checkbox::new(ElementId::from(checkbox_id), state)
-                .label(label)
+                .label(crate::localization::option_text(label))
                 .disabled(disabled);
             if !disabled {
                 checkbox =

@@ -1,0 +1,217 @@
+vim::StartOfLineDownward	Vim: Перейти в начало строки ниже
+vim::StartOfParagraph	Vim: Перейти в начало абзаца
+vim::Substitute	Vim: Заменить
+vim::SubstituteLine	Vim: Заменить строку
+vim::Subword	Vim: Часть слова
+vim::SwitchToHelixNormalMode	Vim: Перейти в обычный режим Helix
+vim::SwitchToInsertMode	Vim: Перейти в режим вставки
+vim::SwitchToNormalMode	Vim: Перейти в обычный режим
+vim::SwitchToReplaceMode	Vim: Перейти в режим замены
+vim::SwitchToVisualBlockMode	Vim: Перейти в визуальный блочный режим
+vim::SwitchToVisualLineMode	Vim: Перейти в визуальный построчный режим
+vim::SwitchToVisualMode	Vim: Перейти в визуальный режим
+vim::Tab	Vim: Перейти по Tab
+vim::Tag	Vim: Тег
+vim::TemporaryNormal	Vim: Временно перейти в обычный режим
+vim::ToggleBlockComments	Vim: Добавить или убрать блочный комментарий
+vim::ToggleComments	Vim: закомментировать или раскомментировать
+vim::ToggleMarksView	Vim: Показать или скрыть метки
+vim::ToggleProjectPanelFocus	Vim: Переключить фокус панели проекта
+vim::ToggleRecord	Vim: Начать или остановить запись
+vim::ToggleRegistersView	Vim: Показать или скрыть регистры
+vim::ToggleReplace	Vim: Показать или скрыть замену
+vim::ToggleVisual	Vim: Включить или отключить визуальный режим
+vim::ToggleVisualBlock	Vim: Включить или отключить визуальный блочный режим
+vim::ToggleVisualLine	Vim: Включить или отключить визуальный построчный режим
+vim::Undo	Vim: отменить
+vim::UndoLastLine	Vim: Отменить изменение последней строки
+vim::UndoReplace	Vim: Отменить замену
+vim::UnmatchedBackward	Vim: Перейти к непарному символу назад
+vim::UnmatchedForward	Vim: Перейти к непарному символу вперёд
+vim::Up	Vim: Вверх
+vim::VerticalBars	Vim: Вертикальные черты
+vim::VisualCommand	Vim: Выполнить команду в визуальном режиме
+vim::VisualDelete	Vim: Удалить визуальное выделение
+vim::VisualDeleteLine	Vim: Удалить выделенные строки
+vim::VisualInsertEndOfLine	Vim: Вставить в конце выделенных строк
+vim::VisualInsertFirstNonWhiteSpace	Vim: Вставить перед первым непробельным символом выделенных строк
+vim::VisualYank	Vim: Копировать визуальное выделение
+vim::VisualYankLine	Vim: Копировать выделенные строки
+vim::WindowBottom	Vim: Перейти к нижней части окна
+vim::WindowMiddle	Vim: Перейти к середине окна
+vim::WindowTop	Vim: Перейти к верхней части окна
+vim::Word	Vim: Слово
+vim::WrappingLeft	Vim: Перейти влево с переносом
+vim::WrappingRight	Vim: Перейти вправо с переносом
+vim::Yank	Vim: Копировать в регистр
+vim::YankLine	Vim: Копировать строку в регистр
+vim::YankToEndOfLine	Vim: Копировать до конца строки в регистр
+welcome::OpenRecentProject	Начальный экран: Открыть недавний проект
+which_key::ShowPendingBindings	Подсказки клавиш: показать продолжения сочетания клавиш
+window::MergeAllWindows	Окно: Объединить все окна
+window::MoveTabToNewWindow	Окно: Переместить вкладку в новое окно
+window::ShowNextWindowTab	Окно: Показать следующую вкладку окна
+window::ShowPreviousWindowTab	Окно: Показать предыдущую вкладку окна
+workspace::ActivateLastPane	Рабочая область: Перейти к последней области редактора
+workspace::ActivateNextPane	Рабочая область: Перейти к следующей области редактора
+workspace::ActivateNextWindow	Рабочая область: Перейти к следующему окну
+workspace::ActivatePane	Рабочая область: Активировать область редактора
+workspace::ActivatePaneDown	Рабочая область: перейти в область снизу
+workspace::ActivatePaneLeft	Рабочая область: перейти в область слева
+workspace::ActivatePaneRight	Рабочая область: перейти в область справа
+workspace::ActivatePaneUp	Рабочая область: перейти в область сверху
+workspace::ActivatePreviousPane	Рабочая область: Перейти к предыдущей области редактора
+workspace::ActivatePreviousWindow	Рабочая область: Перейти к предыдущему окну
+workspace::AddFolderToProject	Рабочая область: Добавить папку в проект
+workspace::ClearAllNotifications	Рабочая область: Очистить все уведомления
+workspace::ClearBookmarks	Рабочая область: Удалить закладки
+workspace::ClearNavigationHistory	Рабочая область: Очистить историю переходов
+workspace::ClearTrustedWorktrees	Рабочая область: Очистить список доверенных рабочих деревьев
+workspace::CloseActiveDock	Рабочая область: Закрыть активную панель
+workspace::CloseAllDocks	Рабочая область: Закрыть все панели
+workspace::CloseAllItemsAndPanes	Рабочая область: Закрыть все вкладки и области редактора
+workspace::CloseInactiveTabsAndPanes	Рабочая область: Закрыть неактивные вкладки и области редактора
+workspace::CloseItemInAllPanes	Рабочая область: Закрыть вкладку во всех областях редактора
+workspace::CloseProject	Рабочая область: Закрыть проект
+workspace::CloseWindow	Рабочая область: закрыть окно
+workspace::CopyPath	Рабочая область: копировать путь
+workspace::CopyRelativePath	Рабочая область: копировать относительный путь
+workspace::DecreaseActiveDockSize	Рабочая область: Уменьшить активную панель
+workspace::DecreaseOpenDocksSize	Рабочая область: Уменьшить открытые панели
+workspace::Feedback	Рабочая область: Обратная связь
+workspace::FocusCenterPane	Рабочая область: Перейти в центральную область редактора
+workspace::FocusNextPart	Рабочая область: Перейти к следующей части
+workspace::FocusPreviousPart	Рабочая область: Перейти к предыдущей части
+workspace::FollowNextCollaborator	Рабочая область: Следовать за следующим участником
+workspace::FormatAndSave	Рабочая область: Форматировать и сохранить
+workspace::IncreaseActiveDockSize	Рабочая область: Увеличить активную панель
+workspace::IncreaseOpenDocksSize	Рабочая область: Увеличить открытые панели
+workspace::MoveFocusedPanelToNextPosition	Рабочая область: Переместить активную панель в следующую позицию
+workspace::MoveItemToPane	Рабочая область: Переместить вкладку в область редактора
+workspace::MoveItemToPaneInDirection	Рабочая область: Переместить вкладку в соседнюю область редактора
+workspace::MovePaneDown	Рабочая область: Переместить область редактора вниз
+workspace::MovePaneLeft	Рабочая область: Переместить область редактора влево
+workspace::MovePaneRight	Рабочая область: Переместить область редактора вправо
+workspace::MovePaneUp	Рабочая область: Переместить область редактора вверх
+workspace::NewCenterTerminal	Рабочая область: Открыть терминал в центре
+workspace::NewFile	Рабочая область: новый файл
+workspace::NewFileSplit	Рабочая область: Создать файл в соседнем редакторе
+workspace::NewFileSplitHorizontal	Рабочая область: Создать файл с горизонтальным разделением
+workspace::NewFileSplitVertical	Рабочая область: Создать файл с вертикальным разделением
+workspace::NewSearch	Рабочая область: Начать новый поиск
+workspace::NewTerminal	Рабочая область: новый терминал
+workspace::NewWindow	Рабочая область: новое окно
+workspace::Open	Рабочая область: открыть
+workspace::OpenComponentPreview	Рабочая область: Открыть просмотр компонентов
+workspace::OpenFiles	Рабочая область: Открыть файлы
+workspace::OpenInTerminal	Рабочая область: открыть в терминале
+workspace::OpenTerminal	Рабочая область: Открыть терминал
+workspace::OpenWithSystem	Рабочая область: Открыть системным приложением
+workspace::Reload	Рабочая область: перезагрузить
+workspace::ReloadActiveItem	Рабочая область: Перезагрузить активную вкладку
+workspace::ReopenLastPicker	Рабочая область: открыть предыдущий список выбора
+workspace::ResetActiveDockSize	Рабочая область: Сбросить размер активной панели
+workspace::ResetOpenDocksSize	Рабочая область: Сбросить размеры открытых панелей
+workspace::ResetPaneSizes	Рабочая область: Сбросить размеры областей редактора
+workspace::RestoreBanner	Рабочая область: Восстановить уведомление
+workspace::Save	Рабочая область: сохранить
+workspace::SaveAll	Рабочая область: сохранить всё
+workspace::SaveAs	Рабочая область: сохранить как
+workspace::SaveWithoutFormat	Рабочая область: сохранить без форматирования
+workspace::SendKeystrokes	Рабочая область: Отправить последовательность клавиш
+workspace::ShutdownDebugAdapters	Рабочая область: Завершить работу адаптеров отладки
+workspace::SuppressNotification	Рабочая область: Скрыть уведомление
+workspace::SwapPaneAdjacent	Рабочая область: Поменять местами соседние области редактора
+workspace::SwapPaneDown	Рабочая область: Поменять область редактора местами с нижней
+workspace::SwapPaneLeft	Рабочая область: Поменять область редактора местами с левой
+workspace::SwapPaneRight	Рабочая область: Поменять область редактора местами с правой
+workspace::SwapPaneUp	Рабочая область: Поменять область редактора местами с верхней
+workspace::ToggleAllDocks	Рабочая область: показать или скрыть все панели
+workspace::ToggleBottomDock	Рабочая область: показать или скрыть нижнюю панель
+workspace::ToggleCenteredLayout	Рабочая область: Включить или отключить центрированное расположение
+workspace::ToggleEditPrediction	Рабочая область: Включить или отключить предлагаемые изменения
+workspace::ToggleEditorZoom	Рабочая область: Развернуть редактор или вернуть прежний размер
+workspace::ToggleExpandItem	Рабочая область: Развернуть или свернуть элемент
+workspace::ToggleHelixMode	Рабочая область: Включить или отключить режим Helix
+workspace::ToggleLeftDock	Рабочая область: показать или скрыть левую панель
+workspace::ToggleReadOnlyFile	Рабочая область: Включить или отключить режим только для чтения
+workspace::ToggleRightDock	Рабочая область: показать или скрыть правую панель
+workspace::ToggleVimMode	Рабочая область: Включить или отключить режим Vim
+workspace::ToggleWorktreeSecurity	Рабочая область: Открыть настройки доверия рабочему дереву
+workspace::ToggleZoom	Рабочая область: Развернуть или вернуть прежний размер
+workspace::Unfollow	Рабочая область: Перестать следовать за участником
+workspace::UseAgenticLayout	Рабочая область: Использовать расположение с агентом
+workspace::UseClassicLayout	Рабочая область: Использовать классическое расположение
+workspace::ZoomIn	Рабочая область: Увеличить масштаб
+workspace::ZoomOut	Рабочая область: Уменьшить масштаб
+worktree_picker::DeleteWorktree	Рабочие деревья: Удалить рабочее дерево
+worktree_picker::ForceDeleteWorktree	Рабочие деревья: Принудительно удалить рабочее дерево
+zed::About	Zed: о приложении
+zed::AcpRegistry	Zed: Реестр ACP
+zed::CopyInstalledExtensionsIntoClipboard	Zed: Копировать список установленных расширений
+zed::CopySystemSpecsIntoClipboard	Zed: Копировать сведения о системе
+zed::DebugElements	Zed: Отладить элементы интерфейса
+zed::DecreaseBufferFontSize	Zed: уменьшить шрифт редактора
+zed::DecreaseUiFontSize	Zed: Уменьшить шрифт интерфейса
+zed::Extensions	Zed: Расширения
+zed::GetMerch	Zed: Открыть магазин сувениров
+zed::Hide	Zed: скрыть
+zed::HideOthers	Zed: скрыть остальные окна
+zed::ImportCursorSettings	Zed: Импортировать настройки Cursor
+zed::ImportVsCodeSettings	Zed: Импортировать настройки VS Code
+zed::IncreaseBufferFontSize	Zed: увеличить шрифт редактора
+zed::IncreaseUiFontSize	Zed: Увеличить шрифт интерфейса
+zed::InstallDevExtension	Zed: Установить разрабатываемое расширение
+zed::Minimize	Zed: свернуть
+zed::NoAction	Zed: Не выполнять действие
+zed::OpenAccountSettings	Zed: Открыть настройки аккаунта
+zed::OpenBrowser	Zed: Открыть браузер
+zed::OpenDebugTasks	Zed: Открыть задачи отладки
+zed::OpenDefaultKeymap	Zed: открыть стандартные сочетания клавиш
+zed::OpenDefaultSettings	Zed: открыть стандартные настройки
+zed::OpenDocs	Zed: Открыть документацию
+zed::OpenKeymap	Zed: открыть сочетания клавиш
+zed::OpenKeymapFile	Zed: открыть файл сочетаний клавиш
+zed::OpenLicenses	Zed: открыть лицензии
+zed::OpenLog	Zed: открыть журнал
+zed::OpenOnboarding	Zed: Открыть первоначальную настройку
+zed::OpenPerformanceProfiler	Zed: Открыть профилировщик производительности
+zed::OpenProjectSettings	Zed: открыть настройки проекта
+zed::OpenProjectSettingsFile	Zed: открыть файл настроек проекта
+zed::OpenProjectTasks	Zed: открыть задачи проекта
+zed::OpenServerSettings	Zed: Открыть настройки сервера
+zed::OpenSettings	Zed: открыть настройки
+zed::OpenSettingsAt	Zed: Открыть настройки в указанной позиции
+zed::OpenSettingsFile	Zed: открыть файл настроек
+zed::OpenSettingsPage	Zed: Открыть страницу настроек
+zed::OpenStatusPage	Zed: Открыть страницу состояния сервиса
+zed::OpenTasks	Zed: Открыть задачи
+zed::OpenTelemetryLog	Zed: открыть журнал телеметрии
+zed::OpenWorktreeSetupTasks	Zed: Открыть задачи настройки рабочего дерева
+zed::OpenZedRepo	Zed: Открыть репозиторий Zed
+zed::OpenZedUrl	Zed: Открыть ссылку Zed
+zed::Quit	Zed: выйти
+zed::RebuildDevExtension	Zed: Пересобрать разрабатываемое расширение
+zed::ReloadExtensions	Zed: Перезагрузить расширения
+zed::ResetAllZoom	Zed: Сбросить весь масштаб
+zed::ResetBufferFontSize	Zed: сбросить размер шрифта редактора
+zed::ResetDatabase	Zed: Сбросить базу данных
+zed::ResetUiFontSize	Zed: Сбросить размер шрифта интерфейса
+zed::RevealLogInFileManager	Zed: Показать журнал в файловом менеджере
+zed::ShowAll	Zed: показать всё
+zed::ShowDefaultSemanticTokenRules	Zed: Показать стандартные правила семантической подсветки
+zed::ShowUpdateNotification	Zed: Показать уведомление об обновлении
+zed::ShowWelcome	Zed: открыть начальный экран
+zed::TestCrash	Zed: Проверить аварийное завершение
+zed::TestPanic	Zed: Проверить панику
+zed::ToggleBaseKeymapSelector	Zed: Показать или скрыть выбор базовых сочетаний клавиш
+zed::ToggleFullScreen	Zed: Включить или отключить полноэкранный режим
+zed::Unbind	Zed: Удалить назначение клавиш
+zed::Zoom	Zed: развернуть
+zed_predict_onboarding::OpenZedPredictOnboarding	Настройка Zed Predict: Открыть настройку Zed Predict
+zeta::FocusPredictions	Zeta: Перейти к предложенным изменениям
+zeta::NextEdit	Zeta: Следующее изменение
+zeta::PreviewPrediction	Zeta: Предварительно просмотреть предложенное изменение
+zeta::PreviousEdit	Zeta: Предыдущее изменение
+zeta::ThumbsDownActivePrediction	Zeta: Оценить текущее предложение отрицательно
+zeta::ThumbsUpActivePrediction	Zeta: Оценить текущее предложение положительно

@@ -378,11 +378,11 @@ impl LanguageModelProvider for CloudLanguageModelProvider {
             None
         } else {
             match state.user_store.read(cx).plan() {
-                Some(Plan::ZedPro) => Some("Subscribed to Pro".into()),
-                Some(Plan::ZedProTrial) => Some("Subscribed to Pro Trial".into()),
-                Some(Plan::ZedStudent) => Some("Subscribed to Student".into()),
-                Some(Plan::ZedBusiness) => Some("Subscribed to Business".into()),
-                Some(Plan::ZedVip) => Some("Subscribed to VIP".into()),
+                Some(Plan::ZedPro) => Some("Подписка Pro".into()),
+                Some(Plan::ZedProTrial) => Some("Пробный период Pro".into()),
+                Some(Plan::ZedStudent) => Some("Студенческая подписка".into()),
+                Some(Plan::ZedBusiness) => Some("Бизнес-подписка".into()),
+                Some(Plan::ZedVip) => Some("Подписка VIP".into()),
                 Some(Plan::ZedFree) | None => None,
             }
         };
@@ -414,10 +414,8 @@ impl LanguageModelProvider for CloudLanguageModelProvider {
 
     fn fast_mode_confirmation(&self, _cx: &App) -> Option<FastModeConfirmation> {
         Some(FastModeConfirmation {
-            title: "Enable Fast Mode for Zed?".into(),
-            message: "Fast mode routes requests through the upstream provider's fast mode or priority tier. The \
-                upstream provider's premium per-token pricing applies and is passed through to \
-                your Zed billing."
+            title: "Включить быстрый режим Zed?".into(),
+            message: "Быстрый режим направляет запросы через быстрый или приоритетный тариф провайдера. Повышенная стоимость токенов провайдера включается в ваш счёт Zed."
                 .into(),
         })
     }
@@ -507,34 +505,30 @@ fn zed_ai_description(
     eligible_for_trial: bool,
 ) -> &'static str {
     if !is_connected {
-        return "Sign in to have access to Zed's complete agentic experience with hosted models.";
+        return "Войдите для доступа к агенту Zed с облачными моделями.";
     }
 
     match plan {
-        Some(Plan::ZedPro) => {
-            "You have access to Zed's hosted models through your Pro subscription."
-        }
+        Some(Plan::ZedPro) => "Подписка Pro предоставляет вам доступ к облачным моделям Zed.",
         Some(Plan::ZedProTrial) => {
-            "Your Pro trial includes $5 of GPT Luna and unlimited edit predictions for 14 days from trial start."
+            "Пробный период Pro включает $5 для GPT Luna и неограниченные подсказки правок на 14 дней с момента начала."
         }
         Some(Plan::ZedStudent) => {
-            "You have access to Zed's hosted models through your Student subscription."
+            "Студенческая подписка предоставляет вам доступ к облачным моделям Zed."
         }
         Some(Plan::ZedBusiness) => {
             if is_zed_model_provider_enabled {
-                "You have access to Zed's hosted models through your organization."
+                "Ваша организация предоставляет вам доступ к облачным моделям Zed."
             } else {
                 "Zed's hosted models are disabled by your organization's configuration."
             }
         }
-        Some(Plan::ZedVip) => {
-            "You have access to Zed's hosted models through your VIP subscription."
-        }
+        Some(Plan::ZedVip) => "Подписка VIP предоставляет вам доступ к облачным моделям Zed.",
         Some(Plan::ZedFree) | None => {
             if eligible_for_trial {
-                "Start a free trial with $5 of GPT Luna and unlimited edit predictions for 14 days from trial start."
+                "Начните бесплатный пробный период: $5 для GPT Luna и неограниченные подсказки правок на 14 дней с момента начала."
             } else {
-                "Subscribe for access to Zed's hosted models."
+                "Оформите подписку для доступа к облачным моделям Zed."
             }
         }
     }
@@ -555,7 +549,7 @@ impl RenderOnce for ZedAiConfiguration {
         );
 
         let manage_subscription_buttons = if has_paid_plan {
-            Button::new("manage_settings", "Manage Subscription")
+            Button::new("manage_settings", "Управление подпиской")
                 .when(!self.compact, |this| {
                     this.full_width().label_size(LabelSize::Small)
                 })
@@ -564,7 +558,7 @@ impl RenderOnce for ZedAiConfiguration {
                 .on_click(|_, _, cx| cx.open_url(&zed_urls::account_url(cx)))
                 .into_any_element()
         } else if self.plan.is_none() || self.eligible_for_trial {
-            Button::new("start_trial", "Start Free Trial")
+            Button::new("start_trial", "Начать пробный период")
                 .when(!self.compact, |this| {
                     this.full_width().label_size(LabelSize::Small)
                 })
@@ -573,7 +567,7 @@ impl RenderOnce for ZedAiConfiguration {
                 .on_click(|_, _, cx| cx.open_url(&zed_urls::start_trial_url(cx)))
                 .into_any_element()
         } else {
-            Button::new("upgrade", "Upgrade to Pro")
+            Button::new("upgrade", "Перейти на Pro")
                 .when(!self.compact, |this| {
                     this.full_width().label_size(LabelSize::Small)
                 })
@@ -588,7 +582,7 @@ impl RenderOnce for ZedAiConfiguration {
                 .gap_2()
                 .when(!self.compact, |this| this.child(Label::new(description)))
                 .child(
-                    Button::new("sign_in", "Sign In to use Zed AI")
+                    Button::new("sign_in", "Войдите для использования ИИ Zed")
                         .start_icon(
                             Icon::new(IconName::Github)
                                 .size(IconSize::Small)
@@ -611,7 +605,7 @@ impl RenderOnce for ZedAiConfiguration {
             .map(|this| {
                 if self.account_too_young {
                     this.child(YoungAccountBanner).child(
-                        Button::new("upgrade", "Upgrade to Pro")
+                        Button::new("upgrade", "Перейти на Pro")
                             .style(ui::ButtonStyle::Tinted(ui::TintColor::Accent))
                             .when(!self.compact, |this| this.full_width())
                             .on_click(|_, _, cx| {

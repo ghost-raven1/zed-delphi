@@ -11,6 +11,13 @@ on:
         description: Optional successful Delphi pasls Linux package run ID for real F12 acceptance
         required: false
         type: string
+      ui_language:
+        description: Expected interface language
+        type: choice
+        default: ru
+        options:
+          - ru
+          - en
 
 permissions:
   actions: read
@@ -57,13 +64,14 @@ jobs:
       - name: Install runtime, FPC and UI test tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends fp-compiler fp-units-base fp-units-fcl libasound2t64 libglib2.0-0t64 libvulkan1 libfontconfig1 xvfb xauth xdotool imagemagick dbus-x11 mesa-vulkan-drivers tesseract-ocr
+          sudo apt-get install -y --no-install-recommends fp-compiler fp-units-base fp-units-fcl libasound2t64 libglib2.0-0t64 libvulkan1 libfontconfig1 xvfb xauth xdotool xclip imagemagick dbus-x11 mesa-vulkan-drivers tesseract-ocr tesseract-ocr-rus
           curl --fail --location --retry 3 https://github.com/vadimcn/codelldb/releases/download/v1.12.3/codelldb-linux-x64.vsix -o "$RUNNER_TEMP/codelldb.vsix"
           sha256sum "$RUNNER_TEMP/codelldb.vsix" > verification/codelldb-sha256.txt
           unzip -q "$RUNNER_TEMP/codelldb.vsix" -d "$RUNNER_TEMP/codelldb"
       - name: Build and debug through the packaged IDE
         env:
           PASLS_RUN_ID: ${{ inputs.pasls_run_id }}
+          UI_LANGUAGE: ${{ inputs.ui_language }}
         run: |
           binary=$(find "$RUNNER_TEMP/application" -path '*/bin/zed' -type f -print -quit)
           test -n "$binary"
@@ -74,6 +82,7 @@ jobs:
           xvfb-run -a -s '-screen 0 1440x1000x24' python3 -u script/delphi/linux/gui_smoke.py \
             --zed "$binary" \
             --codelldb "$RUNNER_TEMP/codelldb/extension/adapter/codelldb" \
+            --ui-language "$UI_LANGUAGE" \
             "${pasls_args[@]}" \
             --fixture script/delphi/examples/multi_unit \
             --output "$GITHUB_WORKSPACE/verification/gui" 2>&1 | tee verification/gui-test.log

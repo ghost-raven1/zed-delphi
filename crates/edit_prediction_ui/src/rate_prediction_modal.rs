@@ -87,8 +87,8 @@ enum RatePredictionView {
 impl RatePredictionView {
     pub fn name(&self) -> &'static str {
         match self {
-            Self::SuggestedEdits => "Suggested Edits",
-            Self::RawInput => "Recorded Events & Input",
+            Self::SuggestedEdits => "Предложенные правки",
+            Self::RawInput => "Записанные события и входные данные",
         }
     }
 }
@@ -799,7 +799,7 @@ impl RatePredictionsModal {
                     editor.set_show_wrap_guides(false, cx);
                     editor.set_show_indent_guides(false, cx);
                     editor.set_show_edit_predictions(Some(false), window, cx);
-                    editor.set_placeholder_text("Add your feedback…", window, cx);
+                    editor.set_placeholder_text("Добавьте отзыв…", window, cx);
                     editor.set_completion_provider(Some(Rc::new(FeedbackCompletionProvider)));
                     if focus {
                         cx.focus_self(window);
@@ -882,7 +882,7 @@ impl RatePredictionsModal {
                                 .px_2()
                                 .border_b_1()
                                 .border_color(border_color)
-                                .child(Label::new("Predicted Patch").size(LabelSize::Small)),
+                                .child(Label::new("Предложенные изменения").size(LabelSize::Small)),
                         )
                         .child(
                             div()
@@ -908,7 +908,7 @@ impl RatePredictionsModal {
                                 .gap_2()
                                 .border_b_1()
                                 .border_color(border_color)
-                                .child(Label::new("Expected Patch").size(LabelSize::Small)),
+                                .child(Label::new("Ожидаемые изменения").size(LabelSize::Small)),
                         )
                         .child(
                             div()
@@ -998,7 +998,7 @@ impl RatePredictionsModal {
                             .into_any_element()
                         } else {
                             div()
-                                .child("No active completion".to_string())
+                                .child("Нет активного предложения".to_string())
                                 .into_any_element()
                         }),
                 )
@@ -1092,7 +1092,7 @@ impl RatePredictionsModal {
                             .child(
                                 DropdownMenu::new(
                                         "failure-mode-dropdown",
-                                        "Issue",
+                                        "Проблема",
                                         failure_mode_menu,
                                     )
                                     .handle(self.failure_mode_menu_handle.clone())
@@ -1110,8 +1110,8 @@ impl RatePredictionsModal {
                                     .child(
                                         div().flex_wrap().child(
                                             Label::new(concat!(
-                                                "Explain why this completion is good or bad. ",
-                                                "If it's negative, describe what you expected instead."
+                                                "Объясните, чем это предложение хорошо или плохо. ",
+                                                "Если оценка отрицательная, опишите ожидаемый результат."
                                             ))
                                             .size(LabelSize::Small)
                                             .color(Color::Muted),
@@ -1146,7 +1146,7 @@ impl RatePredictionsModal {
                                             .size(IconSize::Small)
                                             .color(Color::Success),
                                     )
-                                    .child(Label::new("Rated completion.").color(Color::Muted)),
+                                    .child(Label::new("Предложение оценено.").color(Color::Muted)),
                             )
                         } else if active_prediction.prediction.edits.is_empty() {
                             Some(
@@ -1156,7 +1156,7 @@ impl RatePredictionsModal {
                                             .size(IconSize::Small)
                                             .color(Color::Warning),
                                     )
-                                    .child(Label::new("No edits produced.").color(Color::Muted)),
+                                    .child(Label::new("Нет предложенных правок.").color(Color::Muted)),
                             )
                         } else {
                             Some(label_container)
@@ -1165,12 +1165,12 @@ impl RatePredictionsModal {
                             h_flex()
                                 .gap_1()
                                 .child(
-                                    Button::new("bad", "Bad Prediction")
+                                    Button::new("bad", "Плохое предсказание")
                                         .start_icon(Icon::new(IconName::ThumbsDown).size(IconSize::Small))
                                         .disabled(rated || feedback_empty)
                                         .when(feedback_empty, |this| {
                                             this.tooltip(Tooltip::text(
-                                                "Explain what's bad about it before reporting it",
+                                                "Перед отправкой объясните, что не так с предложением",
                                             ))
                                         })
                                         .key_binding(KeyBinding::for_action_in(
@@ -1189,7 +1189,7 @@ impl RatePredictionsModal {
                                         })),
                                 )
                                 .child(
-                                    Button::new("good", "Good Prediction")
+                                    Button::new("good", "Хорошее предсказание")
                                         .start_icon(Icon::new(IconName::ThumbsUp).size(IconSize::Small))
                                         .disabled(rated)
                                         .key_binding(KeyBinding::for_action_in(
@@ -1227,44 +1227,50 @@ impl RatePredictionsModal {
 
                 let (icon_name, icon_color, tooltip_text) =
                     match (rated, completion.edits.is_empty()) {
-                        (true, _) => (IconName::Check, Color::Success, "Rated Prediction"),
-                        (false, true) => (IconName::File, Color::Muted, "No Edits Produced"),
-                        (false, false) => (IconName::FileDiff, Color::Accent, "Edits Available"),
+                        (true, _) => (IconName::Check, Color::Success, "Оценённое предсказание"),
+                        (false, true) => (IconName::File, Color::Muted, "Нет предложенных правок"),
+                        (false, false) => (
+                            IconName::FileDiff,
+                            Color::Accent,
+                            "Есть предложенные правки",
+                        ),
                     };
                 let (trigger_icon, trigger_tooltip) = match completion.trigger {
-                    PredictEditsRequestTrigger::Testing => (IconName::Debug, "Testing"),
+                    PredictEditsRequestTrigger::Testing => (IconName::Debug, "Тестирование"),
                     PredictEditsRequestTrigger::Diagnostics => {
-                        (IconName::ToolDiagnostics, "Diagnostics")
+                        (IconName::ToolDiagnostics, "Диагностика")
                     }
                     PredictEditsRequestTrigger::DiagnosticNavigation => {
-                        (IconName::ArrowRight, "Diagnostic Navigation")
+                        (IconName::ArrowRight, "Переход к диагностике")
                     }
                     PredictEditsRequestTrigger::Cli => (IconName::Terminal, "CLI"),
-                    PredictEditsRequestTrigger::Explicit => (IconName::Person, "Explicit"),
-                    PredictEditsRequestTrigger::BufferEdit => (IconName::Pencil, "Buffer Edit"),
+                    PredictEditsRequestTrigger::Explicit => (IconName::Person, "Явный запрос"),
+                    PredictEditsRequestTrigger::BufferEdit => (IconName::Pencil, "Изменение файла"),
                     PredictEditsRequestTrigger::LSPCompletionAccepted => {
-                        (IconName::Code, "LSP Completion Accepted")
+                        (IconName::Code, "Принято дополнение LSP")
                     }
                     PredictEditsRequestTrigger::PredictionAccepted => {
-                        (IconName::ZedPredict, "Prediction Accepted")
+                        (IconName::ZedPredict, "Предсказание принято")
                     }
                     PredictEditsRequestTrigger::PredictionPartiallyAccepted => {
-                        (IconName::CheckDouble, "Prediction Partially Accepted")
+                        (IconName::CheckDouble, "Предсказание принято частично")
                     }
-                    PredictEditsRequestTrigger::EditorCreated => (IconName::File, "Editor Created"),
+                    PredictEditsRequestTrigger::EditorCreated => {
+                        (IconName::File, "Редактор создан")
+                    }
                     PredictEditsRequestTrigger::ProviderChanged => {
-                        (IconName::Settings, "Provider Changed")
+                        (IconName::Settings, "Провайдер изменён")
                     }
                     PredictEditsRequestTrigger::UserInfoChanged => {
-                        (IconName::Person, "User Info Changed")
+                        (IconName::Person, "Данные пользователя изменены")
                     }
                     PredictEditsRequestTrigger::VimModeChanged => {
-                        (IconName::Keyboard, "Vim Mode Changed")
+                        (IconName::Keyboard, "Режим Vim изменён")
                     }
                     PredictEditsRequestTrigger::SettingsChanged => {
-                        (IconName::Settings, "Settings Changed")
+                        (IconName::Settings, "Настройки изменены")
                     }
-                    PredictEditsRequestTrigger::Other => (IconName::CircleHelp, "Other"),
+                    PredictEditsRequestTrigger::Other => (IconName::CircleHelp, "Другое"),
                 };
 
                 let file = completion.buffer.read(cx).file();
@@ -1358,7 +1364,7 @@ impl Render for RatePredictionsModal {
                             .border_color(border_color)
                             .child(Icon::new(icons.base).size(IconSize::Small))
                             .child(
-                                Label::new("From most recent to oldest")
+                                Label::new("От новых к старым")
                                     .color(Color::Muted)
                                     .size(LabelSize::Small),
                             )
@@ -1376,9 +1382,9 @@ impl Render for RatePredictionsModal {
                                             .p_2()
                                             .child(
                                                 Label::new(concat!(
-                                                    "No completions yet. ",
-                                                    "Use the editor to generate some, ",
-                                                    "and make sure to rate them!"
+                                                    "Предложений пока нет. ",
+                                                    "Поработайте в редакторе, чтобы они появились, ",
+                                                    "и оцените результат."
                                                 ))
                                                 .color(Color::Muted),
                                             )
@@ -1411,22 +1417,31 @@ struct FeedbackCompletionProvider;
 
 impl FeedbackCompletionProvider {
     const FAILURE_MODES: &'static [(&'static str, &'static str)] = &[
-        ("@location", "Unexpected location"),
-        ("@malformed", "Incomplete, cut off, or syntax error"),
+        ("@location", "Неожиданное место правки"),
+        (
+            "@malformed",
+            "Неполный или обрезанный код либо синтаксическая ошибка",
+        ),
         (
             "@deleted",
-            "Deleted code that should be kept (use `@reverted` if it undid a recent edit)",
+            "Удалён нужный код (используйте `@reverted`, если отменена недавняя правка)",
         ),
-        ("@style", "Wrong coding style or conventions"),
-        ("@repetitive", "Repeated existing code"),
-        ("@hallucinated", "Referenced non-existent symbols"),
-        ("@formatting", "Wrong indentation or structure"),
-        ("@aggressive", "Changed more than expected"),
-        ("@conservative", "Too cautious, changed too little"),
-        ("@context", "Ignored or misunderstood context"),
-        ("@reverted", "Undid recent edits"),
-        ("@cursor_position", "Cursor placed in unhelpful position"),
-        ("@whitespace", "Unwanted whitespace or newline changes"),
+        ("@style", "Неверный стиль кода или нарушение соглашений"),
+        ("@repetitive", "Повторён существующий код"),
+        ("@hallucinated", "Ссылки на несуществующие символы"),
+        ("@formatting", "Неверные отступы или структура"),
+        ("@aggressive", "Изменено больше ожидаемого"),
+        (
+            "@conservative",
+            "Слишком осторожная правка: изменено слишком мало",
+        ),
+        ("@context", "Контекст проигнорирован или неверно понят"),
+        ("@reverted", "Отменены недавние правки"),
+        ("@cursor_position", "Курсор помещён в неудобную позицию"),
+        (
+            "@whitespace",
+            "Нежелательные изменения пробелов или переводов строк",
+        ),
     ];
 }
 

@@ -33,15 +33,7 @@ impl CompletionProvider for ActionCompletionProvider {
         cx: &mut Context<Editor>,
     ) -> gpui::Task<anyhow::Result<Vec<project::CompletionResponse>>> {
         let buffer = buffer.read(cx);
-        let mut count_back = 0;
-
-        for char in buffer.reversed_chars_at(buffer_position) {
-            if char.is_ascii_alphanumeric() || char == '_' || char == ':' {
-                count_back += 1;
-            } else {
-                break;
-            }
-        }
+        let count_back = action_prefix_bytes(buffer.reversed_chars_at(buffer_position));
 
         let start_anchor = buffer.anchor_before(
             buffer_position
@@ -64,7 +56,14 @@ impl CompletionProvider for ActionCompletionProvider {
                     .get(name)
                     .cloned()
                     .unwrap_or_else(|| name.into());
-                StringMatchCandidate::new(ix, &humanized)
+                StringMatchCandidate::new(
+                    ix,
+                    &format!(
+                        "{} {}",
+                        humanized,
+                        command_palette::humanize_action_name(name)
+                    ),
+                )
             })
             .collect();
 
@@ -131,7 +130,33 @@ impl CompletionProvider for ActionCompletionProvider {
         _cx: &mut Context<Editor>,
     ) -> bool {
         text.chars().last().is_some_and(|last_char| {
-            last_char.is_ascii_alphanumeric() || last_char == '_' || last_char == ':'
+            last_char.is_alphanumeric() || last_char == '_' || last_char == ':'
         })
+    }
+}
+
+/// Counts bytes so completion replacement never splits a Cyrillic UTF-8 character.
+fn action_prefix_bytes(reversed_chars: impl Iterator<Item = char>) -> usize {
+    reversed_chars
+        .take_while(|char| char.is_alphanumeric() || *char == '_' || *char == ':')
+        .map(char::len_utf8)
+        .sum()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::action_prefix_bytes;
+
+    #[test]
+    fn completion_prefix_preserves_utf8_boundaries() {
+        for (input, expected) in [
+            ("удалить", "удалить"),
+            ("команда удалить", "удалить"),
+            ("editor::Backspace", "editor::Backspace"),
+            ("[удалить", "удалить"),
+        ] {
+            let bytes = action_prefix_bytes(input.chars().rev());
+            assert_eq!(&input[input.len() - bytes..], expected);
+        }
     }
 }

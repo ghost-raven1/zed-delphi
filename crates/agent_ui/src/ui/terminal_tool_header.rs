@@ -207,7 +207,7 @@ impl RenderOnce for TerminalToolHeader {
                                     .icon_color(Color::Error)
                                     .tooltip(move |_window, cx| {
                                         Tooltip::with_meta(
-                                            "Stop This Command",
+                                            "Остановить команду",
                                             None,
                                             stop_description.clone(),
                                             cx,

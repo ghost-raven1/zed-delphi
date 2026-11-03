@@ -660,7 +660,9 @@ impl StackFrameList {
                                     }
                                 }))
                                 .tooltip(move |window, cx| {
-                                    Tooltip::text("Restart Stack Frame")(window, cx)
+                                    Tooltip::text("Перезапустить кадр стека")(
+                                        window, cx,
+                                    )
                                 }),
                             ),
                     )
@@ -725,7 +727,7 @@ impl StackFrameList {
                     .truncate()
                     .text_color(cx.theme().colors().text_muted)
                     .child(format!(
-                        "Show {} more{}",
+                        "Показать ещё: {}{}",
                         stack_frames.len(),
                         first_stack_frame
                             .source
@@ -908,8 +910,8 @@ impl StackFrameList {
 
     pub(crate) fn render_control_strip(&self) -> AnyElement {
         let tooltip_title = match self.list_filter {
-            StackFrameFilter::All => "Show stack frames from your project",
-            StackFrameFilter::OnlyUserFrames => "Show all stack frames",
+            StackFrameFilter::All => "Показать кадры стека из проекта",
+            StackFrameFilter::OnlyUserFrames => "Показать все кадры стека",
         };
 
         h_flex()

@@ -2871,7 +2871,7 @@ impl ConversationView {
                     .map(|this| {
                         if show_fallback_description {
                             this.child(
-                                Label::new("Choose one of the following authentication options:")
+                                Label::new("Выберите способ аутентификации:")
                                     .size(LabelSize::Small)
                                     .color(Color::Muted),
                             )
@@ -3256,9 +3256,9 @@ impl ConversationView {
         div()
             .debug_selector(|| "copy-saved-agent-input".into())
             .child(
-                Button::new("copy-saved-agent-input", "Copy Saved Input")
+                Button::new("copy-saved-agent-input", "Скопировать сохранённый ввод")
                     .tooltip(Tooltip::text(
-                        "Copy the original content and receipt evidence as JSON",
+                        "Скопировать исходное содержимое и подтверждение получения в JSON",
                     ))
                     .on_click(cx.listener(|this, _, window, cx| {
                         match ThreadRecovery::to_json(
@@ -3310,8 +3310,8 @@ impl ConversationView {
         let action_slot = h_flex()
             .gap_1()
             .child(
-                Button::new("retry-agent-launch", "Retry")
-                    .tooltip(Tooltip::text("Try to restart the agent"))
+                Button::new("retry-agent-launch", "Повторить")
+                    .tooltip(Tooltip::text("Попробовать перезапустить агента"))
                     .on_click(cx.listener(move |this, _, window, cx| {
                         this.retry_connection(window, cx);
                     })),
@@ -3805,7 +3805,8 @@ impl ConversationView {
     fn create_copy_button(&self, message: impl Into<String>) -> impl IntoElement {
         let message = message.into();
 
-        CopyButton::new("copy-error-message", message).tooltip_label("Copy Error Message")
+        CopyButton::new("copy-error-message", message)
+            .tooltip_label("Скопировать сообщение об ошибке")
     }
 
     pub(crate) fn reauthenticate(&mut self, window: &mut Window, cx: &mut Context<Self>) {
@@ -3902,17 +3903,11 @@ fn native_available_skills(
 
 fn placeholder_text(agent_name: &str, has_commands: bool) -> String {
     if agent_name == agent::ZED_AGENT_ID.as_ref() {
-        format!(
-            "Message the {}, @ to include context, / for commands",
-            agent_name
-        )
+        format!("Сообщение для {}: @ — контекст, / — команды", agent_name)
     } else if has_commands {
-        format!(
-            "Message {} — @ to include context, / for commands",
-            agent_name
-        )
+        format!("Сообщение для {}: @ — контекст, / — команды", agent_name)
     } else {
-        format!("Message {} — @ to include context", agent_name)
+        format!("Сообщение для {}: @ — контекст", agent_name)
     }
 }
 
@@ -4045,8 +4040,8 @@ impl Render for ConversationView {
                                     div()
                                         .debug_selector(|| "discard-saved-agent-submissions".into())
                                         .child(
-                                            Button::new("discard-saved-agent-submissions", "Discard Saved Submissions")
-                                                .tooltip(Tooltip::text("Discard local copies only; does not cancel agent work"))
+                                            Button::new("discard-saved-agent-submissions", "Удалить сохранённые сообщения")
+                                                .tooltip(Tooltip::text("Удаляет только локальные копии; работа агента продолжается"))
                                                 .on_click(cx.listener(|this, _, _, cx| {
                                                     this.saved_submissions.clear();
                                                     if let Some(recovery) = &mut this.recovery {
@@ -7598,7 +7593,7 @@ pub(crate) mod tests {
 
         assert_eq!(
             placeholder,
-            Some("Message Test — @ to include context, / for commands".to_string())
+            Some("Сообщение для Test: @ — контекст, / — команды".to_string())
         );
 
         message_editor.update_in(cx, |editor, window, cx| {

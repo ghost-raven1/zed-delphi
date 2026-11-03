@@ -512,14 +512,14 @@ impl MessageEditor {
                 let has_selection = editor.has_non_empty_selection(&editor.display_snapshot(cx));
 
                 Some(ContextMenu::build(window, cx, |menu, _, _| {
-                    menu.action("Cut", Box::new(editor::actions::Cut))
+                    menu.action("Вырезать", Box::new(editor::actions::Cut))
                         .action_disabled_when(
                             !has_selection,
                             "Copy",
                             Box::new(editor::actions::Copy),
                         )
-                        .action("Paste", Box::new(editor::actions::Paste))
-                        .action("Paste as Plain Text", Box::new(PasteRaw))
+                        .action("Вставить", Box::new(editor::actions::Paste))
+                        .action("Вставить как обычный текст", Box::new(PasteRaw))
                 }))
             });
 

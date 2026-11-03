@@ -41,7 +41,7 @@ impl SessionNotice {
                                 .icon_color(Color::Muted)
                                 .aria_label(format!("Dismiss notice: {}", notice.title))
                                 .tab_index(0_isize)
-                                .tooltip(Tooltip::text("Dismiss Notice"))
+                                .tooltip(Tooltip::text("Закрыть уведомление"))
                                 .on_click(on_dismiss),
                         ),
                 ),

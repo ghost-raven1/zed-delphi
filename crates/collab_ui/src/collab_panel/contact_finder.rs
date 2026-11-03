@@ -38,8 +38,8 @@ impl Render for ContactFinder {
                     .bg(cx.theme().colors().element_background)
                     // HACK: Prevent the background color from overflowing the parent container.
                     .rounded_t(px(8.))
-                    .child(Label::new("Contacts"))
-                    .child(h_flex().child(Label::new("Invite new contacts"))),
+                    .child(Label::new("Контакты"))
+                    .child(h_flex().child(Label::new("Пригласить новые контакты"))),
             )
             .child(self.picker.clone())
     }
@@ -86,7 +86,7 @@ impl PickerDelegate for ContactFinderDelegate {
     }
 
     fn placeholder_text(&self, _window: &mut Window, _cx: &mut App) -> Arc<str> {
-        "Search collaborator by username...".into()
+        "Поиск участника по имени пользователя…".into()
     }
 
     fn update_matches(

@@ -92,7 +92,7 @@ fn group_bindings(bindings: Vec<PendingBinding>) -> Vec<PendingBindingRow> {
             );
             result.push(PendingBindingRow {
                 keystrokes: Rc::from([first_keystroke]),
-                action_name: format!("+{longer_count} keybinds").into(),
+                action_name: format!("Ещё сочетаний: {longer_count}").into(),
                 is_group: true,
             });
         } else {
@@ -348,7 +348,7 @@ mod tests {
         let (_, remaining_keystrokes) = chord.split_once(' ').expect("multi-keystroke binding");
         binding(
             remaining_keystrokes,
-            &command_palette::humanize_action_name(action_name),
+            &command_palette::localized_action_name(action_name),
         )
     }
 
@@ -437,13 +437,13 @@ mod tests {
             let bindings = group_bindings(
                 sequences
                     .into_iter()
-                    .map(|sequence| binding(sequence, "zed: open settings"))
+                    .map(|sequence| binding(sequence, "Zed: открыть настройки"))
                     .collect(),
             );
 
             assert_eq!(bindings.len(), 1);
             let group = bindings.first().expect("group");
-            assert_eq!(group.action_name.as_ref(), "+2 keybinds");
+            assert_eq!(group.action_name.as_ref(), "Ещё сочетаний: 2");
             assert!(group.is_group);
         }
     }
@@ -513,7 +513,7 @@ mod tests {
                 .into_iter()
                 .map(|binding| PendingBinding {
                     remaining_keystrokes: binding.keystrokes().iter().skip(1).cloned().collect(),
-                    action_name: command_palette::humanize_action_name(binding.action().name())
+                    action_name: command_palette::localized_action_name(binding.action().name())
                         .into(),
                 })
                 .collect();
@@ -522,7 +522,7 @@ mod tests {
             let row = rows.first().expect("remaining binding");
             assert_eq!(
                 row.action_name.as_ref(),
-                command_palette::humanize_action_name(first_match.action().name())
+                command_palette::localized_action_name(first_match.action().name())
             );
         }
     }
@@ -615,7 +615,10 @@ mod tests {
                 .map(|row| row.action_name.as_ref())
                 .collect::<Vec<_>>();
             action_names.sort();
-            assert_eq!(action_names, vec!["zed: open keymap", "zed: open settings"]);
+            assert_eq!(
+                action_names,
+                vec!["Zed: открыть настройки", "Zed: открыть сочетания клавиш"]
+            );
             assert!(rows.iter().all(|row| !row.is_group));
         }
     }
@@ -638,7 +641,7 @@ mod tests {
         assert_eq!(keys, vec![vec!["É"], vec!["é"]]);
         for row in rows {
             assert_eq!(text_for_keybinding_keystrokes(&row.keystrokes, cx), "É");
-            assert_eq!(row.action_name.as_ref(), "zed: open settings");
+            assert_eq!(row.action_name.as_ref(), "Zed: открыть настройки");
             assert!(!row.is_group);
         }
     }
@@ -669,15 +672,19 @@ mod tests {
                 ))
                 .collect::<Vec<_>>(),
             vec![
-                (parse_keystrokes("cmd-o"), "workspace: open", false),
-                (parse_keystrokes("cmd-s"), "zed: open keymap", false),
+                (parse_keystrokes("cmd-o"), "Рабочая область: открыть", false),
                 (
-                    parse_keystrokes("cmd-o cmd-p"),
-                    "workspace: reopen last picker",
+                    parse_keystrokes("cmd-s"),
+                    "Zed: открыть сочетания клавиш",
                     false
                 ),
-                (parse_keystrokes("z"), "+2 keybinds", true),
-                (parse_keystrokes("cmd-s"), "+2 keybinds", true),
+                (
+                    parse_keystrokes("cmd-o cmd-p"),
+                    "Рабочая область: открыть предыдущий список выбора",
+                    false
+                ),
+                (parse_keystrokes("z"), "Ещё сочетаний: 2", true),
+                (parse_keystrokes("cmd-s"), "Ещё сочетаний: 2", true),
             ],
         );
     }
@@ -687,8 +694,8 @@ mod tests {
         // A longer chord can sit between two bindings for the same keys, so duplicates aren't
         // always adjacent.
         let rows = group_bindings(vec![
-            binding("a", "zed: open keymap"),
-            binding("a b", "zed: open settings"),
+            binding("a", "Zed: открыть сочетания клавиш"),
+            binding("a b", "Zed: открыть настройки"),
             binding("a", "theme selector: toggle"),
         ]);
 
@@ -697,8 +704,8 @@ mod tests {
                 .map(|row| (row.keystrokes.to_vec(), row.action_name.as_ref()))
                 .collect::<Vec<_>>(),
             vec![
-                (parse_keystrokes("a"), "zed: open keymap"),
-                (parse_keystrokes("a b"), "zed: open settings"),
+                (parse_keystrokes("a"), "Zed: открыть сочетания клавиш"),
+                (parse_keystrokes("a b"), "Zed: открыть настройки"),
             ],
         );
         assert!(rows.iter().all(|row| !row.is_group));
@@ -749,7 +756,7 @@ mod tests {
             .into_iter()
             .map(|binding| PendingBinding {
                 remaining_keystrokes: binding.keystrokes().iter().skip(1).cloned().collect(),
-                action_name: command_palette::humanize_action_name(binding.action().name()).into(),
+                action_name: command_palette::localized_action_name(binding.action().name()).into(),
             })
             .collect();
         let rows = prepare_pending_bindings(pending, cx);
@@ -764,12 +771,12 @@ mod tests {
             vec![
                 (
                     parse_keystrokes("cmd-s"),
-                    command_palette::humanize_action_name(first_match.action().name()),
+                    command_palette::localized_action_name(first_match.action().name()),
                     false,
                 ),
                 (
                     parse_keystrokes("cmd-s cmd-,"),
-                    command_palette::humanize_action_name(zed_actions::OpenKeymapFile.name()),
+                    command_palette::localized_action_name(zed_actions::OpenKeymapFile.name()),
                     false,
                 ),
             ],

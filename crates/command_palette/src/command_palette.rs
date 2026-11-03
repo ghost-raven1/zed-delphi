@@ -1,5 +1,8 @@
+mod action_labels;
 mod command_palette_settings;
 mod persistence;
+
+pub use action_labels::localized_action_name;
 
 use std::{
     cmp::{self, Reverse},
@@ -129,6 +132,7 @@ impl CommandPalette {
 
                 Some(Command {
                     name: SharedString::from(humanize_action_name(action.name())),
+                    display_name: localized_action_name(action.name()).into(),
                     action,
                     usage: None,
                 })
@@ -210,7 +214,9 @@ pub struct CommandPaletteDelegate {
 }
 
 struct Command {
+    // Preserve the existing history key independently of the visible language.
     name: SharedString,
+    display_name: SharedString,
     action: Box<dyn Action>,
     usage: Option<CommandUsage>,
 }
@@ -310,6 +316,7 @@ impl Clone for Command {
     fn clone(&self) -> Self {
         Self {
             name: self.name.clone(),
+            display_name: self.display_name.clone(),
             action: self.action.boxed_clone(),
             usage: self.usage,
         }
@@ -365,6 +372,7 @@ impl CommandPaletteDelegate {
             let string = SharedString::from(string);
             commands.push(Command {
                 name: string.clone(),
+                display_name: string.clone(),
                 action,
                 usage: None,
             });
@@ -458,9 +466,9 @@ impl CommandPaletteDelegate {
             })
             .child(
                 ButtonLike::new(("remove-command-history", ix))
-                    .aria_label("Remove from Command History")
+                    .aria_label("Удалить из истории команд")
                     .tooltip(Tooltip::for_action_title(
-                        "Remove from Command History",
+                        "Удалить из истории команд",
                         &RemoveSelected,
                     ))
                     .child(
@@ -521,7 +529,7 @@ impl PickerDelegate for CommandPaletteDelegate {
     }
 
     fn placeholder_text(&self, _window: &mut Window, _cx: &mut App) -> Arc<str> {
-        "Execute a command...".into()
+        "Введите команду…".into()
     }
 
     fn select_history(
@@ -612,7 +620,12 @@ impl PickerDelegate for CommandPaletteDelegate {
                 let candidates = commands
                     .iter()
                     .enumerate()
-                    .map(|(ix, command)| StringMatchCandidate::new(ix, &command.name))
+                    .flat_map(|(ix, command)| {
+                        [
+                            StringMatchCandidate::new(ix * 2, &command.display_name),
+                            StringMatchCandidate::new(ix * 2 + 1, &command.name),
+                        ]
+                    })
                     .collect::<Vec<_>>();
 
                 let mut matches = fuzzy_nucleo::match_strings_async(
@@ -625,6 +638,20 @@ impl PickerDelegate for CommandPaletteDelegate {
                     executor,
                 )
                 .await;
+
+                // English aliases remain searchable, but their byte offsets do not
+                // describe the Russian display text. Keep each action only once.
+                let mut seen = std::collections::HashSet::new();
+                matches.retain_mut(|matched| {
+                    let english_alias = matched.candidate_id % 2 == 1;
+                    matched.candidate_id /= 2;
+                    let command = &commands[matched.candidate_id];
+                    if english_alias && command.name != command.display_name {
+                        matched.positions.clear();
+                    }
+                    matched.string = command.display_name.clone();
+                    seen.insert(matched.candidate_id)
+                });
 
                 let used_commands = commands
                     .iter()
@@ -784,7 +811,7 @@ impl PickerDelegate for CommandPaletteDelegate {
                         .gap_2()
                         .child(
                             HighlightedLabel::new(
-                                command.name.clone(),
+                                command.display_name.clone(),
                                 matching_command.positions.clone(),
                             )
                             .truncate(),
@@ -821,7 +848,7 @@ impl PickerDelegate for CommandPaletteDelegate {
 
         let focus_handle = &self.previous_focus_handle;
         let keybinding_buttons = if keybind.has_binding(window) {
-            Button::new("change", "Change Keybinding…")
+            Button::new("change", "Изменить сочетание клавиш…")
                 .key_binding(
                     KeyBinding::for_action_in(&menu::SecondaryConfirm, focus_handle, cx)
                         .map(|kb| kb.size(rems_from_px(12_f32))),
@@ -830,7 +857,7 @@ impl PickerDelegate for CommandPaletteDelegate {
                     window.dispatch_action(menu::SecondaryConfirm.boxed_clone(), cx);
                 })
         } else {
-            Button::new("add", "Add Keybinding…")
+            Button::new("add", "Добавить сочетание клавиш…")
                 .key_binding(
                     KeyBinding::for_action_in(&menu::SecondaryConfirm, focus_handle, cx)
                         .map(|kb| kb.size(rems_from_px(12_f32))),
@@ -850,7 +877,7 @@ impl PickerDelegate for CommandPaletteDelegate {
                 .border_color(cx.theme().colors().border_variant)
                 .child(keybinding_buttons)
                 .child(
-                    Button::new("run-action", "Run")
+                    Button::new("run-action", "Выполнить")
                         .key_binding(
                             KeyBinding::for_action_in(&menu::Confirm, &focus_handle, cx)
                                 .map(|kb| kb.size(rems_from_px(12_f32))),
@@ -1059,7 +1086,34 @@ mod tests {
         cx.simulate_input("bcksp");
 
         palette.read_with(cx, |palette, _| {
-            assert_eq!(palette.delegate.matches[0].string, "editor: backspace");
+            assert_eq!(
+                palette.delegate.matches[0].string,
+                "Редактор: удалить слева"
+            );
+            assert_eq!(
+                palette.delegate.selected_command().unwrap().name,
+                "editor: backspace"
+            );
+            assert!(palette.delegate.matches[0].positions.is_empty());
+        });
+
+        palette.update_in(cx, |picker, window, cx| {
+            picker.set_query("редактор: удалить слева", window, cx);
+        });
+        cx.run_until_parked();
+        palette.read_with(cx, |palette, _| {
+            let matched = &palette.delegate.matches[0];
+            assert_eq!(
+                palette.delegate.selected_command().unwrap().name,
+                "editor: backspace"
+            );
+            assert!(!matched.positions.is_empty());
+            assert!(
+                matched
+                    .positions
+                    .iter()
+                    .all(|position| matched.string.is_char_boundary(*position))
+            );
         });
 
         cx.dispatch_action(menu::Confirm);
@@ -1124,7 +1178,7 @@ mod tests {
                     .delegate
                     .matches
                     .iter()
-                    .filter(|matching_command| matching_command.string == "editor: backspace")
+                    .filter(|matching_command| matching_command.string == "Редактор: удалить слева")
                     .count(),
                 1,
             );
@@ -1238,14 +1292,22 @@ mod tests {
                 .delegate
                 .matches
                 .iter()
-                .map(|matching_command| matching_command.string.to_string())
+                .map(|matching_command| {
+                    picker.delegate.commands[matching_command.candidate_id]
+                        .name
+                        .to_string()
+                })
                 .collect::<Vec<_>>()
         });
         let (worst_match, second_worst_match, match_count) = picker.read_with(cx, |picker, _| {
             let matches = &picker.delegate.matches;
             (
-                matches[matches.len() - 1].string.to_string(),
-                matches[matches.len() - 2].string.to_string(),
+                picker.delegate.commands[matches[matches.len() - 1].candidate_id]
+                    .name
+                    .to_string(),
+                picker.delegate.commands[matches[matches.len() - 2].candidate_id]
+                    .name
+                    .to_string(),
                 matches.len(),
             )
         });
@@ -1274,7 +1336,11 @@ mod tests {
                 .delegate
                 .matches
                 .iter()
-                .map(|string_match| string_match.string.to_string())
+                .map(|string_match| {
+                    picker.delegate.commands[string_match.candidate_id]
+                        .name
+                        .to_string()
+                })
                 .collect::<Vec<_>>();
             assert_eq!(names[0], worst_match);
             assert_eq!(names[1], second_worst_match);
@@ -1298,7 +1364,11 @@ mod tests {
                     .delegate
                     .matches
                     .iter()
-                    .map(|matching_command| matching_command.string.to_string())
+                    .map(
+                        |matching_command| picker.delegate.commands[matching_command.candidate_id]
+                            .name
+                            .to_string()
+                    )
                     .collect::<Vec<_>>(),
                 unranked_names
             );
@@ -1338,7 +1408,11 @@ mod tests {
                     .delegate
                     .matches
                     .iter()
-                    .map(|matching_command| matching_command.string.to_string())
+                    .map(
+                        |matching_command| picker.delegate.commands[matching_command.candidate_id]
+                            .name
+                            .to_string()
+                    )
                     .collect::<Vec<_>>(),
                 expected
             );
@@ -1378,6 +1452,7 @@ mod tests {
                 .enumerate()
                 .map(|(index, (name, action))| Command {
                     name: SharedString::from(name),
+                    display_name: SharedString::from(name),
                     action,
                     usage: (index < 2).then_some(CommandUsage {
                         last_invoked: 0,
@@ -1486,7 +1561,10 @@ mod tests {
 
         cx.simulate_input("Editor::    Backspace");
         palette.read_with(cx, |palette, _| {
-            assert_eq!(palette.delegate.matches[0].string, "editor: backspace");
+            assert_eq!(
+                palette.delegate.matches[0].string,
+                "Редактор: удалить слева"
+            );
         });
     }
 

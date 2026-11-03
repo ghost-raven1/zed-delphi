@@ -192,9 +192,9 @@ impl BreakpointList {
     ) {
         self.strip_mode = Some(prop);
         let placeholder = match prop {
-            ActiveBreakpointStripMode::Log => "Set Log Message",
-            ActiveBreakpointStripMode::Condition => "Set Condition",
-            ActiveBreakpointStripMode::HitCondition => "Set Hit Condition",
+            ActiveBreakpointStripMode::Log => "Задать сообщение журнала",
+            ActiveBreakpointStripMode::Condition => "Задать условие",
+            ActiveBreakpointStripMode::HitCondition => "Задать условие срабатывания",
         };
         let mut is_exception_breakpoint = true;
         let active_value = self.selected_ix.and_then(|ix| {
@@ -580,21 +580,21 @@ impl BreakpointList {
         let focus_handle = self.focus_handle.clone();
 
         let remove_breakpoint_tooltip = selection_kind.map(|(kind, _)| match kind {
-            SelectedBreakpointKind::Source => "Remove breakpoint from a breakpoint list",
+            SelectedBreakpointKind::Source => "Удалить точку останова из списка",
             SelectedBreakpointKind::Exception => {
-                "Exception Breakpoints cannot be removed from the breakpoint list"
+                "Точки останова на исключениях нельзя удалить из списка"
             }
-            SelectedBreakpointKind::Data => "Remove data breakpoint from a breakpoint list",
+            SelectedBreakpointKind::Data => "Удалить точку останова по данным из списка",
         });
 
         let toggle_label = selection_kind.map(|(_, is_enabled)| {
             if is_enabled {
                 (
-                    "Disable Breakpoint",
-                    "Disable a breakpoint without removing it from the list",
+                    "Отключить точку останова",
+                    "Отключить точку останова, оставив её в списке",
                 )
             } else {
-                ("Enable Breakpoint", "Re-enable a breakpoint")
+                ("Включить точку останова", "Снова включить точку останова")
             }
         });
 
@@ -636,7 +636,7 @@ impl BreakpointList {
                             let focus_handle = focus_handle.clone();
                             move |_window, cx| {
                                 Tooltip::with_meta_in(
-                                    "Remove Breakpoint",
+                                    "Удалить точку останова",
                                     Some(&UnsetBreakpoint),
                                     tooltip,
                                     &focus_handle,
@@ -851,9 +851,9 @@ impl LineBreakpoint {
                 move |_window, cx| {
                     Tooltip::for_action_in(
                         if is_enabled {
-                            "Disable Breakpoint"
+                            "Отключить точку останова"
                         } else {
-                            "Enable Breakpoint"
+                            "Включить точку останова"
                         },
                         &ToggleEnableBreakpoint,
                         &focus_handle,
@@ -935,7 +935,7 @@ impl LineBreakpoint {
                         }))
                         .when_some(self.dir.as_ref(), |this, parent_dir| {
                             this.tooltip(Tooltip::text(format!(
-                                "Worktree parent path: {parent_dir}"
+                                "Родительская папка рабочего дерева: {parent_dir}"
                             )))
                         }),
                 )
@@ -1004,9 +1004,9 @@ impl DataBreakpoint {
                     move |_window, cx| {
                         Tooltip::for_action_in(
                             if is_enabled {
-                                "Disable Data Breakpoint"
+                                "Отключить точку останова по данным"
                             } else {
-                                "Enable Data Breakpoint"
+                                "Включить точку останова по данным"
                             },
                             &ToggleEnableBreakpoint,
                             &focus_handle,
@@ -1108,9 +1108,9 @@ impl ExceptionBreakpoint {
                     move |_window, cx| {
                         Tooltip::for_action_in(
                             if is_enabled {
-                                "Disable Exception Breakpoint"
+                                "Отключить остановку на исключении"
                             } else {
-                                "Enable Exception Breakpoint"
+                                "Включить остановку на исключении"
                             },
                             &ToggleEnableBreakpoint,
                             &focus_handle,
@@ -1424,9 +1424,9 @@ impl RenderOnce for BreakpointOptionsStrip {
                         .on_click(self.on_click_callback(ActiveBreakpointStripMode::Log))
                         .tooltip(|_window, cx|  {
                             Tooltip::with_meta(
-                                "Set Log Message",
+                                "Задать сообщение журнала",
                                 None,
-                                "Set log message to display (instead of stopping) when a breakpoint is hit.",
+                                "Задайте сообщение для вывода вместо остановки при достижении точки останова.",
                                 cx,
                             )
                         }),
@@ -1460,9 +1460,9 @@ impl RenderOnce for BreakpointOptionsStrip {
                             .on_click(self.on_click_callback(ActiveBreakpointStripMode::Condition))
                             .tooltip(|_window, cx|  {
                                 Tooltip::with_meta(
-                                    "Set Condition",
+                                    "Задать условие",
                                     None,
-                                    "Set condition to evaluate when a breakpoint is hit. Program execution will stop only when the condition is met.",
+                                    "Задайте условие для проверки при достижении точки останова. Программа остановится только при выполнении условия.",
                                     cx,
                                 )
                             }),
@@ -1495,9 +1495,9 @@ impl RenderOnce for BreakpointOptionsStrip {
                         .on_click(self.on_click_callback(ActiveBreakpointStripMode::HitCondition))
                         .tooltip(|_window, cx|  {
                             Tooltip::with_meta(
-                                "Set Hit Condition",
+                                "Задать условие срабатывания",
                                 None,
-                                "Set expression that controls how many hits of the breakpoint are ignored.",
+                                "Задайте выражение, определяющее количество пропускаемых срабатываний точки останова.",
                                 cx,
                             )
                         }),

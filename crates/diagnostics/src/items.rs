@@ -67,9 +67,9 @@ impl Render for DiagnosticIndicator {
                 .map_or(diagnostic.message.as_str(), |(first, _)| first);
             let diagnostics_already_active = self.any_active_diagnostics(cx);
             let tooltip = if !diagnostics_already_active {
-                "Expand Diagnostics"
+                "Развернуть диагностику"
             } else {
-                "Next Diagnostic"
+                "Следующая проблема"
             };
             Some(
                 Button::new("diagnostic_message", SharedString::new(message))
@@ -92,22 +92,16 @@ impl Render for DiagnosticIndicator {
         };
 
         let diagnostics_label = match (self.summary.error_count, self.summary.warning_count) {
-            (0, 0) => "Project diagnostics: no problems".to_string(),
+            (0, 0) => "Диагностика проекта: нет проблем".to_string(),
             (errors, warnings) => {
                 let mut parts = Vec::new();
                 if errors > 0 {
-                    parts.push(format!(
-                        "{errors} error{}",
-                        if errors == 1 { "" } else { "s" }
-                    ));
+                    parts.push(format!("ошибок: {errors}"));
                 }
                 if warnings > 0 {
-                    parts.push(format!(
-                        "{warnings} warning{}",
-                        if warnings == 1 { "" } else { "s" }
-                    ));
+                    parts.push(format!("предупреждений: {warnings}"));
                 }
-                format!("Project diagnostics: {}", parts.join(", "))
+                format!("Диагностика проекта: {}", parts.join(", "))
             }
         };
 
@@ -118,7 +112,7 @@ impl Render for DiagnosticIndicator {
                     .tab_index(0isize)
                     .aria_label(diagnostics_label)
                     .tooltip(move |_window, cx| {
-                        Tooltip::for_action("Project Diagnostics", &Deploy, cx)
+                        Tooltip::for_action("Диагностика проекта", &Deploy, cx)
                     })
                     .on_click(cx.listener(|this, _, window, cx| {
                         if let Some(workspace) = this.workspace.upgrade() {

@@ -1991,14 +1991,14 @@ impl<'a> ElicitationCard<'a> {
             (ElicitationStatus::Accepted, acp::ElicitationMode::Url(_))
         );
         let (status_label, status_icon, status_color) = match &self.elicitation.status {
-            ElicitationStatus::Pending { .. } => ("Waiting for input", IconName::Info, Color::Info),
+            ElicitationStatus::Pending { .. } => ("Ожидание ввода", IconName::Info, Color::Info),
             ElicitationStatus::Accepted if is_accepted_url => {
-                ("Waiting for completion", IconName::Info, Color::Info)
+                ("Ожидание завершения", IconName::Info, Color::Info)
             }
-            ElicitationStatus::Accepted => ("Submitted", IconName::Check, Color::Success),
-            ElicitationStatus::Declined => ("Declined", IconName::Close, Color::Muted),
-            ElicitationStatus::Canceled => ("Canceled", IconName::Circle, Color::Muted),
-            ElicitationStatus::Completed => ("Completed", IconName::Check, Color::Success),
+            ElicitationStatus::Accepted => ("Отправлено", IconName::Check, Color::Success),
+            ElicitationStatus::Declined => ("Отклонено", IconName::Close, Color::Muted),
+            ElicitationStatus::Canceled => ("Отменено", IconName::Circle, Color::Muted),
+            ElicitationStatus::Completed => ("Завершено", IconName::Check, Color::Success),
         };
 
         let body = v_flex()
@@ -2044,7 +2044,7 @@ impl<'a> ElicitationCard<'a> {
                                     .color(status_color),
                             )
                             .child(
-                                Label::new(format!("Input Requested by {}", self.requester_name))
+                                Label::new(format!("{} запрашивает ввод", self.requester_name))
                                     .size(LabelSize::Custom(tool_name_font_size))
                                     .truncate(),
                             ),
@@ -2334,7 +2334,7 @@ impl<'a> ElicitationCard<'a> {
                             h_flex()
                                 .gap_1()
                                 .child(
-                                    Label::new("Destination")
+                                    Label::new("Назначение")
                                         .size(LabelSize::Small)
                                         .color(Color::Muted),
                                 )
@@ -2400,11 +2400,11 @@ impl<'a> ElicitationCard<'a> {
             open_url.is_some() && matches!(self.elicitation.status, ElicitationStatus::Accepted);
         let is_submitting = self.form_state.is_some_and(|state| state.is_submitting);
         let (accept_label, accept_icon, accept_icon_color) = if is_accepted_url {
-            ("Open Again", IconName::ArrowUpRight, Color::Muted)
+            ("Открыть снова", IconName::ArrowUpRight, Color::Muted)
         } else if open_url.is_some() {
-            ("Open", IconName::ArrowUpRight, Color::Muted)
+            ("Открыть", IconName::ArrowUpRight, Color::Muted)
         } else {
-            ("Submit", IconName::Check, Color::Success)
+            ("Отправить", IconName::Check, Color::Success)
         };
         let border_color = cx.theme().colors().border.opacity(0.8);
         let on_submit = self.handlers.on_submit.clone();
@@ -2447,7 +2447,7 @@ impl<'a> ElicitationCard<'a> {
             )
             .when(!is_accepted_url, |this| {
                 this.child(
-                    Button::new(("elicitation-decline", self.entry_ix), "Decline")
+                    Button::new(("elicitation-decline", self.entry_ix), "Отклонить")
                         .tab_index(0_isize)
                         .start_icon(
                             Icon::new(IconName::Close)
@@ -2460,7 +2460,7 @@ impl<'a> ElicitationCard<'a> {
                         }),
                 )
                 .child(
-                    Button::new(("elicitation-cancel", self.entry_ix), "Cancel")
+                    Button::new(("elicitation-cancel", self.entry_ix), "Отмена")
                         .tab_index(0_isize)
                         .label_size(LabelSize::Small)
                         .on_click(move |_, window, cx| {
@@ -2470,7 +2470,7 @@ impl<'a> ElicitationCard<'a> {
             })
             .when(is_accepted_url, |this| {
                 this.child(
-                    Button::new(("elicitation-dismiss-url", self.entry_ix), "Cancel")
+                    Button::new(("elicitation-dismiss-url", self.entry_ix), "Отмена")
                         .tab_index(0_isize)
                         .label_size(LabelSize::Small)
                         .on_click(move |_, window, cx| {

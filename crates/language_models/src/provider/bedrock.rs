@@ -799,7 +799,7 @@ impl LanguageModelProvider for BedrockLanguageModelProvider {
                     .into()
             })
             .description(InlineDescription::Text(
-                "To use Zed's agent with Bedrock, set a custom authentication strategy in your settings or use static credentials. Mantle-only models (e.g. GPT-5.5, GPT-5.4, Grok 4.3) additionally require IAM permissions for the `bedrock-mantle` endpoint.".into(),
+                "Для работы агента Zed с Bedrock задайте способ аутентификации в настройках или используйте статические учётные данные. Модели только для Mantle (например, GPT-5.5, GPT-5.4, Grok 4.3) также требуют разрешений IAM для адреса `bedrock-mantle`.".into(),
             )),
         ))
     }
@@ -2768,28 +2768,28 @@ impl ConfigurationView {
 
         let access_key_id_editor = cx.new(|cx| {
             InputField::new(window, cx, Self::PLACEHOLDER_ACCESS_KEY_ID_TEXT)
-                .label("Access Key ID")
+                .label("Идентификатор ключа доступа")
                 .tab_index(0)
                 .tab_stop(true)
         });
 
         let secret_access_key_editor = cx.new(|cx| {
             InputField::new(window, cx, Self::PLACEHOLDER_SECRET_ACCESS_KEY_TEXT)
-                .label("Secret Access Key")
+                .label("Секретный ключ доступа")
                 .tab_index(1)
                 .tab_stop(true)
         });
 
         let session_token_editor = cx.new(|cx| {
             InputField::new(window, cx, Self::PLACEHOLDER_SESSION_TOKEN_TEXT)
-                .label("Session Token (Optional)")
+                .label("Токен сеанса (необязательно)")
                 .tab_index(2)
                 .tab_stop(true)
         });
 
         let bearer_token_editor = cx.new(|cx| {
             InputField::new(window, cx, Self::PLACEHOLDER_BEARER_TOKEN_TEXT)
-                .label("Bedrock API Key")
+                .label("Ключ API Bedrock")
                 .tab_index(3)
                 .tab_stop(true)
         });
@@ -2919,34 +2919,36 @@ impl Render for ConfigurationView {
             .and_then(|s| s.authentication_method.clone());
 
         if self.load_credentials_task.is_some() {
-            return div().child(Label::new("Loading credentials...")).into_any();
+            return div()
+                .child(Label::new("Загрузка учётных данных…"))
+                .into_any();
         }
 
         let configured_label = match &auth {
             Some(BedrockAuth::Automatic) => {
-                "Using automatic credentials (AWS default chain)".into()
+                "Автоматические учётные данные (стандартная цепочка AWS)".into()
             }
             Some(BedrockAuth::NamedProfile { profile_name }) => {
-                format!("Using AWS profile: {profile_name}")
+                format!("Используется профиль AWS: {profile_name}")
             }
             Some(BedrockAuth::SingleSignOn { profile_name }) => {
-                format!("Using AWS SSO profile: {profile_name}")
+                format!("Используется профиль AWS SSO: {profile_name}")
             }
             Some(BedrockAuth::IamCredentials { .. }) if env_var_set => {
                 format!(
-                    "Using IAM credentials from {} and {} environment variables",
+                    "Учётные данные IAM из переменных окружения {} и {}",
                     ZED_BEDROCK_ACCESS_KEY_ID_VAR.name, ZED_BEDROCK_SECRET_ACCESS_KEY_VAR.name
                 )
             }
-            Some(BedrockAuth::IamCredentials { .. }) => "Using IAM credentials".into(),
+            Some(BedrockAuth::IamCredentials { .. }) => "Используются учётные данные IAM".into(),
             Some(BedrockAuth::ApiKey { .. }) if env_var_set => {
                 format!(
-                    "Using Bedrock API Key from {} environment variable",
+                    "Ключ API Bedrock из переменной окружения {}",
                     ZED_BEDROCK_BEARER_TOKEN_VAR.name
                 )
             }
-            Some(BedrockAuth::ApiKey { .. }) => "Using Bedrock API Key".into(),
-            None => "Not authenticated".into(),
+            Some(BedrockAuth::ApiKey { .. }) => "Используется ключ API Bedrock".into(),
+            None => "Вход не выполнен".into(),
         };
 
         // Determine if credentials can be reset
@@ -2960,7 +2962,7 @@ impl Render for ConfigurationView {
 
         let tooltip_label = if env_var_set {
             Some(format!(
-                "To reset your credentials, unset the {}, {}, and {} or {} environment variables.",
+                "Чтобы сбросить учётные данные, удалите переменные окружения {}, {}, {} либо {}.",
                 ZED_BEDROCK_ACCESS_KEY_ID_VAR.name,
                 ZED_BEDROCK_SECRET_ACCESS_KEY_VAR.name,
                 ZED_BEDROCK_SESSION_TOKEN_VAR.name,
@@ -2968,7 +2970,7 @@ impl Render for ConfigurationView {
             ))
         } else if is_settings_derived {
             Some(
-                "Authentication method is configured in settings. Edit settings.json to change."
+                "Способ аутентификации задан в настройках. Измените его в settings.json."
                     .to_string(),
             )
         } else {
@@ -2996,12 +2998,12 @@ impl Render for ConfigurationView {
             .child(Headline::new("Amazon Bedrock").size(HeadlineSize::Small))
             .child(
                 Label::new(
-                    "To use Zed's agent with Bedrock, you can set a custom authentication strategy through your settings file or use static credentials.",
+                    "Для работы агента Zed с Bedrock задайте способ аутентификации в файле настроек или используйте статические учётные данные.",
                 )
                 .color(Color::Muted),
             )
             .child(
-                Label::new("But first, to access models on AWS, you need to:")
+                Label::new("Для доступа к моделям AWS необходимо:")
                     .mt_1()
                     .color(Color::Muted),
             )
@@ -3011,23 +3013,23 @@ impl Render for ConfigurationView {
                         ListBulletItem::new("")
                             .child(
                                 Label::new(
-                                    "Grant permissions to the strategy you'll use according to the:",
+                                    "Выдайте выбранному способу аутентификации разрешения согласно разделу:",
                                 )
                                 .color(Color::Muted),
                             )
                             .child(ButtonLink::new(
-                                "Prerequisites",
+                                "Предварительные требования",
                                 "https://docs.aws.amazon.com/bedrock/latest/userguide/inference-prereq.html",
                             )),
                     )
                     .child(
                         ListBulletItem::new("")
                             .child(
-                                Label::new("Select the models you would like access to:")
+                                Label::new("Выберите модели, к которым нужен доступ:")
                                     .color(Color::Muted),
                             )
                             .child(ButtonLink::new(
-                                "Bedrock Model Catalog",
+                                "Каталог моделей Bedrock",
                                 "https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/model-catalog",
                             )),
                     ),
@@ -3044,40 +3046,40 @@ impl ConfigurationView {
                 ListBulletItem::new("")
                     .child(
                         Label::new(
-                            "For access keys: Create an IAM user in the AWS console with programmatic access",
+                            "Для ключей доступа создайте пользователя IAM с программным доступом в консоли AWS",
                         )
                         .color(Color::Muted),
                     )
                     .child(ButtonLink::new(
-                        "IAM Console",
+                        "Консоль IAM",
                         "https://us-east-1.console.aws.amazon.com/iam/home?region=us-east-1#/users",
                     )),
             )
             .child(
                 ListBulletItem::new("")
                     .child(
-                        Label::new("For Bedrock API Keys: Generate an API key from the")
+                        Label::new("Создайте ключ API Bedrock в")
                             .color(Color::Muted),
                     )
                     .child(ButtonLink::new(
-                        "Bedrock Console",
+                        "Консоль Bedrock",
                         "https://docs.aws.amazon.com/bedrock/latest/userguide/api-keys-use.html",
                     )),
             )
             .child(
                 ListBulletItem::new("")
                     .child(
-                        Label::new("Attach the necessary Bedrock permissions to")
+                        Label::new("Назначьте необходимые разрешения Bedrock")
                             .color(Color::Muted),
                     )
                     .child(ButtonLink::new(
-                        "this user",
+                        "этому пользователю",
                         "https://docs.aws.amazon.com/bedrock/latest/userguide/inference-prereq.html",
                     )),
             )
             .child(
                 ListBulletItem::new(
-                    "Enter either access keys OR a Bedrock API Key below (not both)",
+                    "Введите ниже либо ключи доступа, либо ключ API Bedrock",
                 )
                 .label_color(Color::Muted),
             );
@@ -3087,10 +3089,10 @@ impl ConfigurationView {
             .tab_group()
             .gap_1p5()
             .child(Divider::horizontal())
-            .child(Label::new("Static Credentials").mt_2())
+            .child(Label::new("Статические учётные данные").mt_2())
             .child(
                 Label::new(
-                    "This method uses your AWS access key ID and secret access key, or a Bedrock API Key.",
+                    "Этот способ использует идентификатор и секретный ключ доступа AWS либо ключ API Bedrock.",
                 )
                 .color(Color::Muted),
             )
@@ -3104,7 +3106,7 @@ impl ConfigurationView {
             )
             .child(
                 Label::new(format!(
-                    "You can also set the {}, {} and {} environment variables (or {} for Bedrock API Key authentication) and restart Zed.",
+                    "Также можно задать переменные окружения {}, {} и {} (либо {} для ключа API Bedrock) и перезапустить Zed.",
                     ZED_BEDROCK_ACCESS_KEY_ID_VAR.name,
                     ZED_BEDROCK_SECRET_ACCESS_KEY_VAR.name,
                     ZED_BEDROCK_REGION_VAR.name,
@@ -3115,7 +3117,7 @@ impl ConfigurationView {
             )
             .child(
                 Label::new(format!(
-                    "Optionally, if your environment uses AWS CLI profiles, you can set {}; if it requires a custom endpoint, you can set {}; and if it requires a Session Token, you can set {}.",
+                    "Для профиля AWS CLI задайте {}; для собственного адреса сервера — {}; для токена сеанса — {}.",
                     ZED_AWS_PROFILE_VAR.name,
                     ZED_AWS_ENDPOINT_VAR.name,
                     ZED_BEDROCK_SESSION_TOKEN_VAR.name
@@ -3126,11 +3128,11 @@ impl ConfigurationView {
                 .mb_2p5(),
             )
             .child(Divider::horizontal())
-            .child(Label::new("Using the API key").mt_2().mb_1())
+            .child(Label::new("Использование ключа API").mt_2().mb_1())
             .child(self.bearer_token_editor.clone())
             .child(
                 Label::new(format!(
-                    "Region is configured via {} environment variable or settings.json (defaults to us-east-1).",
+                    "Регион задаётся переменной окружения {} или в settings.json (по умолчанию us-east-1).",
                     ZED_BEDROCK_REGION_VAR.name
                 ))
                 .size(LabelSize::Small)

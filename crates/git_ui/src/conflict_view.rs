@@ -384,7 +384,7 @@ fn render_conflict_buttons(
                 }),
         )
         .child(
-            Button::new("both", "Use Both")
+            Button::new("both", "Использовать оба варианта")
                 .label_size(LabelSize::Small)
                 .on_click({
                     let editor = editor.clone();
@@ -405,7 +405,7 @@ fn render_conflict_buttons(
         )
         .when(is_ai_enabled, |this| {
             this.child(Divider::vertical()).child(
-                Button::new("resolve-with-agent", "Resolve with Agent")
+                Button::new("resolve-with-agent", "Разрешить с помощью агента")
                     .label_size(LabelSize::Small)
                     .start_icon(
                         Icon::new(IconName::ZedAssistant)
@@ -626,22 +626,8 @@ impl Render for MergeConflictIndicator {
 
         let file_count = self.conflicted_paths.len();
 
-        let message: SharedString = format!(
-            "Resolve Merge Conflict{} with Agent",
-            if file_count == 1 { "" } else { "s" }
-        )
-        .into();
-
-        let tooltip_label: SharedString = format!(
-            "Found {} {} across the codebase",
-            file_count,
-            if file_count == 1 {
-                "conflict"
-            } else {
-                "conflicts"
-            }
-        )
-        .into();
+        let message: SharedString = "Разрешить конфликты с помощью агента".into();
+        let tooltip_label: SharedString = format!("Найдено конфликтов: {file_count}").into();
 
         let border_color = cx.theme().colors().text_accent.opacity(0.2);
 
@@ -669,7 +655,7 @@ impl Render for MergeConflictIndicator {
                         Tooltip::with_meta(
                             tooltip_label.clone(),
                             None,
-                            "Click to Resolve with Agent",
+                            "Нажмите, чтобы разрешить с помощью агента",
                             cx,
                         )
                     })

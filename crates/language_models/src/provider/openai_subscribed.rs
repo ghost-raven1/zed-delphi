@@ -17,7 +17,7 @@ use std::sync::Arc;
 use ui::{ConfiguredApiCard, prelude::*};
 
 const SUBSCRIPTION_DESCRIPTION: &str =
-    "Sign in with your ChatGPT Plus or Pro subscription to use OpenAI models in Zed's agent.";
+    "Войдите с подпиской ChatGPT Plus или Pro, чтобы использовать модели OpenAI в агенте Zed.";
 
 pub struct OpenAiSubscribedProvider {
     state: Entity<State>,
@@ -135,7 +135,7 @@ impl LanguageModelProvider for OpenAiSubscribedProvider {
         let title = if is_authenticated {
             None
         } else {
-            Some("Configure ChatGPT".into())
+            Some("Настроить ChatGPT".into())
         };
         let description = if is_authenticated {
             None
@@ -175,10 +175,8 @@ impl LanguageModelProvider for OpenAiSubscribedProvider {
 
     fn fast_mode_confirmation(&self, _cx: &App) -> Option<FastModeConfirmation> {
         Some(FastModeConfirmation {
-            title: "Enable Fast Mode for OpenAI?".into(),
-            message: "Fast mode sends requests using OpenAI's Priority processing tier, which \
-                targets significantly lower latency than the standard tier and is billed at a \
-                premium per-token rate."
+            title: "Включить быстрый режим OpenAI?".into(),
+            message: "Быстрый режим использует приоритетную обработку OpenAI с меньшей задержкой и повышенной стоимостью за токен."
                 .into(),
         })
     }
@@ -229,8 +227,8 @@ impl Render for ConfigurationView {
         if state.is_authenticated() {
             let label = state
                 .email()
-                .map(|e| format!("Signed in as {e}"))
-                .unwrap_or_else(|| "Signed in".to_string());
+                .map(|e| format!("Вы вошли как {e}"))
+                .unwrap_or_else(|| "Вход выполнен".to_string());
             let model_catalog_error = state.model_catalog_error();
 
             let state_entity = self.state.clone();
@@ -239,7 +237,7 @@ impl Render for ConfigurationView {
                 .gap_2()
                 .child(
                     ConfiguredApiCard::new("openai-subscribed-sign-out", SharedString::from(label))
-                        .button_label("Sign Out")
+                        .button_label("Выйти")
                         .on_click(cx.listener(move |_this, _, _window, cx| {
                             state_entity
                                 .update(cx, |state, cx| state.sign_out(cx))
@@ -269,9 +267,9 @@ impl Render for ConfigurationView {
         let is_signing_in = state.is_signing_in();
         let is_sign_in_cancellable = state.is_sign_in_cancellable();
         let button_label = if is_signing_in {
-            "Signing in…"
+            "Вход…"
         } else {
-            "Sign In"
+            "Войти"
         };
 
         v_flex()
@@ -295,7 +293,7 @@ impl Render for ConfigurationView {
                     )
                     .when(is_sign_in_cancellable, |this| {
                         this.child(
-                            Button::new("cancel-sign-in", "Cancel")
+                            Button::new("cancel-sign-in", "Отмена")
                                 .style(ButtonStyle::Subtle)
                                 .size(ButtonSize::Medium)
                                 .on_click(move |_, _window, cx| {

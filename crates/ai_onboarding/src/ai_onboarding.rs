@@ -148,7 +148,7 @@ impl ZedAiOnboarding {
                 .child(
                     IconButton::new("dismiss_onboarding", IconName::Close)
                         .icon_size(IconSize::Small)
-                        .tooltip(Tooltip::text("Dismiss"))
+                        .tooltip(Tooltip::text("Закрыть"))
                         .on_click(move |_, window, cx| {
                             telemetry::event!("Banner Dismissed", source = "AI Onboarding",);
                             callback(window, cx)
@@ -165,15 +165,15 @@ impl ZedAiOnboarding {
             .w_full()
             .relative()
             .gap_1()
-            .child(Headline::new("Welcome to Zed AI"))
+            .child(Headline::new("Добро пожаловать в Zed AI"))
             .child(
-                Label::new("Sign in to try GPT Luna. Your 14 days begin when you start the trial.")
+                Label::new("Войдите, чтобы попробовать GPT Luna. Отсчёт 14 дней начнётся при запуске пробного периода.")
                     .color(Color::Muted)
                     .mb_2(),
             )
             .child(PlanDefinitions.sign_in_upsell())
             .child(
-                Button::new("sign_in", "Sign In to Try GPT Luna")
+                Button::new("sign_in", "Войти и попробовать GPT Luna")
                     .disabled(signing_in)
                     .full_width()
                     .style(ButtonStyle::Tinted(ui::TintColor::Accent))
@@ -195,7 +195,7 @@ impl ZedAiOnboarding {
                 .relative()
                 .min_w_0()
                 .gap_1()
-                .child(Headline::new("Welcome to Zed AI"))
+                .child(Headline::new("Добро пожаловать в Zed AI"))
                 .child(YoungAccountBanner)
                 .child(
                     v_flex()
@@ -214,7 +214,7 @@ impl ZedAiOnboarding {
                         )
                         .child(PlanDefinitions.pro_plan())
                         .child(
-                            Button::new("pro", "Get Started")
+                            Button::new("pro", "Начать")
                                 .full_width()
                                 .style(ButtonStyle::Tinted(ui::TintColor::Accent))
                                 .on_click(move |_, _window, cx| {
@@ -232,7 +232,7 @@ impl ZedAiOnboarding {
                 .w_full()
                 .relative()
                 .gap_1()
-                .child(Headline::new("Welcome to Zed AI"))
+                .child(Headline::new("Добро пожаловать в Zed AI"))
                 .child(
                     v_flex()
                         .mt_2()
@@ -241,13 +241,13 @@ impl ZedAiOnboarding {
                             h_flex()
                                 .gap_2()
                                 .child(
-                                    Label::new("Free")
+                                    Label::new("Бесплатный")
                                         .size(LabelSize::Small)
                                         .color(Color::Muted)
                                         .buffer_font(cx),
                                 )
                                 .child(
-                                    Label::new("(Current Plan)")
+                                    Label::new("Текущий тариф")
                                         .size(LabelSize::Small)
                                         .color(Color::Custom(
                                             cx.theme().colors().text_muted.opacity(0.6),
@@ -267,7 +267,7 @@ impl ZedAiOnboarding {
                             h_flex()
                                 .gap_2()
                                 .child(
-                                    Label::new("Pro Trial")
+                                    Label::new("Пробный Pro")
                                         .size(LabelSize::Small)
                                         .color(Color::Accent)
                                         .buffer_font(cx),
@@ -276,7 +276,7 @@ impl ZedAiOnboarding {
                         )
                         .child(PlanDefinitions.pro_trial(true))
                         .child(
-                            Button::new("pro", "Start Free Trial")
+                            Button::new("pro", "Начать бесплатный пробный период")
                                 .full_width()
                                 .style(ButtonStyle::Tinted(ui::TintColor::Accent))
                                 .on_click(move |_, _window, cx| {
@@ -298,9 +298,9 @@ impl ZedAiOnboarding {
             .relative()
             .gap_1()
             .child(Self::pro_trial_stamp(cx))
-            .child(Headline::new("Welcome to the Zed Pro Trial"))
+            .child(Headline::new("Добро пожаловать в пробную версию Zed Pro"))
             .child(
-                Label::new("Included for 14 days from when your trial started:")
+                Label::new("Доступно в течение 14 дней с начала пробного периода:")
                     .color(Color::Muted)
                     .mb_2(),
             )
@@ -315,12 +315,8 @@ impl ZedAiOnboarding {
             .relative()
             .gap_1()
             .child(Self::certified_user_stamp(cx))
-            .child(Headline::new("Welcome to Zed Pro"))
-            .child(
-                Label::new("Here's what you get:")
-                    .color(Color::Muted)
-                    .mb_2(),
-            )
+            .child(Headline::new("Добро пожаловать в Zed Pro"))
+            .child(Label::new("Вам доступно:").color(Color::Muted).mb_2())
             .child(PlanDefinitions.pro_plan())
             .children(self.render_dismiss_button())
             .into_any_element()
@@ -332,12 +328,8 @@ impl ZedAiOnboarding {
             .relative()
             .gap_1()
             .child(Self::business_stamp(cx))
-            .child(Headline::new("Welcome to Zed Business"))
-            .child(
-                Label::new("Here's what you get:")
-                    .color(Color::Muted)
-                    .mb_2(),
-            )
+            .child(Headline::new("Добро пожаловать в Zed Business"))
+            .child(Label::new("Вам доступно:").color(Color::Muted).mb_2())
             .child(PlanDefinitions.business_plan())
             .children(self.render_dismiss_button())
             .into_any_element()
@@ -349,12 +341,8 @@ impl ZedAiOnboarding {
             .relative()
             .gap_1()
             .child(Self::vip_stamp(cx))
-            .child(Headline::new("Welcome to Zed VIP"))
-            .child(
-                Label::new("Here's what you get:")
-                    .color(Color::Muted)
-                    .mb_2(),
-            )
+            .child(Headline::new("Добро пожаловать в Zed VIP"))
+            .child(Label::new("Вам доступно:").color(Color::Muted).mb_2())
             .child(PlanDefinitions.vip_plan())
             .children(self.render_dismiss_button())
             .into_any_element()
@@ -366,12 +354,8 @@ impl ZedAiOnboarding {
             .relative()
             .gap_1()
             .child(Self::student_stamp(cx))
-            .child(Headline::new("Welcome to Zed Student"))
-            .child(
-                Label::new("Here's what you get:")
-                    .color(Color::Muted)
-                    .mb_2(),
-            )
+            .child(Headline::new("Добро пожаловать в Zed Student"))
+            .child(Label::new("Вам доступно:").color(Color::Muted).mb_2())
             .child(PlanDefinitions.student_plan())
             .children(self.render_dismiss_button())
             .into_any_element()
@@ -454,7 +438,7 @@ impl Component for ZedAiOnboarding {
                     onboarding(SignInStatus::SignedIn, Some(Plan::ZedFree), false),
                 ),
                 single_example(
-                    "Pro Trial",
+                    "Пробный Pro",
                     onboarding(SignInStatus::SignedIn, Some(Plan::ZedProTrial), false),
                 ),
                 single_example(

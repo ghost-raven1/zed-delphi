@@ -247,58 +247,55 @@ pub fn deploy_context_menu(
             let builder = menu
                 .on_blur_subscription(Subscription::new(|| {}))
                 .when(run_to_cursor, |builder| {
-                    builder.action("Run to Cursor", Box::new(RunToCursor))
+                    builder.action("Выполнить до курсора", Box::new(RunToCursor))
                 })
                 .when(evaluate_selection && has_selections, |builder| {
-                    builder.action("Evaluate Selection", Box::new(EvaluateSelectedText))
+                    builder.action("Вычислить выделенное", Box::new(EvaluateSelectedText))
                 })
                 .when(
                     run_to_cursor || (evaluate_selection && has_selections),
                     |builder| builder.separator(),
                 )
-                .action("Go to Definition", Box::new(GoToDefinition::default()))
-                .action("Go to Declaration", Box::new(GoToDeclaration::default()))
+                .action("Перейти к определению", Box::new(GoToDefinition::default()))
+                .action("Перейти к объявлению", Box::new(GoToDeclaration::default()))
                 .action(
-                    "Go to Type Definition",
+                    "Перейти к определению типа",
                     Box::new(GoToTypeDefinition::default()),
                 )
                 .action(
-                    "Go to Implementation",
+                    "Перейти к реализации",
                     Box::new(GoToImplementation::default()),
                 )
+                .action("Найти все ссылки", Box::new(FindAllReferences::default()))
                 .action(
-                    "Find All References",
-                    Box::new(FindAllReferences::default()),
-                )
-                .action(
-                    "Show Incoming Calls",
+                    "Показать входящие вызовы",
                     Box::new(zed_actions::ShowIncomingCalls),
                 )
                 .action(
-                    "Show Outgoing Calls",
+                    "Показать исходящие вызовы",
                     Box::new(zed_actions::ShowOutgoingCalls),
                 )
                 .separator()
-                .action("Rename Symbol", Box::new(Rename))
-                .action("Format Buffer", Box::new(Format))
+                .action("Переименовать символ", Box::new(Rename))
+                .action("Форматировать документ", Box::new(Format))
                 .when(format_selections, |cx| {
-                    cx.action("Format Selections", Box::new(FormatSelections))
+                    cx.action("Форматировать выделенное", Box::new(FormatSelections))
                 })
                 .action(
-                    "Show Code Actions",
+                    "Показать действия с кодом",
                     Box::new(ToggleCodeActions {
                         deployed_from: None,
                         quick_launch: false,
                     }),
                 )
                 .when(!disable_ai && has_selections, |this| {
-                    this.action("Add to Agent Thread", Box::new(AddSelectionToThread))
+                    this.action("Добавить в чат агента", Box::new(AddSelectionToThread))
                 })
                 .separator()
-                .action("Cut", Box::new(Cut))
-                .action("Copy", Box::new(Copy))
-                .action("Copy and Trim", Box::new(CopyAndTrim))
-                .action("Paste", Box::new(Paste))
+                .action("Вырезать", Box::new(Cut))
+                .action("Копировать", Box::new(Copy))
+                .action("Копировать без крайних пробелов", Box::new(CopyAndTrim))
+                .action("Вставить", Box::new(Paste))
                 .separator()
                 .action_disabled_when(
                     !has_reveal_target,
@@ -306,24 +303,27 @@ pub fn deploy_context_menu(
                     Box::new(RevealInFileManager),
                 )
                 .when(is_markdown, |builder| {
-                    builder.action("Open Markdown Preview", Box::new(OpenMarkdownPreview))
+                    builder.action(
+                        "Открыть предпросмотр Markdown",
+                        Box::new(OpenMarkdownPreview),
+                    )
                 })
                 .when(is_svg, |builder| {
-                    builder.action("Open SVG Preview", Box::new(OpenSvgPreview))
+                    builder.action("Открыть предпросмотр SVG", Box::new(OpenSvgPreview))
                 })
                 .action_disabled_when(
                     !has_reveal_target,
-                    "Open in Terminal",
+                    "Открыть в терминале",
                     Box::new(OpenInTerminal),
                 )
                 .action_disabled_when(
                     !has_git_repo,
-                    "Copy Permalink to Line",
+                    "Копировать постоянную ссылку на строку",
                     Box::new(CopyPermalinkToLine),
                 )
                 .action_disabled_when(
                     !has_git_repo,
-                    "View File History",
+                    "Показать историю файла",
                     Box::new(git::FileHistory),
                 );
             match focus {
