@@ -87,6 +87,7 @@ jobs:
         if: inputs.link_editor
         run: ./script/generate-licenses 2>&1 | tee verification/licenses.log
       - name: Link native editor
+        id: editor
         if: inputs.link_editor
         run: cargo build --locked --release -p zed --bin zed 2>&1 | tee verification/zed-build.log
       - name: Package native executable with provenance
@@ -148,8 +149,10 @@ jobs:
           $compiler = Get-ChildItem $prefix -Recurse -File | Where-Object Name -Match '^pp(cross)?x64\.exe$' | Select-Object -First 1
           if (-not $compiler) { throw 'Installed x86_64 FPC compiler not found' }
           "FPC_SMOKE=$($compiler.FullName)" >> $env:GITHUB_ENV
-          & $compiler.FullName -iTP | Tee-Object verification/fpc-target.txt
+          $target = & $compiler.FullName -iTP
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $target | Set-Content verification/fpc-target.txt
+          if ($target.Trim() -ne 'x86_64') { throw "Expected x86_64 FPC, got $target" }
           $archive = Join-Path $env:RUNNER_TEMP 'codelldb.zip'
           Invoke-WebRequest 'https://github.com/vadimcn/codelldb/releases/download/v1.12.3/codelldb-win32-x64.vsix' -OutFile $archive
           if ((Get-FileHash $archive -Algorithm SHA256).Hash.ToLowerInvariant() -ne 'a916e509308dac817732f63ca604a8b93ed29cd16f38a2fa9f0b64ed58e8f51a') { throw 'CodeLLDB checksum mismatch' }
@@ -159,11 +162,13 @@ jobs:
       - name: Test build and remote transport helpers
         run: python -m unittest discover -s script/delphi/tests -v 2>&1 | tee verification/python-tests.log
       - name: Verify FPC and real LLDB DAP on macOS
+        id: macos_debug
         if: runner.os == 'macOS'
         run: |
           python script/delphi/tests/smoke_lldb.py --fpc "$(command -v fpc)" --lldb-dap "$(xcrun --find lldb-dap)" 2>&1 | tee verification/fpc-dap.log
           python script/delphi/tests/smoke_lldb.py --multi-unit --fpc "$(command -v fpc)" --lldb-dap "$(xcrun --find lldb-dap)" 2>&1 | tee verification/fpc-multi-unit-dap.log
       - name: Verify x86_64 FPC and real CodeLLDB on Windows
+        id: windows_debug
         if: runner.os == 'Windows'
         run: |
           python script/delphi/tests/smoke_lldb.py --fpc "$FPC_SMOKE" --lldb-dap "$CODELLDB_SMOKE" 2>&1 | tee verification/fpc-dap.log
@@ -174,12 +179,30 @@ jobs:
       - name: Check remote server
         run: cargo check --locked --release -p remote_server 2>&1 | tee verification/remote-server-check.log
       - name: Test Delphi grammar and inert telemetry
+        id: rust_tests
         run: |
           cargo test --locked --release -p grammars --features load-grammars --test delphi 2>&1 | tee verification/grammar-tests.log
           cargo test --locked --release -p telemetry --lib 2>&1 | tee verification/telemetry-tests.log
           cargo test --locked --release -p client --lib telemetry::tests 2>&1 | tee verification/client-privacy-tests.log
           cargo test --locked --release -p languages --features test-support --lib delphi::tests 2>&1 | tee verification/lsp-adapter-tests.log
           cargo test --locked --release -p dap_adapters --lib delphi::tests 2>&1 | tee verification/dap-tests.log
+      - name: Record acceptance scope
+        if: always()
+        env:
+          EDITOR_RESULT: ${{ steps.editor.outcome }}
+          MACOS_DEBUG_RESULT: ${{ steps.macos_debug.outcome }}
+          WINDOWS_DEBUG_RESULT: ${{ steps.windows_debug.outcome }}
+          RUST_TEST_RESULT: ${{ steps.rust_tests.outcome }}
+        run: |
+          python - <<'PYTHON'
+          import os, pathlib
+          text = '\n'.join(f'{key}: {os.environ[key]}' for key in (
+              'EDITOR_RESULT', 'MACOS_DEBUG_RESULT', 'WINDOWS_DEBUG_RESULT', 'RUST_TEST_RESULT'))
+          text += '\nGUI acceptance: not performed\nLicensed Embarcadero toolchain: not tested\n'
+          pathlib.Path('verification/acceptance.txt').write_text(text)
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
+              summary.write('```text\n' + text + '```\n')
+          PYTHON
       - name: Save validation logs
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a

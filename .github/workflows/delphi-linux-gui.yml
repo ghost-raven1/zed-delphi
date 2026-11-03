@@ -1,0 +1,61 @@
+name: Delphi Linux x86_64 GUI acceptance
+
+on:
+  workflow_dispatch:
+    inputs:
+      artifact_run_id:
+        description: Run ID of Delphi Linux x86_64 bundle containing the archive to test
+        required: true
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  gui:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+      - name: Download the exact existing build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BUILD_RUN_ID: ${{ inputs.artifact_run_id }}
+        run: |
+          [[ "$BUILD_RUN_ID" =~ ^[0-9]+$ ]]
+          mkdir -p verification "$RUNNER_TEMP/package" "$RUNNER_TEMP/application"
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$BUILD_RUN_ID" > verification/build-run.json
+          gh run download "$BUILD_RUN_ID" --repo "$GITHUB_REPOSITORY" --name zed-delphi-ubuntu24.04-x86_64 --dir "$RUNNER_TEMP/package"
+          (cd "$RUNNER_TEMP/package" && sha256sum -c SHA256SUMS) | tee verification/package-checksums.log
+          cp "$RUNNER_TEMP/package/commit.txt" verification/binary-source-commit.txt
+          printf '%s\n' "$GITHUB_SHA" > verification/gui-test-source-commit.txt
+          sha256sum "$RUNNER_TEMP/package/zed-linux-x86_64.tar.gz" > verification/tested-bundle-sha256.txt
+          tar -xzf "$RUNNER_TEMP/package/zed-linux-x86_64.tar.gz" -C "$RUNNER_TEMP/application"
+      - name: Install runtime, FPC and UI test tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends fp-compiler libasound2t64 libglib2.0-0t64 libvulkan1 libfontconfig1 xvfb xauth xdotool imagemagick dbus-x11 mesa-vulkan-drivers tesseract-ocr
+          curl --fail --location --retry 3 https://github.com/vadimcn/codelldb/releases/download/v1.12.3/codelldb-linux-x64.vsix -o "$RUNNER_TEMP/codelldb.vsix"
+          sha256sum "$RUNNER_TEMP/codelldb.vsix" > verification/codelldb-sha256.txt
+          unzip -q "$RUNNER_TEMP/codelldb.vsix" -d "$RUNNER_TEMP/codelldb"
+      - name: Build and debug through the packaged IDE
+        run: |
+          binary=$(find "$RUNNER_TEMP/application" -path '*/bin/zed' -type f -print -quit)
+          test -n "$binary"
+          xvfb-run -a -s '-screen 0 1440x1000x24' python3 -u script/delphi/linux/gui_smoke.py \
+            --zed "$binary" \
+            --codelldb "$RUNNER_TEMP/codelldb/extension/adapter/codelldb" \
+            --fixture script/delphi/examples/multi_unit \
+            --output "$GITHUB_WORKSPACE/verification/gui" 2>&1 | tee verification/gui-test.log
+      - name: Save screenshots, assertions and provenance
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: delphi-linux-x86_64-gui-${{ inputs.artifact_run_id }}
+          path: verification/
+          retention-days: 30
